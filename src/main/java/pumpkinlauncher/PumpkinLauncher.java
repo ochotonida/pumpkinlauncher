@@ -13,7 +13,7 @@ import pumpkinlauncher.proxy.CommonProxy;
 public class PumpkinLauncher {
 
     public static final String MODID = "pumpkinlauncher";
-    public static final String MODNAME = "Jack 'O Launcher";
+    public static final String MODNAME = "Jack-O'-Launcher";
     public static final String MODVERSION = "1.12.2-0.0.0";
 
     @SidedProxy(serverSide = "pumpkinlauncher.proxy.CommonProxy", clientSide = "pumpkinlauncher.proxy.ClientProxy")
