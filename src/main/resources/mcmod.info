@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "pumpkinlauncher",
+    "name": "Jack 'O Launcher",
+    "description": "",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": ["ochotonida"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
