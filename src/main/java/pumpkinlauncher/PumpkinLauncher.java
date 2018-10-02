@@ -8,6 +8,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import pumpkinlauncher.proxy.CommonProxy;
 
@@ -22,8 +23,16 @@ public class PumpkinLauncher {
 
     public static final CreativeTabs CREATIVE_TAB = new ModTab();
 
+    @Mod.Instance
+    public static PumpkinLauncher instance;
+
     @SidedProxy(serverSide = "pumpkinlauncher.proxy.CommonProxy", clientSide = "pumpkinlauncher.proxy.ClientProxy")
     public static CommonProxy proxy;
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        proxy.preInit(event);
+    }
 
     @net.minecraftforge.fml.common.Mod.EventBusSubscriber
     public static class RegistrationHandler {

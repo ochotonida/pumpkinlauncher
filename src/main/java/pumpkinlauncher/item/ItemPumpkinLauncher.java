@@ -14,6 +14,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import pumpkinlauncher.PumpkinLauncher;
+import pumpkinlauncher.entity.EntityPumkinProjectile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -42,10 +43,11 @@ public class ItemPumpkinLauncher extends Item {
 
         if (!world.isRemote)
         {
-            EntityFallingBlock projectile = new EntityFallingBlock(world, playerIn.posX, playerIn.posY + 3, playerIn.posZ, Blocks.PUMPKIN.getDefaultState());
-            EntitySnowball entitysnowball = new EntitySnowball(world, playerIn);
-            entitysnowball.shoot(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 1.5F, 1.0F);
-            world.spawnEntity(entitysnowball);
+            EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, playerIn);
+            projectile.shoot(playerIn, playerIn.rotationPitch,playerIn.rotationYaw, 1.1F, 2.5F);
+            //EntitySnowball entitysnowball = new EntitySnowball(world, playerIn);
+            //entitysnowball.shoot(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 1.5F, 1.0F);
+            world.spawnEntity(projectile);
         }
 
         // noinspection ConstantConditions
