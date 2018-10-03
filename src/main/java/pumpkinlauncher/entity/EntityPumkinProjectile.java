@@ -4,11 +4,8 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
-import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.PotionTypes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.*;
@@ -26,9 +23,10 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     private int yTile;
     private int zTile;
     private Block inTile;
-    protected boolean inGround;
+    private boolean inGround;
     private int ticksInGround;
-    private int ticksInAir;
+    /* used for rendering */
+    public int rotation;
     private int ignoreTime;
     private Entity ignoreEntity;
 
@@ -37,6 +35,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
 
     public EntityPumkinProjectile(World worldIn) {
         super(worldIn);
+        this.rotation = this.rand.nextInt(20000);
         this.xTile = -1;
         this.yTile = -1;
         this.zTile = -1;
@@ -153,6 +152,8 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
          */
         super.onUpdate();
 
+        rotation++;
+
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
             float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
             this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
@@ -192,14 +193,11 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             this.motionY *= (double)(this.rand.nextFloat() * 0.2F);
             this.motionZ *= (double)(this.rand.nextFloat() * 0.2F);
             this.ticksInGround = 0;
-            this.ticksInAir = 0;
-        } else {
-            ++this.ticksInAir;
         }
 
         Vec3d vec3d = new Vec3d(this.posX, this.posY, this.posZ);
         Vec3d vec3d1 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        RayTraceResult raytraceresult = this.world.rayTraceBlocks(vec3d, vec3d1);
+        RayTraceResult raytraceresult = this.world.rayTraceBlocks(vec3d, vec3d1, false, true, false);
         vec3d = new Vec3d(this.posX, this.posY, this.posZ);
         vec3d1 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
@@ -303,7 +301,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     }
 
     protected float getGravityVelocity() {
-        return 0.06F;
+        return 0.08F;
     }
 
     protected void onImpact(RayTraceResult result) {
