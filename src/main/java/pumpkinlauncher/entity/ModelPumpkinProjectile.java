@@ -1,4 +1,4 @@
-package pumpkinlauncher.client.model;
+package pumpkinlauncher.entity;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;

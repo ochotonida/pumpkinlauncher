@@ -1,4 +1,4 @@
-package pumpkinlauncher.client.renderer;
+package pumpkinlauncher.entity;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
@@ -9,8 +9,6 @@ import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pumpkinlauncher.PumpkinLauncher;
-import pumpkinlauncher.client.model.ModelPumpkinProjectile;
-import pumpkinlauncher.entity.EntityPumkinProjectile;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
