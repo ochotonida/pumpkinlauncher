@@ -23,18 +23,48 @@ public class ItemPumpkinLauncher extends Item {
         setMaxStackSize(1);
     }
 
+    private ItemStack findAmmo(EntityPlayer player) {
+        if (player.getHeldItem(EnumHand.OFF_HAND).getItem() instanceof ItemPumpkinAmmo) {
+            return player.getHeldItem(EnumHand.OFF_HAND);
+        } else if (player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemPumpkinAmmo) {
+            return player.getHeldItem(EnumHand.MAIN_HAND);
+        } else {
+            for (int i = 0; i < player.inventory.getSizeInventory(); ++i) {
+                ItemStack stack = player.inventory.getStackInSlot(i);
+                if (stack.getItem() instanceof ItemPumpkinAmmo) {
+                    return stack;
+                }
+            }
+            return ItemStack.EMPTY;
+        }
+    }
+
     @Nonnull
     @Override
     @ParametersAreNonnullByDefault
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        if (!world.isRemote) {
-            world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
-            player.getCooldownTracker().setCooldown(this, 30);
-            EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player);
-            projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
-            world.spawnEntity(projectile);
+        ItemStack stack = findAmmo(player);
+        if (!stack.isEmpty() || player.capabilities.isCreativeMode) {
+            if (!world.isRemote) {
+                world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
+                player.getCooldownTracker().setCooldown(this, 30);
+                if (!player.capabilities.isCreativeMode) {
+                    stack.shrink(1);
+                }
+                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
+                world.spawnEntity(projectile);
+            }
+            if (stack.isEmpty()) {
+                return new ActionResult<>(EnumActionResult.PASS, player.getHeldItem(hand));
+            }
+            return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
+        } else {
+            if (!world.isRemote) {
+                world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.NEUTRAL, 1.0F, 1.2F);
+            }
+            return new ActionResult<>(EnumActionResult.FAIL, player.getHeldItem(hand));
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
     }
 
     @Override

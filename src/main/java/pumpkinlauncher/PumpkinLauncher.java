@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
+import pumpkinlauncher.item.ItemPumpkinAmmo;
 import pumpkinlauncher.item.ItemPumpkinLauncher;
 import pumpkinlauncher.proxy.CommonProxy;
 
@@ -21,6 +22,7 @@ public class PumpkinLauncher {
     public static final String MODVERSION = "1.12.2-0.0.0";
 
     public static final ItemPumpkinLauncher PUMPKIN_LAUNCHER = new ItemPumpkinLauncher();
+    public static final ItemPumpkinAmmo PUMPKIN_AMMO = new ItemPumpkinAmmo();
 
     @Mod.Instance
     public static PumpkinLauncher instance;
@@ -45,6 +47,7 @@ public class PumpkinLauncher {
         public static void registerItems(RegistryEvent.Register<Item> event) {
             IForgeRegistry<Item> registry = event.getRegistry();
             registry.register(PUMPKIN_LAUNCHER);
+            registry.register(PUMPKIN_AMMO);
         }
 
         @SubscribeEvent
