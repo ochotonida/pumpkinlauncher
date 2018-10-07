@@ -55,9 +55,6 @@ public class ItemPumpkinLauncher extends Item {
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
                 world.spawnEntity(projectile);
             }
-            if (stack.isEmpty()) {
-                return new ActionResult<>(EnumActionResult.PASS, player.getHeldItem(hand));
-            }
             return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
         } else {
             if (!world.isRemote) {

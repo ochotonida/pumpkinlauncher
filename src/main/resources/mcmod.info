@@ -2,7 +2,7 @@
   {
     "modid": "pumpkinlauncher",
     "name": "Jack-O'-Launcher",
-    "description": "",
+    "description": "Exploding pumpkins and stuff",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "https://github.com/ochotonida/pumpkinlauncher",
