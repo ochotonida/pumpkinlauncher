@@ -1,10 +1,9 @@
 {
-  "homepage": "",
+  "homepage": "https://github.com/ochotonida/pumpkinlauncher",
   "1.12.2": {
-    "0.0.0": ""
+    "1.0.0": "initial release"
   },
   "promos": {
-    "1.12-latest": "0.0.0",
-    "1.12-recommended": "0.0.0"
+
   }
 }
