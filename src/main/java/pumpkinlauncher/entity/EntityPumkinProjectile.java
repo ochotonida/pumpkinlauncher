@@ -1,13 +1,11 @@
 package pumpkinlauncher.entity;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -17,21 +15,23 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
+@ParametersAreNonnullByDefault
 public class EntityPumkinProjectile extends Entity implements IProjectile {
 
     private int xTile;
     private int yTile;
     private int zTile;
-    private Block inTile;
-    private boolean inGround;
-    private int ticksInGround;
     /* used for rendering */
-    public int rotation;
+    int rotation;
     private int ignoreTime;
     private Entity ignoreEntity;
+    private int power;
+    private boolean isFiery;
+    private boolean canDestroyBlocks;
 
     @Nullable
-    public Entity shootingEntity;
+    private Entity shootingEntity;
 
     public EntityPumkinProjectile(World worldIn) {
         super(worldIn);
@@ -40,6 +40,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.yTile = -1;
         this.zTile = -1;
         this.setSize(1.0F, 1.0F);
+        this.power = 1;
     }
 
     public EntityPumkinProjectile(World worldIn, double x, double y, double z) {
@@ -47,18 +48,17 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.setPosition(x, y, z);
     }
 
-    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity)
-    {
+    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, boolean isFiery, boolean canDestroyBlocks) {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
+        this.power = power;
+        this.isFiery = isFiery;
+        this.canDestroyBlocks = canDestroyBlocks;
     }
 
     @Override
     protected void entityInit() { }
 
-    /**
-     * Checks if the entity is in range to render.
-     */
     @Override
     @SideOnly(Side.CLIENT)
     public boolean isInRangeToRenderDist(double distance) {
@@ -92,12 +92,8 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.rotationPitch = (float)(MathHelper.atan2(y, (double)f1) * (180D / Math.PI));
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
-        this.ticksInGround = 0;
     }
 
-    /**
-     * Sets projectile heading based the entity that launches it
-     */
     public void shoot(Entity shooter, float pitch, float yaw, float velocity, float inaccuracy) {
         float f = -MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F);
         float f1 = -MathHelper.sin(pitch * 0.017453292F);
@@ -111,9 +107,6 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         }
     }
 
-    /**
-     * Set the position and rotation values directly without any clamping.
-     */
     @Override
     @SideOnly(Side.CLIENT)
     public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
@@ -121,9 +114,6 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.setRotation(yaw, pitch);
     }
 
-    /**
-     * Updates the entity motion clientside, called by packets from the server
-     */
     @Override
     public void setVelocity(double x, double y, double z) {
         this.motionX = x;
@@ -140,16 +130,8 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         }
     }
 
-    /**
-     * Called to update the entity's position/logic.
-     */
     @Override
     public void onUpdate() {
-        /* See EntityThrowable, not yet sure what the purpose of this is, EntityArrow doesn't have this
-        this.lastTickPosX = this.posX;
-        this.lastTickPosY = this.posY;
-        this.lastTickPosZ = this.posZ;
-         */
         super.onUpdate();
 
         rotation++;
@@ -160,39 +142,6 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * (180D / Math.PI));
             this.prevRotationYaw = this.rotationYaw;
             this.prevRotationPitch = this.rotationPitch;
-        }
-
-        /* Check if the entity is stuck in ground, see EntityArrow
-        BlockPos blockpos = new BlockPos(this.xTile, this.yTile, this.zTile);
-        IBlockState iblockstate = this.world.getBlockState(blockpos);
-        Block block = iblockstate.getBlock();
-
-        if (iblockstate.getMaterial() != Material.AIR) {
-            AxisAlignedBB axisalignedbb = iblockstate.getCollisionBoundingBox(this.world, blockpos);
-
-            if (axisalignedbb != Block.NULL_AABB && axisalignedbb.offset(blockpos).contains(new Vec3d(this.posX, this.posY, this.posZ))) {
-                this.inGround = true;
-            }
-        }
-         */
-
-        if (this.inGround) {
-            if (this.world.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock() == this.inTile) {
-                ++this.ticksInGround;
-
-                if (this.ticksInGround == 1200) {
-                    this.setDead();
-                }
-
-                return;
-            }
-
-            // ?
-            this.inGround = false;
-            this.motionX *= (double)(this.rand.nextFloat() * 0.2F);
-            this.motionY *= (double)(this.rand.nextFloat() * 0.2F);
-            this.motionZ *= (double)(this.rand.nextFloat() * 0.2F);
-            this.ticksInGround = 0;
         }
 
         Vec3d vec3d = new Vec3d(this.posX, this.posY, this.posZ);
@@ -219,7 +168,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
                     flag = true;
                 } else {
                     flag = false;
-                    AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.30000001192092896D);
+                    AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.3D);
                     RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(vec3d, vec3d1);
 
                     if (raytraceresult1 != null) {
@@ -250,7 +199,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK && this.world.getBlockState(raytraceresult.getBlockPos()).getBlock() == Blocks.PORTAL) {
                 this.setPortal(raytraceresult.getBlockPos());
             } else if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
-                this.onImpact(raytraceresult);
+                this.onImpact();
             }
         }
 
@@ -260,7 +209,10 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
         this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
 
-        for (this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * (180D / Math.PI)); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F);
+        this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * (180D / Math.PI));
+        while (this.rotationPitch - this.prevRotationPitch < -180.0F) {
+            this.prevRotationPitch -= 360.0F;
+        }
 
         while (this.rotationPitch - this.prevRotationPitch >= 180.0F) {
             this.prevRotationPitch += 360.0F;
@@ -281,11 +233,11 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
 
         if (this.isInWater()) {
             for (int j = 0; j < 4; ++j) {
-                float f3 = 0.25F;
                 this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * 0.25D, this.posY - this.motionY * 0.25D, this.posZ - this.motionZ * 0.25D, this.motionX, this.motionY, this.motionZ);
             }
-
-            f1 = 0.8F;
+            f1 = 0.9F;
+        } else {
+            this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX - this.motionX * 0.25D, this.posY - this.motionY * 0.25D, this.posZ - this.motionZ * 0.25D, this.motionX * 0.3, this.motionY * 0.3, this.motionZ * 0.3);
         }
 
         this.motionX *= (double)f1;
@@ -304,43 +256,31 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         return 0.08F;
     }
 
-    protected void onImpact(RayTraceResult result) {
-        if (!this.world.isRemote)
-        {
+    protected void onImpact() {
+        if (!this.world.isRemote) {
             boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-            this.world.newExplosion(null, this.posX, this.posY, this.posZ, 3.0F, flag, flag);
+            this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
             this.setDead();
         }
     }
 
     @Override
-    @ParametersAreNonnullByDefault
-    public void writeEntityToNBT(NBTTagCompound compound)
-    {
+    public void writeEntityToNBT(NBTTagCompound compound) {
         compound.setInteger("xTile", this.xTile);
         compound.setInteger("yTile", this.yTile);
         compound.setInteger("zTile", this.zTile);
-        ResourceLocation resourcelocation = Block.REGISTRY.getNameForObject(this.inTile);
-        compound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
-        compound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
+        compound.setByte("power", (byte) this.power);
+        compound.setBoolean("isFiery", this.isFiery);
+        compound.setBoolean("canDestroyBlocks", this.canDestroyBlocks);
     }
 
-    public void readEntityFromNBT(NBTTagCompound compound)
-    {
+    @Override
+    public void readEntityFromNBT(NBTTagCompound compound) {
         this.xTile = compound.getInteger("xTile");
         this.yTile = compound.getInteger("yTile");
         this.zTile = compound.getInteger("zTile");
-
-        if (compound.hasKey("inTile", 8))
-        {
-            this.inTile = Block.getBlockFromName(compound.getString("inTile"));
-        }
-        else
-        {
-            this.inTile = Block.getBlockById(compound.getByte("inTile") & 255);
-        }
-
-        this.inGround = compound.getByte("inGround") == 1;
-        this.shootingEntity = null;
+        this.power = compound.getByte("power");
+        this.isFiery = compound.getBoolean("isFiery");
+        this.canDestroyBlocks = compound.getBoolean("canDestroyBlocks");
     }
 }

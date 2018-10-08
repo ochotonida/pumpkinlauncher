@@ -9,6 +9,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
+import pumpkinlauncher.PumpkinLauncher;
 import pumpkinlauncher.entity.EntityPumkinProjectile;
 
 import javax.annotation.Nonnull;
@@ -24,14 +25,14 @@ public class ItemPumpkinLauncher extends Item {
     }
 
     private ItemStack findAmmo(EntityPlayer player) {
-        if (player.getHeldItem(EnumHand.OFF_HAND).getItem() instanceof ItemPumpkinAmmo) {
+        if (player.getHeldItem(EnumHand.OFF_HAND).getItem() == PumpkinLauncher.PUMPKIN_AMMO) {
             return player.getHeldItem(EnumHand.OFF_HAND);
-        } else if (player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemPumpkinAmmo) {
+        } else if (player.getHeldItem(EnumHand.MAIN_HAND).getItem() == PumpkinLauncher.PUMPKIN_AMMO) {
             return player.getHeldItem(EnumHand.MAIN_HAND);
         } else {
             for (int i = 0; i < player.inventory.getSizeInventory(); ++i) {
                 ItemStack stack = player.inventory.getStackInSlot(i);
-                if (stack.getItem() instanceof ItemPumpkinAmmo) {
+                if (stack.getItem() == PumpkinLauncher.PUMPKIN_AMMO) {
                     return stack;
                 }
             }
@@ -47,13 +48,28 @@ public class ItemPumpkinLauncher extends Item {
         if (!stack.isEmpty() || player.capabilities.isCreativeMode) {
             if (!world.isRemote) {
                 world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
-                player.getCooldownTracker().setCooldown(this, 30);
+                player.getCooldownTracker().setCooldown(this, 20);
+
+                int power = 3;
+                boolean isFiery = false;
+                boolean canDestroyBlocks = true;
+                if (!stack.isEmpty() && stack.getTagCompound() != null) {
+                    if (stack.getTagCompound().hasKey("power")) {
+                        power = stack.getTagCompound().getByte("power");
+                    }
+                    if (stack.getTagCompound().hasKey("isFiery")) {
+                        isFiery = stack.getTagCompound().getBoolean("isFiery");
+                    }
+                    if (stack.getTagCompound().hasKey("canDestroyBlocks")) {
+                        canDestroyBlocks = stack.getTagCompound().getBoolean("canDestroyBlocks");
+                    }
+                }
+                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player, power, isFiery, canDestroyBlocks);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
+                world.spawnEntity(projectile);
                 if (!player.capabilities.isCreativeMode) {
                     stack.shrink(1);
                 }
-                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player);
-                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
-                world.spawnEntity(projectile);
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
         } else {

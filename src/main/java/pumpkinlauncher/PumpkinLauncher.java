@@ -1,6 +1,7 @@
 package pumpkinlauncher;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,6 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import pumpkinlauncher.item.ItemPumpkinAmmo;
 import pumpkinlauncher.item.ItemPumpkinLauncher;
+import pumpkinlauncher.item.RecipePumpkinAmmo;
 import pumpkinlauncher.proxy.CommonProxy;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -22,7 +24,7 @@ public class PumpkinLauncher {
     public static final String MODVERSION = "1.12.2-1.0.0";
 
     public static final ItemPumpkinLauncher PUMPKIN_LAUNCHER = new ItemPumpkinLauncher();
-    public static final ItemPumpkinAmmo PUMPKIN_AMMO = new ItemPumpkinAmmo();
+    public static final Item PUMPKIN_AMMO = new ItemPumpkinAmmo();
 
     @Mod.Instance
     public static PumpkinLauncher instance;
@@ -52,7 +54,13 @@ public class PumpkinLauncher {
 
         @SubscribeEvent
         public static void registerItemModels(ModelRegistryEvent event) {
-            PumpkinLauncher.proxy.registerItemRenderer(PUMPKIN_LAUNCHER, 0, "pumpkinlauncher");
+            proxy.registerItemRenderer(PUMPKIN_LAUNCHER, 0, "pumpkinlauncher");
+            proxy.registerItemRenderer(PUMPKIN_AMMO, 0, "pumpkinammo");
+        }
+
+        @SubscribeEvent
+        public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+            event.getRegistry().register(new RecipePumpkinAmmo());
         }
     }
 }

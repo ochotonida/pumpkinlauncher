@@ -1,1 +1,8 @@
 item.pumpkinlauncher.name=Jack-O'-Launcher
+item.pumpkinammo.name=Exploding Jack-O'-Lantern
+
+item.pumpkinammo.power=Explosion Power:
+item.pumpkinammo.isfiery=Flaming
+item.pumpkinammo.nogriefing=Muffled
+
+entity.pumpkinprojectile.name=Exploding Jack-O'-Lantern
