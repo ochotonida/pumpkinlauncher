@@ -36,7 +36,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
             if (!stack.isEmpty()) {
-                if (stack.getItem() == ItemBlock.getItemFromBlock(Blocks.PUMPKIN)) {
+                if (stack.getItem() == ItemBlock.getItemFromBlock(Blocks.LIT_PUMPKIN)) {
                     pumpkinAmount++;
                 } else if (stack.getItem() == Items.GUNPOWDER) {
                     gunpowderAmount++;
