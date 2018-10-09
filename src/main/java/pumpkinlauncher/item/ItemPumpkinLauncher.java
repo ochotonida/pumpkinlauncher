@@ -51,11 +51,15 @@ public class ItemPumpkinLauncher extends Item {
                 player.getCooldownTracker().setCooldown(this, 20);
 
                 int power = 3;
+                int bounceAmount = 0;
                 boolean isFiery = false;
                 boolean canDestroyBlocks = true;
                 if (!stack.isEmpty() && stack.getTagCompound() != null) {
                     if (stack.getTagCompound().hasKey("power")) {
                         power = stack.getTagCompound().getByte("power");
+                    }
+                    if (stack.getTagCompound().hasKey("bounceAmount")) {
+                        bounceAmount = stack.getTagCompound().getByte("bounceAmount");
                     }
                     if (stack.getTagCompound().hasKey("isFiery")) {
                         isFiery = stack.getTagCompound().getBoolean("isFiery");
@@ -64,7 +68,7 @@ public class ItemPumpkinLauncher extends Item {
                         canDestroyBlocks = stack.getTagCompound().getBoolean("canDestroyBlocks");
                     }
                 }
-                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player, power, isFiery, canDestroyBlocks);
+                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
                 world.spawnEntity(projectile);
                 if (!player.capabilities.isCreativeMode) {

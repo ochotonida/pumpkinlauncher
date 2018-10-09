@@ -32,6 +32,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         int gunpowderAmount = 0;
         int firechargeAmount = 0;
         int woolAmount = 0;
+        int slimeballAmount = 0;
 
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
@@ -44,16 +45,19 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     firechargeAmount++;
                 } else if (stack.getItem() == ItemBlock.getItemFromBlock(Blocks.WOOL)) {
                     woolAmount++;
+                } else if (stack.getItem() == Items.SLIME_BALL) {
+                    slimeballAmount++;
                 } else {
                     return false;
                 }
             }
         }
 
-        if (pumpkinAmount == 1 && gunpowderAmount >= 1 && gunpowderAmount <= 3 && firechargeAmount <= 1 && woolAmount <= 1) {
+        if (pumpkinAmount == 1 && gunpowderAmount >= 1 && gunpowderAmount <= 4 && firechargeAmount <= 1 && woolAmount <= 1 && slimeballAmount <=3) {
             this.resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
             NBTTagCompound compound = new NBTTagCompound();
-            compound.setByte("power", (byte) (gunpowderAmount));
+            compound.setByte("power", (byte) gunpowderAmount);
+            compound.setByte("bounceAmount", (byte) (slimeballAmount));
             compound.setBoolean("isFiery", firechargeAmount > 0);
             compound.setBoolean("canDestroyBlocks", woolAmount < 1);
             resultItem.setTagCompound(compound);

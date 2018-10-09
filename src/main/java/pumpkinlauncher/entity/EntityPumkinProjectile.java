@@ -1,11 +1,15 @@
 package pumpkinlauncher.entity;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,6 +33,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     private int power;
     private boolean isFiery;
     private boolean canDestroyBlocks;
+    private int bouncesLeft;
 
     @Nullable
     private Entity shootingEntity;
@@ -48,12 +53,13 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.setPosition(x, y, z);
     }
 
-    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, boolean isFiery, boolean canDestroyBlocks) {
+    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks) {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
         this.power = power;
         this.isFiery = isFiery;
         this.canDestroyBlocks = canDestroyBlocks;
+        this.bouncesLeft = bounces;
     }
 
     @Override
@@ -199,7 +205,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK && this.world.getBlockState(raytraceresult.getBlockPos()).getBlock() == Blocks.PORTAL) {
                 this.setPortal(raytraceresult.getBlockPos());
             } else if (!net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
-                this.onImpact();
+                this.onImpact(raytraceresult);
             }
         }
 
@@ -256,11 +262,38 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         return 0.08F;
     }
 
-    protected void onImpact() {
+    protected void onImpact(RayTraceResult raytraceresult) {
         if (!this.world.isRemote) {
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-            this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
-            this.setDead();
+            if (this.isFiery && raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
+                raytraceresult.entityHit.setFire(this.power + 3);
+            }
+            if (bouncesLeft > 0 && !isInWater()) {
+                bouncesLeft--;
+                world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+                if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
+                    if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.X) {
+                        this.motionX = -this.motionX;
+                    } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Y) {
+                        this.motionY = -this.motionY;
+                    } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Z) {
+                        this.motionZ = -this.motionZ;
+                    }
+                    if (isFiery && world.isAirBlock(raytraceresult.getBlockPos().offset(raytraceresult.sideHit)) && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity)) {
+                        world.setBlockState(raytraceresult.getBlockPos().offset(raytraceresult.sideHit), Blocks.FIRE.getDefaultState(), 11);
+                    }
+                } else if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY) {
+                    this.motionX = -this.motionX;
+                    this.motionY = -this.motionY;
+                    this.motionZ = -this.motionZ;
+                }
+                this.motionX *= 0.75;
+                this.motionY *= 0.75;
+                this.motionZ *= 0.75;
+            } else {
+                boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
+                this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
+                this.setDead();
+            }
         }
     }
 
@@ -272,6 +305,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         compound.setByte("power", (byte) this.power);
         compound.setBoolean("isFiery", this.isFiery);
         compound.setBoolean("canDestroyBlocks", this.canDestroyBlocks);
+        compound.setByte("bouncesLeft", (byte) this.bouncesLeft);
     }
 
     @Override
@@ -282,5 +316,6 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.power = compound.getByte("power");
         this.isFiery = compound.getBoolean("isFiery");
         this.canDestroyBlocks = compound.getBoolean("canDestroyBlocks");
+        this.bouncesLeft = compound.getByte("bouncesLeft");
     }
 }

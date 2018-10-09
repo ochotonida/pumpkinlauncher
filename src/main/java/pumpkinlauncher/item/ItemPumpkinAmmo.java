@@ -30,6 +30,11 @@ public class ItemPumpkinAmmo extends Item {
         if (nbttagcompound != null) {
             if (nbttagcompound.hasKey("power")) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.power") + " " + nbttagcompound.getByte("power"));
+            } else {
+                tooltip.add(I18n.translateToLocal("item.pumpkinammo.craftinginfo"));
+            }
+            if (nbttagcompound.hasKey("bounceAmount") && nbttagcompound.getByte("bounceAmount") > 0) {
+                tooltip.add(I18n.translateToLocal("item.pumpkinammo.bounce") + " " + nbttagcompound.getByte("bounceAmount"));
             }
             if (nbttagcompound.hasKey("isFiery") && nbttagcompound.getBoolean("isFiery")) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.isfiery"));
@@ -37,6 +42,8 @@ public class ItemPumpkinAmmo extends Item {
             if (nbttagcompound.hasKey("canDestroyBlocks") && !nbttagcompound.getBoolean("canDestroyBlocks")) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.nogriefing"));
             }
+        } else {
+            tooltip.add(I18n.translateToLocal("item.pumpkinammo.craftinginfo"));
         }
     }
 }
