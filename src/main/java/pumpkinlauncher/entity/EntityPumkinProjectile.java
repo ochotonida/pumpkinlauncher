@@ -26,14 +26,16 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     private int xTile;
     private int yTile;
     private int zTile;
-    /* used for rendering */
-    int rotation;
     private int ignoreTime;
     private Entity ignoreEntity;
     private int power;
     private boolean isFiery;
     private boolean canDestroyBlocks;
     private int bouncesLeft;
+    private boolean shouldSendPackets = true;
+    /* rendering */
+    int rotation;
+    private boolean shouldSpawnSmokeParticles;
 
     @Nullable
     private Entity shootingEntity;
@@ -140,6 +142,15 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     public void onUpdate() {
         super.onUpdate();
 
+        if (shouldSendPackets) {
+            shouldSendPackets = false;
+            if (isFiery) {
+                world.setEntityState(this, (byte) 102);
+            } else if (power > 0) {
+                world.setEntityState(this, (byte) 101);
+            }
+        }
+
         rotation++;
 
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
@@ -160,28 +171,28 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             vec3d1 = new Vec3d(raytraceresult.hitVec.x, raytraceresult.hitVec.y, raytraceresult.hitVec.z);
         }
 
-        Entity entity = null;
+        Entity hitEntity = null;
         List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D));
         double d0 = 0.0D;
         boolean flag = false;
 
-        for (Entity entity1 : list) {
-            if (entity1.canBeCollidedWith()) {
-                if (entity1 == this.ignoreEntity) {
+        for (Entity entity : list) {
+            if (entity.canBeCollidedWith()) {
+                if (entity == this.ignoreEntity) {
                     flag = true;
                 } else if (this.shootingEntity != null && this.ticksExisted < 2 && this.ignoreEntity == null) {
-                    this.ignoreEntity = entity1;
+                    this.ignoreEntity = entity;
                     flag = true;
                 } else {
                     flag = false;
-                    AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow(0.3D);
+                    AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().grow(0.3D);
                     RayTraceResult raytraceresult1 = axisalignedbb.calculateIntercept(vec3d, vec3d1);
 
                     if (raytraceresult1 != null) {
                         double d1 = vec3d.squareDistanceTo(raytraceresult1.hitVec);
 
                         if (d1 < d0 || d0 == 0.0D) {
-                            entity = entity1;
+                            hitEntity = entity;
                             d0 = d1;
                         }
                     }
@@ -197,8 +208,8 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             }
         }
 
-        if (entity != null) {
-            raytraceresult = new RayTraceResult(entity);
+        if (hitEntity != null) {
+            raytraceresult = new RayTraceResult(hitEntity);
         }
 
         if (raytraceresult != null) {
@@ -213,49 +224,58 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.posY += this.motionY;
         this.posZ += this.motionZ;
         float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+
         this.rotationYaw = (float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
-
         this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * (180D / Math.PI));
-        while (this.rotationPitch - this.prevRotationPitch < -180.0F) {
-            this.prevRotationPitch -= 360.0F;
-        }
 
-        while (this.rotationPitch - this.prevRotationPitch >= 180.0F) {
-            this.prevRotationPitch += 360.0F;
-        }
-
-        while (this.rotationYaw - this.prevRotationYaw < -180.0F) {
-            this.prevRotationYaw -= 360.0F;
-        }
-
-        while (this.rotationYaw - this.prevRotationYaw >= 180.0F) {
-            this.prevRotationYaw += 360.0F;
-        }
+        while (this.rotationPitch - this.prevRotationPitch < -180.0F) { this.prevRotationPitch -= 360.0F; }
+        while (this.rotationPitch - this.prevRotationPitch >= 180.0F) { this.prevRotationPitch += 360.0F; }
+        while (this.rotationYaw - this.prevRotationYaw < -180.0F) { this.prevRotationYaw -= 360.0F; }
+        while (this.rotationYaw - this.prevRotationYaw >= 180.0F) { this.prevRotationYaw += 360.0F; }
 
         this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
-        float f1 = 0.99F;
-        float f2 = this.getGravityVelocity();
+
+        spawnParticles();
+
+        float speedMultiplier = 0.99F;
+        float gravityVelocity = this.getGravityVelocity();
 
         if (this.isInWater()) {
-            for (int j = 0; j < 4; ++j) {
-                this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * 0.25D, this.posY - this.motionY * 0.25D, this.posZ - this.motionZ * 0.25D, this.motionX, this.motionY, this.motionZ);
-            }
-            f1 = 0.9F;
-        } else {
-            this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX - this.motionX * 0.25D, this.posY - this.motionY * 0.25D, this.posZ - this.motionZ * 0.25D, this.motionX * 0.3, this.motionY * 0.3, this.motionZ * 0.3);
+            speedMultiplier = 0.9F;
         }
 
-        this.motionX *= (double)f1;
-        this.motionY *= (double)f1;
-        this.motionZ *= (double)f1;
+        this.motionX *= (double) speedMultiplier;
+        this.motionY *= (double) speedMultiplier;
+        this.motionZ *= (double) speedMultiplier;
 
         if (!this.hasNoGravity()) {
-            this.motionY -= (double)f2;
+            this.motionY -= (double) gravityVelocity;
         }
 
         this.setPosition(this.posX, this.posY, this.posZ);
         this.doBlockCollisions();
+    }
+
+    private void spawnParticles() {
+        if (isInWater()) {
+            if (isFiery) {
+                this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, posX - motionX * 0.25 + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+            }
+            for (int j = 0; j < 4; ++j) {
+                this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX, motionY, motionZ);
+            }
+        } else {
+            if (isFiery) {
+                this.world.spawnParticle(EnumParticleTypes.FLAME, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.6, motionY * 0.6, motionZ * 0.6);
+            }
+            if (shouldSpawnSmokeParticles) {
+                this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+                if (ticksExisted % 2 == 0) {
+                    this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+                }
+            }
+        }
     }
 
     protected float getGravityVelocity() {
@@ -294,6 +314,16 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
                 this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
                 this.setDead();
             }
+        }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void handleStatusUpdate(byte id) {
+        if (id == 101) {
+            this.shouldSpawnSmokeParticles = true;
+        } else if (id == 102) {
+            this.isFiery = true;
         }
     }
 
