@@ -33,7 +33,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     private boolean canDestroyBlocks;
     private int bouncesLeft;
     private boolean shouldSendPackets = true;
-    /* rendering */
+    /* rendering/client */
     int rotation;
     private boolean shouldSpawnSmokeParticles;
 
@@ -146,7 +146,8 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             shouldSendPackets = false;
             if (isFiery) {
                 world.setEntityState(this, (byte) 102);
-            } else if (power > 0) {
+            }
+            if (power > 0) {
                 world.setEntityState(this, (byte) 101);
             }
         }
@@ -259,9 +260,6 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
 
     private void spawnParticles() {
         if (isInWater()) {
-            if (isFiery) {
-                this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, posX - motionX * 0.25 + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
-            }
             for (int j = 0; j < 4; ++j) {
                 this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX, motionY, motionZ);
             }
@@ -270,7 +268,9 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
                 this.world.spawnParticle(EnumParticleTypes.FLAME, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.6, motionY * 0.6, motionZ * 0.6);
             }
             if (shouldSpawnSmokeParticles) {
-                this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+                for (int i = 0; i < 3; i++) {
+                    this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+                }
                 if (ticksExisted % 2 == 0) {
                     this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
                 }
@@ -288,32 +288,39 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
                 raytraceresult.entityHit.setFire(this.power + 3);
             }
             if (bouncesLeft > 0 && !isInWater()) {
-                bouncesLeft--;
-                world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
                 if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.X) {
-                        this.motionX = -this.motionX;
-                    } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Y) {
-                        this.motionY = -this.motionY;
-                    } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Z) {
-                        this.motionZ = -this.motionZ;
-                    }
                     if (isFiery && world.isAirBlock(raytraceresult.getBlockPos().offset(raytraceresult.sideHit)) && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity)) {
                         world.setBlockState(raytraceresult.getBlockPos().offset(raytraceresult.sideHit), Blocks.FIRE.getDefaultState(), 11);
                     }
-                } else if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY) {
-                    this.motionX = -this.motionX;
-                    this.motionY = -this.motionY;
-                    this.motionZ = -this.motionZ;
                 }
-                this.motionX *= 0.75;
-                this.motionY *= 0.75;
-                this.motionZ *= 0.75;
             } else {
                 boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-                this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
+                if (power > 0) {
+                    this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
+                }
                 this.setDead();
             }
+        }
+
+        if (bouncesLeft > 0 && !isInWater()) {
+            bouncesLeft--;
+            world.setEntityState(this, (byte) 103);
+            world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
+                if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.X) {
+                    this.motionX = - this.motionX;
+                } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Y) {
+                    this.motionY = - this.motionY;
+                } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Z) {
+                    this.motionZ = - this.motionZ;
+                }
+
+            } else if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY) {
+                this.motionY = - this.motionY;
+            }
+            this.motionX *= 0.75;
+            this.motionY *= 0.75;
+            this.motionZ *= 0.75;
         }
     }
 
@@ -324,6 +331,21 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             this.shouldSpawnSmokeParticles = true;
         } else if (id == 102) {
             this.isFiery = true;
+        } else if (id == 103) {
+            for (int j = 0; j < 16; ++j)
+            {
+                float f = this.rand.nextFloat() * ((float)Math.PI * 2F);
+                float f1 = this.rand.nextFloat() * 0.5F + 0.5F;
+                float f2 = MathHelper.sin(f) * f1;
+                float f3 = MathHelper.cos(f) * f1;
+                World world = this.world;
+                EnumParticleTypes enumparticletypes = EnumParticleTypes.SLIME;
+                double d0 = this.posX + (double)f2;
+                double d1 = this.posZ + (double)f3;
+                world.spawnParticle(enumparticletypes, d0, this.getEntityBoundingBox().minY, d1, 0.0D, 0.0D, 0.0D);
+            }
+        } else {
+            super.handleStatusUpdate(id);
         }
     }
 
