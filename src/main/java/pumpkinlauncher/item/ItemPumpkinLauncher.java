@@ -4,6 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -54,6 +55,7 @@ public class ItemPumpkinLauncher extends Item {
                 int bounceAmount = 0;
                 boolean isFiery = false;
                 boolean canDestroyBlocks = true;
+                NBTTagCompound fireworkCompound = null;
                 if (!stack.isEmpty() && stack.getTagCompound() != null) {
                     if (stack.getTagCompound().hasKey("power")) {
                         power = stack.getTagCompound().getByte("power");
@@ -67,8 +69,11 @@ public class ItemPumpkinLauncher extends Item {
                     if (stack.getTagCompound().hasKey("canDestroyBlocks")) {
                         canDestroyBlocks = stack.getTagCompound().getBoolean("canDestroyBlocks");
                     }
+                    if (stack.getTagCompound().hasKey("fireworks")) {
+                        fireworkCompound = stack.getTagCompound().getCompoundTag("fireworks");
+                    }
                 }
-                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks);
+                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
                 world.spawnEntity(projectile);
                 if (!player.capabilities.isCreativeMode) {

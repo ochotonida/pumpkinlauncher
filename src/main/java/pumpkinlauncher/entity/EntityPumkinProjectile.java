@@ -7,6 +7,9 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
@@ -22,6 +25,8 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 @ParametersAreNonnullByDefault
 public class EntityPumkinProjectile extends Entity implements IProjectile {
+
+    private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumkinProjectile.class, DataSerializers.COMPOUND_TAG);
 
     private int xTile;
     private int yTile;
@@ -55,17 +60,22 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.setPosition(x, y, z);
     }
 
-    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks) {
+    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks, @Nullable NBTTagCompound fireworkCompound) {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
         this.power = power;
         this.isFiery = isFiery;
         this.canDestroyBlocks = canDestroyBlocks;
         this.bouncesLeft = bounces;
+        if (fireworkCompound != null) {
+            this.dataManager.set(FIREWORK_NBT, fireworkCompound);
+        }
     }
 
     @Override
-    protected void entityInit() { }
+    protected void entityInit() {
+        this.dataManager.register(FIREWORK_NBT, new NBTTagCompound());
+    }
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -329,6 +339,9 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     public void handleStatusUpdate(byte id) {
         if (id == 101) {
             this.shouldSpawnSmokeParticles = true;
+        } else if (id == 17 && this.world.isRemote) {
+            NBTTagCompound nbtTagCompound = this.dataManager.get(FIREWORK_NBT);
+            this.world.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, nbtTagCompound);
         } else if (id == 102) {
             this.isFiery = true;
         } else if (id == 103) {

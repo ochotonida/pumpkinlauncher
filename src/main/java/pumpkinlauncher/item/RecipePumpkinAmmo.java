@@ -4,12 +4,12 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 import pumpkinlauncher.PumpkinLauncher;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,15 +37,15 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
             if (!stack.isEmpty()) {
-                if (stack.getItem() == ItemBlock.getItemFromBlock(Blocks.LIT_PUMPKIN)) {
+                if (OreDictionary.itemMatches(new ItemStack(Blocks.LIT_PUMPKIN, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     pumpkinAmount++;
-                } else if (stack.getItem() == Items.GUNPOWDER) {
+                } else if (OreDictionary.itemMatches(new ItemStack(Items.GUNPOWDER, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     gunpowderAmount++;
-                } else if (stack.getItem() == Items.FIRE_CHARGE) {
+                } else if (OreDictionary.itemMatches(new ItemStack(Items.FIRE_CHARGE, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     firechargeAmount++;
-                } else if (stack.getItem() == ItemBlock.getItemFromBlock(Blocks.WOOL)) {
+                } else if (OreDictionary.itemMatches(new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     woolAmount++;
-                } else if (stack.getItem() == Items.SLIME_BALL) {
+                } else if (OreDictionary.itemMatches(new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     slimeballAmount++;
                 } else {
                     return false;

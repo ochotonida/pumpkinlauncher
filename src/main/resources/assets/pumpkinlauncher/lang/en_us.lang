@@ -5,6 +5,5 @@ item.pumpkinammo.power=Explosion Power:
 item.pumpkinammo.isfiery=Flaming
 item.pumpkinammo.nogriefing=Muffled
 item.pumpkinammo.bounce=Bounce
-item.pumpkinammo.craftinginfo=Craft a Jack o'Lantern together with 1 or more pieces of gunpowder to obtain this item, add a fire charge, wool block or slimeballs for additional effects
 
 entity.pumpkinprojectile.name=Exploding Jack o'Lantern
