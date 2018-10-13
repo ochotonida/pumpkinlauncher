@@ -29,7 +29,6 @@ public class JEIPlugin implements IModPlugin {
         NBTTagCompound compound = new NBTTagCompound();
         compound.setByte("power", (byte) 1);
         NBTTagCompound compound0 = compound.copy();
-        compound0.setByte("power", (byte) 3);
         NBTTagCompound compound1 = compound.copy();
         compound1.setBoolean("isFiery", true);
         NBTTagCompound compound2 = compound.copy();
@@ -76,7 +75,7 @@ public class JEIPlugin implements IModPlugin {
         firework.setTagCompound(fireworkItemCompound);
 
         registry.addRecipes(Arrays.asList(
-                new PumpkinAmmoRecipeWrapper(output0, pumpkin, gunpowder, gunpowder, gunpowder),
+                new PumpkinAmmoRecipeWrapper(output0, pumpkin, gunpowder),
                 new PumpkinAmmoRecipeWrapper(output1, pumpkin, gunpowder, fireCharge),
                 new PumpkinAmmoRecipeWrapper(output2, pumpkin, gunpowder, woolBlock),
                 new PumpkinAmmoRecipeWrapper(output3, pumpkin, gunpowder, slimeBall),
