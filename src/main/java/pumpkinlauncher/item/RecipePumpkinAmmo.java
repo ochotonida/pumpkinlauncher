@@ -30,9 +30,9 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
 
         int pumpkinAmount = 0;
         int gunpowderAmount = 0;
-        int firechargeAmount = 0;
+        int fireChargeAmount = 0;
         int woolAmount = 0;
-        int slimeballAmount = 0;
+        int slimeBallAmount = 0;
         NBTTagCompound fireworkNBT = null;
 
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
@@ -43,11 +43,11 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                 } else if (OreDictionary.itemMatches(new ItemStack(Items.GUNPOWDER, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     gunpowderAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Items.FIRE_CHARGE, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
-                    firechargeAmount++;
+                    fireChargeAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     woolAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
-                    slimeballAmount++;
+                    slimeBallAmount++;
                 } else  if (OreDictionary.itemMatches(new ItemStack(Items.FIREWORKS, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     if (fireworkNBT != null || stack.getTagCompound() == null) {
                         return false;
@@ -55,7 +55,6 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                         try {
                             fireworkNBT = (NBTTagCompound) stack.getTagCompound().getTag("Fireworks");
                         } catch (ClassCastException e ) {
-                            // this probably never happens
                             return false;
                         }
                     }
@@ -65,12 +64,12 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             }
         }
 
-        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireworkNBT != null) && gunpowderAmount <= 4 && firechargeAmount <= 1 && woolAmount <= 1 && slimeballAmount <=3) {
-            this.resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
+        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireworkNBT != null) && gunpowderAmount <= 4 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <=3) {
+            resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setByte("power", (byte) gunpowderAmount);
-            compound.setByte("bounceAmount", (byte) (slimeballAmount));
-            compound.setBoolean("isFiery", firechargeAmount > 0);
+            compound.setByte("bounceAmount", (byte) (slimeBallAmount));
+            compound.setBoolean("isFiery", fireChargeAmount > 0);
             compound.setBoolean("canDestroyBlocks", woolAmount < 1);
             if (fireworkNBT != null) {
                 compound.setTag("fireworks", fireworkNBT);
@@ -83,22 +82,22 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
 
     @Override
     public ItemStack getCraftingResult(InventoryCrafting inventory) {
-        return this.resultItem.copy();
+        return resultItem.copy();
     }
 
     @Override
     public ItemStack getRecipeOutput() {
-        return this.resultItem;
+        return resultItem;
     }
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inventory) {
-        NonNullList<ItemStack> nonnulllist = NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
-        for (int i = 0; i < nonnulllist.size(); ++i) {
+        NonNullList<ItemStack> list = NonNullList.withSize(inventory.getSizeInventory(), ItemStack.EMPTY);
+        for (int i = 0; i < list.size(); ++i) {
             ItemStack itemstack = inventory.getStackInSlot(i);
-            nonnulllist.set(i, net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack));
+            list.set(i, net.minecraftforge.common.ForgeHooks.getContainerItem(itemstack));
         }
-        return nonnulllist;
+        return list;
     }
 
     @Override

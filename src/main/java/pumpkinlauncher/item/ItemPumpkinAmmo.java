@@ -23,15 +23,9 @@ import java.util.List;
 public class ItemPumpkinAmmo extends Item {
 
     public ItemPumpkinAmmo() {
-        this.setRegistryName("pumpkinammo");
-        this.setUnlocalizedName("pumpkinammo");
-        this.setCreativeTab(CreativeTabs.COMBAT);
-    }
-
-    @Override
-    public String getHighlightTip( ItemStack item, String displayName )
-    {
-        return displayName;
+        setRegistryName("pumpkinammo");
+        setUnlocalizedName("pumpkinammo");
+        setCreativeTab(CreativeTabs.COMBAT);
     }
 
     @Override
@@ -60,7 +54,6 @@ public class ItemPumpkinAmmo extends Item {
                 }
 
                 NBTTagList nbttaglist = fireworksCompound.getTagList("Explosions", 10);
-
                 if (!nbttaglist.hasNoTags()) {
                     for (int i = 0; i < nbttaglist.tagCount(); ++i) {
                         NBTTagCompound subCompound = nbttaglist.getCompoundTagAt(i);
@@ -71,7 +64,6 @@ public class ItemPumpkinAmmo extends Item {
                             for (int j = 1; j < list.size(); ++j) {
                                 list.set(j, "  " + list.get(j));
                             }
-
                             tooltip.addAll(list);
                         }
                     }

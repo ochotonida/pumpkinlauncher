@@ -35,7 +35,7 @@
       "scale": [1.15, 1.15, 1.15]
     }
   },
-	"textures": {"texture": "pumpkinlauncher:items/pumpkinlauncher"},
+	"textures": {"texture": "pumpkinlauncher:pumpkinlauncher"},
 	"elements": [
 		{
 			"name": "barrel_top",

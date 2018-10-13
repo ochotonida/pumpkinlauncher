@@ -11,21 +11,19 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.oredict.OreDictionary;
 import pumpkinlauncher.PumpkinLauncher;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 @mezz.jei.api.JEIPlugin
-@SuppressWarnings("unused")
 public class JEIPlugin implements IModPlugin {
 
     @Override
-    public void register(@Nonnull IModRegistry registry) {
+    public void register(IModRegistry registry) {
         registry.handleRecipes(PumpkinAmmoRecipeWrapper.class, (w) -> w, VanillaRecipeCategoryUid.CRAFTING);
         addContainerRecipes(registry);
     }
 
     @SuppressWarnings("deprecation")
-    private void addContainerRecipes(@Nonnull IModRegistry registry) {
+    private void addContainerRecipes(IModRegistry registry) {
         NBTTagCompound compound = new NBTTagCompound();
         compound.setByte("power", (byte) 1);
         NBTTagCompound compound0 = compound.copy();

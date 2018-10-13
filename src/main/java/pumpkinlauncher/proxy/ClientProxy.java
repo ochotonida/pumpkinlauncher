@@ -32,5 +32,4 @@ public class ClientProxy extends CommonProxy {
         ClientEventHandler handler = new ClientEventHandler();
         MinecraftForge.EVENT_BUS.register(handler);
     }
-
 }

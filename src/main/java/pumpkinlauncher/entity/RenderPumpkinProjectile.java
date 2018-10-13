@@ -19,22 +19,22 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
 
     public static final Factory FACTORY = new Factory();
-    private static final ResourceLocation TEXTURES = new ResourceLocation(PumpkinLauncher.MODID, "textures/entity/pumpkinprojectile/pumpkinprojectile.png");
+    private static final ResourceLocation TEXTURES = new ResourceLocation(PumpkinLauncher.MODID, "textures/pumpkinprojectile.png");
     private final ModelBase MODEL = new ModelPumpkinProjectile();
 
     private RenderPumpkinProjectile(RenderManager rendermanager) {
         super(rendermanager);
-        this.shadowSize = 0.5F;
+        shadowSize = 0.5F;
     }
 
     @Override
     @ParametersAreNonnullByDefault
     public void doRender(EntityPumpkinProjectile entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        float f = entity.rotation + partialTicks;
+        float rotation = entity.rotation + partialTicks;
         GlStateManager.pushMatrix();
-        this.bindEntityTexture(entity);
+        bindEntityTexture(entity);
         GlStateManager.translate((float)x, (float)y, (float)z);
-        this.MODEL.render(entity, 0.0F, f * 20.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+        MODEL.render(entity, 0, rotation * 20, 0, 0, 0, 0.0625F);
         GlStateManager.popMatrix();
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
@@ -57,26 +57,25 @@ public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
         private ModelRenderer cube;
 
         ModelPumpkinProjectile() {
-            this.textureWidth = 64;
-            this.textureHeight = 32;
-            this.cube = new ModelRenderer(this, 0, 0);
-            this.cube.setRotationPoint(0.0F, 0.0F, 0.0F);
-            this.cube.addBox(-8.0F, -8.0F, -8.0F, 16, 16, 16, 0.0F);
+            textureWidth = 64;
+            textureHeight = 32;
+            cube = new ModelRenderer(this, 0, 0);
+            cube.setRotationPoint(0, 0, 0);
+            cube.addBox(-8, -8, -8, 16, 16, 16, 0);
         }
 
         @Override
         public void render(@Nullable Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
             GlStateManager.pushMatrix();
-
             GlStateManager.rotate(limbSwingAmount / 2.5F, 0.7071F, 0.0F, 0.7071F);
             GlStateManager.rotate(limbSwingAmount, 0.0F, 1.0F, 0.0F);
-            this.cube.render(scale);
+            cube.render(scale);
             GlStateManager.popMatrix();
         }
 
         @Override
         public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
-            this.cube.rotateAngleX = entityIn.rotationPitch;
+            cube.rotateAngleX = entityIn.rotationPitch;
         }
     }
 }

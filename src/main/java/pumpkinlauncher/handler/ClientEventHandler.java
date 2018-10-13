@@ -19,7 +19,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     @SuppressWarnings("unused")
     public void onEntityLiving(RenderLivingEvent.Pre<EntityPlayer> event){
-        if(event.getEntity() instanceof EntityPlayer) {
+        if (event.getEntity() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getEntity();
             boolean isHoldingOffhand = player.getHeldItemOffhand().getItem() instanceof ItemPumpkinLauncher;
             boolean isHoldingMainhand = player.getHeldItemMainhand().getItem() instanceof ItemPumpkinLauncher;
