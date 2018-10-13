@@ -4,6 +4,6 @@ item.pumpkinammo.name=Exploding Jack o'Lantern
 item.pumpkinammo.power=Explosion Power:
 item.pumpkinammo.isfiery=Flaming
 item.pumpkinammo.nogriefing=Muffled
-item.pumpkinammo.bounce=Bounce
+item.pumpkinammo.bounce=Bounce:
 
 entity.pumpkinprojectile.name=Exploding Jack o'Lantern

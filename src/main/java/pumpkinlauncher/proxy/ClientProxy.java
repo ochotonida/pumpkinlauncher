@@ -7,7 +7,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import pumpkinlauncher.entity.EntityPumkinProjectile;
+import pumpkinlauncher.entity.EntityPumpkinProjectile;
 import pumpkinlauncher.PumpkinLauncher;
 import pumpkinlauncher.entity.RenderPumpkinProjectile;
 import pumpkinlauncher.handler.ClientEventHandler;
@@ -23,7 +23,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
-        RenderingRegistry.registerEntityRenderingHandler(EntityPumkinProjectile.class, RenderPumpkinProjectile.FACTORY);
+        RenderingRegistry.registerEntityRenderingHandler(EntityPumpkinProjectile.class, RenderPumpkinProjectile.FACTORY);
     }
 
     @Override

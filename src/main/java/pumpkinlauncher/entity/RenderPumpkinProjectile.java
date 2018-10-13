@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @SideOnly(Side.CLIENT)
-public class RenderPumpkinProjectile extends Render<EntityPumkinProjectile> {
+public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
 
     public static final Factory FACTORY = new Factory();
     private static final ResourceLocation TEXTURES = new ResourceLocation(PumpkinLauncher.MODID, "textures/entity/pumpkinprojectile/pumpkinprojectile.png");
@@ -29,7 +29,7 @@ public class RenderPumpkinProjectile extends Render<EntityPumkinProjectile> {
 
     @Override
     @ParametersAreNonnullByDefault
-    public void doRender(EntityPumkinProjectile entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void doRender(EntityPumpkinProjectile entity, double x, double y, double z, float entityYaw, float partialTicks) {
         float f = entity.rotation + partialTicks;
         GlStateManager.pushMatrix();
         this.bindEntityTexture(entity);
@@ -41,14 +41,14 @@ public class RenderPumpkinProjectile extends Render<EntityPumkinProjectile> {
 
     @Override
     @ParametersAreNonnullByDefault
-    protected ResourceLocation getEntityTexture(EntityPumkinProjectile entity) {
+    protected ResourceLocation getEntityTexture(EntityPumpkinProjectile entity) {
         return TEXTURES;
     }
 
-    public static class Factory implements IRenderFactory<EntityPumkinProjectile> {
+    public static class Factory implements IRenderFactory<EntityPumpkinProjectile> {
 
         @Override
-        public Render<? super EntityPumkinProjectile> createRenderFor(RenderManager manager) {
+        public Render<? super EntityPumpkinProjectile> createRenderFor(RenderManager manager) {
             return new RenderPumpkinProjectile(manager);
         }
     }

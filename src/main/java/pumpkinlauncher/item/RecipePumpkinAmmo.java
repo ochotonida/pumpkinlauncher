@@ -33,6 +33,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         int firechargeAmount = 0;
         int woolAmount = 0;
         int slimeballAmount = 0;
+        NBTTagCompound fireworkNBT = null;
 
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
@@ -47,24 +48,37 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     woolAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     slimeballAmount++;
+                } else  if (OreDictionary.itemMatches(new ItemStack(Items.FIREWORKS, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
+                    if (fireworkNBT != null || stack.getTagCompound() == null) {
+                        return false;
+                    } else {
+                        try {
+                            fireworkNBT = (NBTTagCompound) stack.getTagCompound().getTag("Fireworks");
+                        } catch (ClassCastException e ) {
+                            // this probably never happens
+                            return false;
+                        }
+                    }
                 } else {
                     return false;
                 }
             }
         }
 
-        if (pumpkinAmount == 1 && gunpowderAmount >= 1 && gunpowderAmount <= 4 && firechargeAmount <= 1 && woolAmount <= 1 && slimeballAmount <=3) {
+        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireworkNBT != null) && gunpowderAmount <= 4 && firechargeAmount <= 1 && woolAmount <= 1 && slimeballAmount <=3) {
             this.resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setByte("power", (byte) gunpowderAmount);
             compound.setByte("bounceAmount", (byte) (slimeballAmount));
             compound.setBoolean("isFiery", firechargeAmount > 0);
             compound.setBoolean("canDestroyBlocks", woolAmount < 1);
+            if (fireworkNBT != null) {
+                compound.setTag("fireworks", fireworkNBT);
+            }
             resultItem.setTagCompound(compound);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

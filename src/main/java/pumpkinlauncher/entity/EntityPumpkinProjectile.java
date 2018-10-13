@@ -7,9 +7,11 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
@@ -24,18 +26,20 @@ import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 @ParametersAreNonnullByDefault
-public class EntityPumkinProjectile extends Entity implements IProjectile {
+public class EntityPumpkinProjectile extends Entity implements IProjectile {
 
-    private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumkinProjectile.class, DataSerializers.COMPOUND_TAG);
+    private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
 
     private int xTile;
     private int yTile;
     private int zTile;
     private int ignoreTime;
+    private int lifetime = -1;
     private Entity ignoreEntity;
     private int power;
     private boolean isFiery;
     private boolean canDestroyBlocks;
+    private boolean isFirework;
     private int bouncesLeft;
     private boolean shouldSendPackets = true;
     /* rendering/client */
@@ -45,7 +49,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
     @Nullable
     private Entity shootingEntity;
 
-    public EntityPumkinProjectile(World worldIn) {
+    public EntityPumpkinProjectile(World worldIn) {
         super(worldIn);
         this.rotation = this.rand.nextInt(20000);
         this.xTile = -1;
@@ -55,12 +59,12 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.power = 1;
     }
 
-    public EntityPumkinProjectile(World worldIn, double x, double y, double z) {
+    public EntityPumpkinProjectile(World worldIn, double x, double y, double z) {
         this(worldIn);
         this.setPosition(x, y, z);
     }
 
-    public EntityPumkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks, @Nullable NBTTagCompound fireworkCompound) {
+    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks, @Nullable NBTTagCompound fireworkCompound) {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
         this.power = power;
@@ -69,6 +73,8 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.bouncesLeft = bounces;
         if (fireworkCompound != null) {
             this.dataManager.set(FIREWORK_NBT, fireworkCompound);
+            this.lifetime = 6 * (fireworkCompound.getByte("Flight") + 1) + this.rand.nextInt(5);
+            this.isFirework = true;
         }
     }
 
@@ -160,6 +166,9 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             if (power > 0) {
                 world.setEntityState(this, (byte) 101);
             }
+            if (isFirework) {
+                world.setEntityState(this, (byte) 104);
+            }
         }
 
         rotation++;
@@ -170,6 +179,17 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             this.rotationPitch = (float)(MathHelper.atan2(this.motionY, (double)f) * (180D / Math.PI));
             this.prevRotationYaw = this.rotationYaw;
             this.prevRotationPitch = this.rotationPitch;
+        }
+
+        if (isFirework) {
+            if (lifetime <= 0) {
+                explode();
+            } else {
+                lifetime -= 1;
+            }
+            if (this.ticksExisted == 0) {
+                this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.AMBIENT, 3.0F, 1.0F);
+            }
         }
 
         Vec3d vec3d = new Vec3d(this.posX, this.posY, this.posZ);
@@ -247,9 +267,11 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
         this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
 
-        spawnParticles();
+        if (this.world.isRemote) {
+            spawnParticles();
+        }
 
-        float speedMultiplier = 0.99F;
+        float speedMultiplier = this.getSpeedMultiplier();
         float gravityVelocity = this.getGravityVelocity();
 
         if (this.isInWater()) {
@@ -277,7 +299,7 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
             if (isFiery) {
                 this.world.spawnParticle(EnumParticleTypes.FLAME, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.6, motionY * 0.6, motionZ * 0.6);
             }
-            if (shouldSpawnSmokeParticles) {
+            if (shouldSpawnSmokeParticles && !isFirework) {
                 for (int i = 0; i < 3; i++) {
                     this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
                 }
@@ -285,16 +307,26 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
                     this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
                 }
             }
+            if (isFirework) {
+                this.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, this.posX, this.posY - 0.3D, this.posZ, this.rand.nextGaussian() * 0.05D, -this.motionY * 0.5D, this.rand.nextGaussian() * 0.05D);
+            }
         }
     }
 
     protected float getGravityVelocity() {
-        return 0.08F;
+        return isFirework ? 0 : 0.08F;
+    }
+
+    protected float getSpeedMultiplier() {
+        if (isInWater()) {
+            return 0.9F;
+        }
+        return isFirework ? 1 : 0.99F;
     }
 
     protected void onImpact(RayTraceResult raytraceresult) {
         if (!this.world.isRemote) {
-            if (this.isFiery && raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
+            if (isFiery && raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
                 raytraceresult.entityHit.setFire(this.power + 3);
             }
             if (bouncesLeft > 0 && !isInWater()) {
@@ -304,33 +336,72 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
                     }
                 }
             } else {
-                boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-                if (power > 0) {
-                    this.world.newExplosion(null, this.posX, this.posY, this.posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
-                }
-                this.setDead();
+                explode();
             }
         }
 
         if (bouncesLeft > 0 && !isInWater()) {
             bouncesLeft--;
             world.setEntityState(this, (byte) 103);
-            world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+            world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
             if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
                 if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.X) {
-                    this.motionX = - this.motionX;
+                    motionX = - motionX * 0.75;
                 } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Y) {
-                    this.motionY = - this.motionY;
+                    motionY = - motionY * 0.75;
                 } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Z) {
-                    this.motionZ = - this.motionZ;
+                    motionZ = - motionZ * 0.75;
                 }
-
             } else if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY) {
-                this.motionY = - this.motionY;
+                explode();
             }
-            this.motionX *= 0.75;
-            this.motionY *= 0.75;
-            this.motionZ *= 0.75;
+        }
+    }
+
+    private void explode() {
+        if (!this.world.isRemote) {
+            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
+            if (power > 0) {
+                this.world.newExplosion(null, posX, posY, posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
+            }
+            if (isFirework) {
+                this.dealExplosionDamage();
+                this.world.setEntityState(this, (byte)17);
+            }
+            this.setDead();
+        }
+    }
+
+    private void dealExplosionDamage() {
+        float f = 0.0F;
+        NBTTagList nbttaglist = this.dataManager.get(FIREWORK_NBT).getTagList("Explosions", 10);
+
+        if (!nbttaglist.hasNoTags()) {
+            f = (float)(5 + nbttaglist.tagCount() * 2);
+        }
+
+        if (f > 0.0F) {
+            Vec3d vec3d = new Vec3d(this.posX, this.posY, this.posZ);
+
+            for (EntityLivingBase entitylivingbase : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(5.0D))) {
+                if (this.getDistanceSq(entitylivingbase) <= 25.0D) {
+                    boolean flag = false;
+
+                    for (int i = 0; i < 2; ++i) {
+                        RayTraceResult raytraceresult = this.world.rayTraceBlocks(vec3d, new Vec3d(entitylivingbase.posX, entitylivingbase.posY + (double)entitylivingbase.height * 0.5D * (double)i, entitylivingbase.posZ), false, true, false);
+
+                        if (raytraceresult == null || raytraceresult.typeOfHit == RayTraceResult.Type.MISS) {
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (flag) {
+                        float f1 = f * (float)Math.sqrt((5.0D - (double)this.getDistance(entitylivingbase)) / 5.0D);
+                        entitylivingbase.attackEntityFrom(DamageSource.FIREWORKS, f1);
+                    }
+                }
+            }
         }
     }
 
@@ -345,18 +416,21 @@ public class EntityPumkinProjectile extends Entity implements IProjectile {
         } else if (id == 102) {
             this.isFiery = true;
         } else if (id == 103) {
-            for (int j = 0; j < 16; ++j)
-            {
-                float f = this.rand.nextFloat() * ((float)Math.PI * 2F);
+            for (int j = 0; j < 16; ++j) {
+                float f = this.rand.nextFloat() * ((float) Math.PI * 2F);
                 float f1 = this.rand.nextFloat() * 0.5F + 0.5F;
                 float f2 = MathHelper.sin(f) * f1;
                 float f3 = MathHelper.cos(f) * f1;
                 World world = this.world;
                 EnumParticleTypes enumparticletypes = EnumParticleTypes.SLIME;
-                double d0 = this.posX + (double)f2;
-                double d1 = this.posZ + (double)f3;
+                double d0 = this.posX + (double) f2;
+                double d1 = this.posZ + (double) f3;
                 world.spawnParticle(enumparticletypes, d0, this.getEntityBoundingBox().minY, d1, 0.0D, 0.0D, 0.0D);
             }
+        } else if (id == 104) {
+            this.isFirework = true;
+        } else if (id == 17) {
+            this.world.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, dataManager.get(FIREWORK_NBT));
         } else {
             super.handleStatusUpdate(id);
         }

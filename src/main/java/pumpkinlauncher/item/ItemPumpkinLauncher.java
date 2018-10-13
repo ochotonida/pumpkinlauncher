@@ -11,7 +11,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import pumpkinlauncher.PumpkinLauncher;
-import pumpkinlauncher.entity.EntityPumkinProjectile;
+import pumpkinlauncher.entity.EntityPumpkinProjectile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -70,10 +70,11 @@ public class ItemPumpkinLauncher extends Item {
                         canDestroyBlocks = stack.getTagCompound().getBoolean("canDestroyBlocks");
                     }
                     if (stack.getTagCompound().hasKey("fireworks")) {
+                        world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 2.0F, 1.0F);
                         fireworkCompound = stack.getTagCompound().getCompoundTag("fireworks");
                     }
                 }
-                EntityPumkinProjectile projectile = new EntityPumkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound);
+                EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
                 world.spawnEntity(projectile);
                 if (!player.capabilities.isCreativeMode) {
