@@ -28,6 +28,10 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class EntityPumpkinProjectile extends Entity implements IProjectile {
 
+    private static final DataParameter<Integer> BOUNCES_LEFT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.VARINT);
+    private static final DataParameter<Boolean> IS_FLAMING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> IS_SMOKING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> IS_FIREWORK = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
 
     private int xTile;
@@ -37,14 +41,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private int lifetime = -1;
     private Entity ignoreEntity;
     private int power;
-    private boolean isFiery;
     private boolean canDestroyBlocks;
-    private boolean isFirework;
-    private int bouncesLeft;
-    private boolean shouldSendPackets = true;
-    /* rendering/client */
+    /* rendering */
     int rotation;
-    private boolean shouldSpawnSmokeParticles;
 
     @Nullable
     private Entity shootingEntity;
@@ -68,18 +67,23 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
         this.power = power;
-        this.isFiery = isFiery;
+        this.dataManager.set(IS_SMOKING, power > 0);
+        this.dataManager.set(IS_FLAMING, isFiery);
+        this.dataManager.set(BOUNCES_LEFT, bounces);
         this.canDestroyBlocks = canDestroyBlocks;
-        this.bouncesLeft = bounces;
         if (fireworkCompound != null) {
             this.dataManager.set(FIREWORK_NBT, fireworkCompound);
+            this.dataManager.set(IS_FIREWORK, true);
             this.lifetime = 6 * (fireworkCompound.getByte("Flight") + 1) + this.rand.nextInt(5);
-            this.isFirework = true;
         }
     }
 
     @Override
     protected void entityInit() {
+        this.dataManager.register(BOUNCES_LEFT, 0);
+        this.dataManager.register(IS_FLAMING, false);
+        this.dataManager.register(IS_SMOKING, false);
+        this.dataManager.register(IS_FIREWORK, false);
         this.dataManager.register(FIREWORK_NBT, new NBTTagCompound());
     }
 
@@ -158,19 +162,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     public void onUpdate() {
         super.onUpdate();
 
-        if (shouldSendPackets) {
-            shouldSendPackets = false;
-            if (isFiery) {
-                world.setEntityState(this, (byte) 102);
-            }
-            if (power > 0) {
-                world.setEntityState(this, (byte) 101);
-            }
-            if (isFirework) {
-                world.setEntityState(this, (byte) 104);
-            }
-        }
-
         rotation++;
 
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
@@ -181,11 +172,13 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             this.prevRotationPitch = this.rotationPitch;
         }
 
-        if (isFirework) {
-            if (lifetime <= 0) {
-                explode();
-            } else {
-                lifetime -= 1;
+        if (dataManager.get(IS_FIREWORK)) {
+            if (!this.world.isRemote) {
+                if (lifetime <= 0) {
+                    explode();
+                } else {
+                    lifetime -= 1;
+                }
             }
             if (this.ticksExisted == 0) {
                 this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.AMBIENT, 3.0F, 1.0F);
@@ -296,10 +289,10 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX, motionY, motionZ);
             }
         } else {
-            if (isFiery) {
+            if (dataManager.get(IS_FLAMING)) {
                 this.world.spawnParticle(EnumParticleTypes.FLAME, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.6, motionY * 0.6, motionZ * 0.6);
             }
-            if (shouldSpawnSmokeParticles && !isFirework) {
+            if (dataManager.get(IS_SMOKING) && !dataManager.get(IS_FIREWORK)) {
                 for (int i = 0; i < 3; i++) {
                     this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
                 }
@@ -307,31 +300,31 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                     this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, posX - motionX * 0.25D + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25D + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
                 }
             }
-            if (isFirework) {
+            if (dataManager.get(IS_FIREWORK)) {
                 this.world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, this.posX, this.posY - 0.3D, this.posZ, this.rand.nextGaussian() * 0.05D, -this.motionY * 0.5D, this.rand.nextGaussian() * 0.05D);
             }
         }
     }
 
     protected float getGravityVelocity() {
-        return isFirework ? 0 : 0.08F;
+        return dataManager.get(IS_FIREWORK) ? 0 : 0.08F;
     }
 
     protected float getSpeedMultiplier() {
         if (isInWater()) {
             return 0.9F;
         }
-        return isFirework ? 1 : 0.99F;
+        return dataManager.get(IS_FIREWORK) ? 1 : 0.99F;
     }
 
     protected void onImpact(RayTraceResult raytraceresult) {
         if (!this.world.isRemote) {
-            if (isFiery && raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
+            if (dataManager.get(IS_FLAMING) && raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
                 raytraceresult.entityHit.setFire(this.power + 3);
             }
-            if (bouncesLeft > 0 && !isInWater()) {
+            if (getBouncesLeft() > 0 && !isInWater()) {
                 if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    if (isFiery && world.isAirBlock(raytraceresult.getBlockPos().offset(raytraceresult.sideHit)) && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity)) {
+                    if (dataManager.get(IS_FLAMING) && world.isAirBlock(raytraceresult.getBlockPos().offset(raytraceresult.sideHit)) && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity)) {
                         world.setBlockState(raytraceresult.getBlockPos().offset(raytraceresult.sideHit), Blocks.FIRE.getDefaultState(), 11);
                     }
                 }
@@ -340,9 +333,8 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             }
         }
 
-        if (bouncesLeft > 0 && !isInWater()) {
-            bouncesLeft--;
-            world.setEntityState(this, (byte) 103);
+        if (getBouncesLeft() > 0 && !isInWater()) {
+            setBouncesLeft(getBouncesLeft() - 1);
             world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
             if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
                 if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.X) {
@@ -362,9 +354,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         if (!this.world.isRemote) {
             boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
             if (power > 0) {
-                this.world.newExplosion(null, posX, posY, posZ, power + 1, flag && isFiery, flag && canDestroyBlocks);
+                this.world.newExplosion(null, posX, posY, posZ, power + 1, flag && dataManager.get(IS_FLAMING), flag && canDestroyBlocks);
             }
-            if (isFirework) {
+            if (dataManager.get(IS_FIREWORK)) {
                 this.dealExplosionDamage();
                 this.world.setEntityState(this, (byte)17);
             }
@@ -408,13 +400,8 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     @Override
     @SideOnly(Side.CLIENT)
     public void handleStatusUpdate(byte id) {
-        if (id == 101) {
-            this.shouldSpawnSmokeParticles = true;
-        } else if (id == 17 && this.world.isRemote) {
-            NBTTagCompound nbtTagCompound = this.dataManager.get(FIREWORK_NBT);
-            this.world.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, nbtTagCompound);
-        } else if (id == 102) {
-            this.isFiery = true;
+        if (id == 17 && this.world.isRemote) {
+            this.world.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, dataManager.get(FIREWORK_NBT));
         } else if (id == 103) {
             for (int j = 0; j < 16; ++j) {
                 float f = this.rand.nextFloat() * ((float) Math.PI * 2F);
@@ -427,13 +414,40 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 double d1 = this.posZ + (double) f3;
                 world.spawnParticle(enumparticletypes, d0, this.getEntityBoundingBox().minY, d1, 0.0D, 0.0D, 0.0D);
             }
-        } else if (id == 104) {
-            this.isFirework = true;
-        } else if (id == 17) {
-            this.world.makeFireworks(this.posX, this.posY, this.posZ, this.motionX, this.motionY, this.motionZ, dataManager.get(FIREWORK_NBT));
         } else {
             super.handleStatusUpdate(id);
         }
+    }
+
+    public int getBouncesLeft() {
+        return dataManager.get(BOUNCES_LEFT);
+    }
+
+    public void setBouncesLeft(int bounces) {
+        dataManager.set(BOUNCES_LEFT, bounces);
+    }
+
+    public boolean isFlaming() {
+        return dataManager.get(IS_FLAMING);
+    }
+
+    protected void setIsFlaming(boolean isFlaming) {
+        dataManager.set(IS_FLAMING, isFlaming);
+    }
+
+    public boolean isSmoking() {
+        return dataManager.get(IS_SMOKING);
+    }
+
+    protected void setIsSmoking(boolean isSmoking) {
+        dataManager.set(IS_SMOKING, isSmoking);
+    }
+
+    public boolean isFirework() {
+        return dataManager.get(IS_FIREWORK);
+    }
+    protected void setIsFirework(boolean isFirework) {
+        dataManager.set(IS_FIREWORK, isFirework);
     }
 
     @Override
@@ -442,9 +456,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         compound.setInteger("yTile", this.yTile);
         compound.setInteger("zTile", this.zTile);
         compound.setByte("power", (byte) this.power);
-        compound.setBoolean("isFiery", this.isFiery);
         compound.setBoolean("canDestroyBlocks", this.canDestroyBlocks);
-        compound.setByte("bouncesLeft", (byte) this.bouncesLeft);
+        compound.setByte("bouncesLeft", (byte) getBouncesLeft());
+        compound.setBoolean("isFiery", isFlaming());
+        compound.setBoolean("isSmoking", isSmoking());
+        compound.setBoolean("isFirework", isFirework());
+        compound.setTag("fireworkTag", dataManager.get(FIREWORK_NBT));
     }
 
     @Override
@@ -453,8 +470,11 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         this.yTile = compound.getInteger("yTile");
         this.zTile = compound.getInteger("zTile");
         this.power = compound.getByte("power");
-        this.isFiery = compound.getBoolean("isFiery");
         this.canDestroyBlocks = compound.getBoolean("canDestroyBlocks");
-        this.bouncesLeft = compound.getByte("bouncesLeft");
+        setBouncesLeft(compound.getByte("bouncesLeft"));
+        setIsFlaming(compound.getBoolean("isFiery"));
+        setIsSmoking(compound.getBoolean("isSmoking"));
+        setIsFirework(compound.getBoolean("isFirework"));
+        dataManager.set(FIREWORK_NBT, (NBTTagCompound) compound.getTag("fireworkTag"));
     }
 }
