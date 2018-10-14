@@ -286,6 +286,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Z) {
                     motionZ = - motionZ * 0.75;
                 }
+                world.setEntityState(this, (byte) 100);
             } else if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY) {
                 detonate();
             }
@@ -343,15 +344,15 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     public void handleStatusUpdate(byte id) {
         if (id == 17 && world.isRemote) {
             world.makeFireworks(posX, posY, posZ, motionX, motionY, motionZ, getFireworkNBT());
-        } else if (id == 103) {
+        } else if (id == 100 && world.isRemote) {
             for (int j = 0; j < 16; ++j) {
-                float f = rand.nextFloat() * ((float) Math.PI * 2F);
-                float f1 = rand.nextFloat() * 0.5F + 0.5F;
-                float f2 = MathHelper.sin(f) * f1;
-                float f3 = MathHelper.cos(f) * f1;
-                double x = posX + (double) f2;
-                double z = posZ + (double) f3;
-                world.spawnParticle(EnumParticleTypes.SLIME, x, getEntityBoundingBox().minY, z, 0, 0, 0);
+                float rotationXZ = (float) (rand.nextFloat() * Math.PI * 2);
+                float rotationY = (float) (rand.nextFloat() * Math.PI);
+                float distance = rand.nextFloat() * 0.4F + 0.3F;
+                float x = MathHelper.sin(rotationXZ) * MathHelper.sin(rotationY) * distance;
+                float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
+                float z = MathHelper.cos(rotationY) * distance;
+                world.spawnParticle(EnumParticleTypes.SLIME, posX + x, posY + y, posZ + z, 0, 0, 0);
             }
         } else {
             super.handleStatusUpdate(id);
