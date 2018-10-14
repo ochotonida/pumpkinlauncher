@@ -115,11 +115,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         motionX = x;
         motionY = y;
         motionZ = z;
-        f = MathHelper.sqrt(x * x + z * z);
-        rotationYaw = (float) (MathHelper.atan2(x, z) * (180 / Math.PI));
-        rotationPitch = (float) (MathHelper.atan2(y, (double) f) * (180 / Math.PI));
-        prevRotationYaw = rotationYaw;
-        prevRotationPitch = rotationPitch;
     }
 
     public void shoot(Entity shooter, float pitch, float yaw, float velocity, float inaccuracy) {
@@ -136,41 +131,10 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
-        setPosition(x, y, z);
-        setRotation(yaw, pitch);
-    }
-
-    @Override
-    public void setVelocity(double x, double y, double z) {
-        motionX = x;
-        motionY = y;
-        motionZ = z;
-
-        if (prevRotationPitch == 0 && prevRotationYaw == 0) {
-            float motionXZ = MathHelper.sqrt(x * x + z * z);
-            rotationPitch = (float) (MathHelper.atan2(y, motionXZ) * 180 / Math.PI);
-            rotationYaw = (float) (MathHelper.atan2(x, z) * 180 / Math.PI);
-            prevRotationPitch = rotationPitch;
-            prevRotationYaw = rotationYaw;
-            setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
-        }
-    }
-
-    @Override
     public void onUpdate() {
         super.onUpdate();
 
         rotation++;
-
-        if (prevRotationPitch == 0 && prevRotationYaw == 0) {
-            float motionXZ = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-            rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * 180 / Math.PI);
-            rotationPitch = (float)(MathHelper.atan2(motionY, motionXZ) * 180 / Math.PI);
-            prevRotationYaw = rotationYaw;
-            prevRotationPitch = rotationPitch;
-        }
 
         if (isFirework() && !world.isRemote) {
             if (lifetimeRemaining <= 0) {
@@ -242,26 +206,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         posX += motionX;
         posY += motionY;
         posZ += motionZ;
-
-        float motionXZ = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-        rotationYaw = (float)(MathHelper.atan2(motionX, motionZ) * 180 / Math.PI);
-        rotationPitch = (float)(MathHelper.atan2(motionY, motionXZ) * 180 / Math.PI);
-
-        while (rotationPitch - prevRotationPitch < -180) {
-            prevRotationPitch -= 360F;
-        }
-        while (rotationPitch - prevRotationPitch >= 180) {
-            prevRotationPitch += 360F;
-        }
-        while (rotationYaw - prevRotationYaw < -180) {
-            prevRotationYaw -= 360F;
-        }
-        while (rotationYaw - prevRotationYaw >= 180) {
-            prevRotationYaw += 360F;
-        }
-
-        rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
-        rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
 
         spawnParticles();
 
@@ -405,10 +349,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 float f1 = rand.nextFloat() * 0.5F + 0.5F;
                 float f2 = MathHelper.sin(f) * f1;
                 float f3 = MathHelper.cos(f) * f1;
-                EnumParticleTypes enumparticletypes = EnumParticleTypes.SLIME;
                 double x = posX + (double) f2;
                 double z = posZ + (double) f3;
-                world.spawnParticle(enumparticletypes, x, getEntityBoundingBox().minY, z, 0, 0, 0);
+                world.spawnParticle(EnumParticleTypes.SLIME, x, getEntityBoundingBox().minY, z, 0, 0, 0);
             }
         } else {
             super.handleStatusUpdate(id);
