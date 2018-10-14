@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.OreIngredient;
 import pumpkinlauncher.PumpkinLauncher;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -46,7 +47,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     fireChargeAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     woolAmount++;
-                } else if (OreDictionary.itemMatches(new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
+                } else if (new OreIngredient("slimeball").apply(stack)) {
                     slimeBallAmount++;
                 } else  if (OreDictionary.itemMatches(new ItemStack(Items.FIREWORKS, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     if (fireworkNBT != null || stack.getTagCompound() == null) {

@@ -18,7 +18,7 @@ public class JEIPlugin implements IModPlugin {
 
     @Override
     public void register(IModRegistry registry) {
-        registry.handleRecipes(PumpkinAmmoRecipeWrapper.class, (w) -> w, VanillaRecipeCategoryUid.CRAFTING);
+        registry.handleRecipes(ItemStackRecipeWrapper.class, (w) -> w, VanillaRecipeCategoryUid.CRAFTING);
         addContainerRecipes(registry);
     }
 
@@ -73,12 +73,12 @@ public class JEIPlugin implements IModPlugin {
         firework.setTagCompound(fireworkItemCompound);
 
         registry.addRecipes(Arrays.asList(
-                new PumpkinAmmoRecipeWrapper(output0, pumpkin, gunpowder),
-                new PumpkinAmmoRecipeWrapper(output1, pumpkin, gunpowder, fireCharge),
-                new PumpkinAmmoRecipeWrapper(output2, pumpkin, gunpowder, woolBlock),
-                new PumpkinAmmoRecipeWrapper(output3, pumpkin, gunpowder, slimeBall),
-                new PumpkinAmmoRecipeWrapper(output4, pumpkin, firework),
-                new PumpkinAmmoRecipeWrapper(output5, pumpkin, gunpowder, firework)
+                new ItemStackRecipeWrapper(output0, pumpkin, gunpowder),
+                new ItemStackRecipeWrapper(output1, pumpkin, gunpowder, fireCharge),
+                new ItemStackRecipeWrapper(output2, pumpkin, gunpowder, woolBlock),
+                new ItemStackRecipeWrapper(output3, pumpkin, gunpowder, slimeBall),
+                new ItemStackRecipeWrapper(output4, pumpkin, firework),
+                new ItemStackRecipeWrapper(output5, pumpkin, gunpowder, firework)
         ));
     }
 }

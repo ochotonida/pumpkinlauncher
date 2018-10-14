@@ -9,12 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
-public class PumpkinAmmoRecipeWrapper implements IRecipeWrapper {
+public class ItemStackRecipeWrapper implements IRecipeWrapper {
 
     private final List<ItemStack> inputs;
     private final ItemStack output;
 
-    PumpkinAmmoRecipeWrapper(ItemStack output, ItemStack... inputs) {
+    ItemStackRecipeWrapper(ItemStack output, ItemStack... inputs) {
         this.inputs = Arrays.asList(inputs);
         this.output = output;
     }
