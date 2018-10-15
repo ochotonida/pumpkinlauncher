@@ -1,4 +1,4 @@
-package pumpkinlauncher.handler;
+package pumpkinlauncher.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;

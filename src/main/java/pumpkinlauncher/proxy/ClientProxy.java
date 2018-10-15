@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import pumpkinlauncher.entity.EntityPumpkinProjectile;
 import pumpkinlauncher.PumpkinLauncher;
 import pumpkinlauncher.entity.RenderPumpkinProjectile;
-import pumpkinlauncher.handler.ClientEventHandler;
+import pumpkinlauncher.client.ClientEventHandler;
 
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {
