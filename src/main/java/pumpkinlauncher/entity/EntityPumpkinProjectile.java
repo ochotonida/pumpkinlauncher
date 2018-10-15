@@ -37,7 +37,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private static final DataParameter<Integer> BOUNCES_LEFT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> IS_FLAMING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_SMOKING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Boolean> IS_FIREWORK = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
     private static final DataParameter<NBTTagCompound> POTION_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
 
@@ -80,7 +79,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         if (fireworkCompound != null) {
             this.lifetimeRemaining = 6 * (fireworkCompound.getByte("Flight") + 1) + this.rand.nextInt(5);
             setFireworkNBT(fireworkCompound);
-            setIsFirework(true);
         }
     }
 
@@ -89,7 +87,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         dataManager.register(BOUNCES_LEFT, 0);
         dataManager.register(IS_FLAMING, false);
         dataManager.register(IS_SMOKING, false);
-        dataManager.register(IS_FIREWORK, false);
         dataManager.register(FIREWORK_NBT, new NBTTagCompound());
     }
 
@@ -412,10 +409,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     }
 
     public boolean isFirework() {
-        return dataManager.get(IS_FIREWORK);
-    }
-    private void setIsFirework(boolean isFirework) {
-        dataManager.set(IS_FIREWORK, isFirework);
+        return !dataManager.get(FIREWORK_NBT).hasNoTags();
     }
 
     public NBTTagCompound getFireworkNBT() {
@@ -425,6 +419,8 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private void setFireworkNBT(NBTBase compound) {
         dataManager.set(FIREWORK_NBT, (NBTTagCompound) compound);
     }
+
+
 
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
@@ -436,7 +432,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         compound.setByte("bouncesLeft", (byte) getBouncesLeft());
         compound.setBoolean("isFiery", isFlaming());
         compound.setBoolean("isSmoking", isSmoking());
-        compound.setBoolean("isFirework", isFirework());
         compound.setTag("fireworkTag", getFireworkNBT());
     }
 
@@ -450,7 +445,6 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setBouncesLeft(compound.getByte("bouncesLeft"));
         setIsFlaming(compound.getBoolean("isFiery"));
         setIsSmoking(compound.getBoolean("isSmoking"));
-        setIsFirework(compound.getBoolean("isFirework"));
         setFireworkNBT(compound.getTag("fireworkTag"));
     }
 
