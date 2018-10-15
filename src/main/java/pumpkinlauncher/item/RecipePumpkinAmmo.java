@@ -50,8 +50,11 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                 } else if (new OreIngredient("slimeball").apply(stack)) {
                     slimeBallAmount++;
                 } else  if (OreDictionary.itemMatches(new ItemStack(Items.FIREWORKS, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
-                    if (fireworkNBT != null || stack.getTagCompound() == null) {
+                    if (fireworkNBT != null) {
                         return false;
+                    } else if (stack.getTagCompound() == null) {
+                        fireworkNBT = new NBTTagCompound();
+                        fireworkNBT.setByte("Flight", (byte) 2);
                     } else {
                         try {
                             fireworkNBT = (NBTTagCompound) stack.getTagCompound().getTag("Fireworks");
