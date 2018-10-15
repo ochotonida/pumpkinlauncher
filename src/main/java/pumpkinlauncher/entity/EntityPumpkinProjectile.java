@@ -1,9 +1,13 @@
 package pumpkinlauncher.entity;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTBase;
@@ -12,14 +16,15 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.network.play.server.SPacketExplosion;
+import net.minecraft.util.*;
 import net.minecraft.util.math.*;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import pumpkinlauncher.client.ParticlePumpkin;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -34,6 +39,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private static final DataParameter<Boolean> IS_SMOKING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_FIREWORK = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
+    private static final DataParameter<NBTTagCompound> POTION_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
 
     private int xTile;
     private int yTile;
@@ -46,7 +52,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     int rotation;
 
     @Nullable
-    private Entity shootingEntity;
+    private EntityLivingBase shootingEntity;
 
     public EntityPumpkinProjectile(World worldIn) {
         super(worldIn);
@@ -261,8 +267,14 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
 
     protected void onImpact(RayTraceResult raytraceresult) {
         if (!world.isRemote) {
-            if (isFlaming() && raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
-                raytraceresult.entityHit.setFire(power + 3);
+            if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
+                if (shootingEntity instanceof EntityPlayer) {
+                    float velocity = MathHelper.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                    raytraceresult.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) shootingEntity), 2 * velocity);
+                }
+                if (isFlaming()) {
+                    raytraceresult.entityHit.setFire(power + 3);
+                }
             }
             if (getBouncesLeft() > 0 && !isInWater()) {
                 if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
@@ -297,13 +309,18 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         if (!world.isRemote) {
             boolean canMobGrief = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
-                world.newExplosion(null, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks);
+                CustomExplosion.createExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks);
+            } else {
+                world.setEntityState(this, (byte) 101);
             }
             if (isFirework()) {
                 dealExplosionDamage();
                 world.setEntityState(this, (byte) 17);
             }
             setDead();
+        }
+        if (power <= 0) {
+            world.playSound(null, posX, posY, posZ, SoundEvents.BLOCK_WOOD_BREAK, SoundCategory.NEUTRAL, 1.0F, 1.0F);
         }
     }
 
@@ -353,6 +370,17 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
                 float z = MathHelper.cos(rotationY) * distance;
                 world.spawnParticle(EnumParticleTypes.SLIME, posX + x, posY + y, posZ + z, 0, 0, 0);
+            }
+        } else if (id == 101 && world.isRemote) {
+            for (int j = 0; j < 48; ++j) {
+                float rotationXZ = (float) (rand.nextFloat() * Math.PI * 2);
+                float rotationY = (float) (rand.nextFloat() * Math.PI);
+                float distance = rand.nextFloat() * 0.4F + 0.3F;
+                float x = MathHelper.sin(rotationXZ) * MathHelper.sin(rotationY) * distance;
+                float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
+                float z = MathHelper.cos(rotationY) * distance;
+                Particle particle = new ParticlePumpkin(world, posX + x, posY + y, posZ + z, 0, 0, 0);
+                Minecraft.getMinecraft().effectRenderer.addEffect(particle);
             }
         } else {
             super.handleStatusUpdate(id);
@@ -424,5 +452,40 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setIsSmoking(compound.getBoolean("isSmoking"));
         setIsFirework(compound.getBoolean("isFirework"));
         setFireworkNBT(compound.getTag("fireworkTag"));
+    }
+
+    private static class CustomExplosion extends Explosion {
+
+        private final EntityLivingBase shootingEntity;
+
+        private CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking) {
+            super (world, explodingEntity, x, y, z, power, isFlaming, isSmoking);
+            this.shootingEntity = shootingEntity;
+        }
+
+        public static void createExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking) {
+            CustomExplosion explosion = new CustomExplosion(world, explodingEntity, shootingEntity, x, y, z, power, isFlaming, isSmoking);
+            if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) return;
+            explosion.doExplosionA();
+            if (world instanceof WorldServer) {
+                explosion.doExplosionB(false);
+                if (!isSmoking) {
+                    explosion.clearAffectedBlockPositions();
+                }
+                for (EntityPlayer entityplayer : world.playerEntities) {
+                    if (entityplayer.getDistanceSq(x, y, z) < 4096.0D) {
+                        ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, power, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
+                    }
+                }
+            } else {
+                explosion.doExplosionB(true);
+            }
+        }
+
+        @Override
+        @Nullable
+        public EntityLivingBase getExplosivePlacedBy() {
+            return shootingEntity != null ? shootingEntity : super.getExplosivePlacedBy();
+        }
     }
 }
