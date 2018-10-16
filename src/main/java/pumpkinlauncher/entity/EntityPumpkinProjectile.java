@@ -373,6 +373,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 }
             }
 
+            // spawn particles
             int eventType = type.hasInstantEffect() ? 2007 : 2002;
             this.world.playEvent(eventType, new BlockPos(this), PotionUtils.getColor(stack));
         }
@@ -385,7 +386,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     }
 
     private void applyWater() {
-        AxisAlignedBB axisalignedbb = getEntityBoundingBox().grow(6, 3, 6);
+        AxisAlignedBB axisalignedbb = getEntityBoundingBox().grow(5, 3, 5);
         List<EntityLivingBase> list = world.getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb, WATER_SENSITIVE);
 
         if (!list.isEmpty()) {
@@ -438,8 +439,8 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private void makeAreaOfEffectCloud(ItemStack stack, PotionType type) {
         EntityAreaEffectCloud entityareaeffectcloud = new EntityAreaEffectCloud(world, posX, posY, posZ);
         entityareaeffectcloud.setOwner(shootingEntity);
-        entityareaeffectcloud.setRadius(4F);
-        entityareaeffectcloud.setRadiusOnUse(-0.5F);
+        entityareaeffectcloud.setRadius(3.2F);
+        entityareaeffectcloud.setRadiusOnUse(-0.4F);
         entityareaeffectcloud.setWaitTime(10);
         entityareaeffectcloud.setRadiusPerTick(-entityareaeffectcloud.getRadius() / entityareaeffectcloud.getDuration());
         entityareaeffectcloud.setPotion(type);
@@ -571,6 +572,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private void setPotion(ItemStack itemstack) {
         dataManager.set(POTION_ITEM, itemstack);
         dataManager.setDirty(POTION_ITEM);
+        for (PotionEffect effect : PotionUtils.getEffectsFromStack(itemstack)) {
+            if (effect.getPotion() == MobEffects.INVISIBILITY) {
+                setInvisible(true);
+                break;
+            }
+        }
     }
 
     @Override

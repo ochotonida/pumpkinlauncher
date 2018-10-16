@@ -30,12 +30,14 @@ public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
     @Override
     @ParametersAreNonnullByDefault
     public void doRender(EntityPumpkinProjectile entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        float rotation = entity.rotation + partialTicks;
-        GlStateManager.pushMatrix();
-        bindEntityTexture(entity);
-        GlStateManager.translate((float)x, (float)y, (float)z);
-        MODEL.render(entity, 0, rotation * 20, 0, 0, 0, 0.0625F);
-        GlStateManager.popMatrix();
+        if (!entity.isInvisible()) {
+            float rotation = entity.rotation + partialTicks;
+            GlStateManager.pushMatrix();
+            bindEntityTexture(entity);
+            GlStateManager.translate((float) x, (float) y, (float) z);
+            MODEL.render(entity, 0, rotation * 20, 0, 0, 0, 0.0625F);
+            GlStateManager.popMatrix();
+        }
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 

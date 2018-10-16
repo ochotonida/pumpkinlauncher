@@ -41,7 +41,7 @@ public class ItemPumpkinAmmo extends Item {
                 ItemStack potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
                 PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
                 if (potionStack.getItem() == Items.LINGERING_POTION) {
-                    tooltip.add(1, I18n.translateToLocal("item.pumpkinammo.lingering"));
+                    tooltip.add(I18n.translateToLocal("item.pumpkinammo.lingering"));
                 }
             }
             if (nbttagcompound.hasKey("power") && nbttagcompound.getByte("power") > 0) {

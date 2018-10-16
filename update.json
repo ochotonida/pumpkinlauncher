@@ -4,10 +4,11 @@
     "1.0.0": "initial release",
     "1.1.0": "recipe for exploding jack-o'-lantern can now take up to 4 gunpowder,\nexploding jack-o'-lanterns withouth proper nbt tags now get a tooltip with crafting info,\nslime balls can now be used as a crafting ingredient to make jack-o'-lanterns bouncy,\nspelling of 'Jack o'Lantern' is now consistent with the spelling used by minecraft",
     "1.2.0": "added JEI support,\nadded better particles,\nmade some minor changes to projectile behaviour",
-    "1.3.0": "fireworks can now be used in the exploding jack o'lantern recipe to remove gravity from the projectile, set a maximum flight time before exploding, and optionally adding particle effects,\nfixed a few desynchronisation issues,\nrenamed 'Bounce' to 'Bounce:'"
+    "1.3.0": "fireworks can now be used in the exploding jack o'lantern recipe to remove gravity from the projectile, set a maximum flight time before exploding, and optionally adding particle effects,\nfixed a few desynchronisation issues,\nrenamed 'Bounce' to 'Bounce:'",
+    "1.4.0": "splash- & lingering potions can now be used in the exploding jack o'lantern recipe to add effects to exploding jack o'lanterns,\nadded french translation (by pyrofab),\nincreased amount of exploding jack o'lanterns obtained from crafting to 2,\nfixed exploding jack o'lanterns being uncraftable with fireworks without nbt"
   },
   "promos": {
-    "1.12.2-latest": "1.3.0",
-    "1.12.2-recommended": "1.3.0"
+    "1.12.2-latest": "1.4.0",
+    "1.12.2-recommended": "1.4.0"
   }
 }
