@@ -2,7 +2,6 @@ package pumpkinlauncher.item;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,7 +23,6 @@ public class ItemPumpkinLauncher extends Item {
         setUnlocalizedName("pumpkinlauncher");
         setCreativeTab(CreativeTabs.COMBAT);
         setMaxStackSize(1);
-        setMaxDamage(95);
     }
 
     private ItemStack findAmmo(EntityPlayer player) {
@@ -88,7 +86,6 @@ public class ItemPumpkinLauncher extends Item {
                     stack.shrink(1);
                 }
             }
-            player.getHeldItem(hand).damageItem(1, player);
             return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
         } else {
             if (!world.isRemote) {
@@ -101,10 +98,5 @@ public class ItemPumpkinLauncher extends Item {
     @Override
     public boolean isFull3D() {
         return true;
-    }
-
-    @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return net.minecraftforge.oredict.OreDictionary.itemMatches(new ItemStack(Items.IRON_INGOT), repair, false);
     }
 }
