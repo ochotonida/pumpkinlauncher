@@ -1,0 +1,9 @@
+item.pumpkinlauncher.name=Lance-citrouilles
+item.pumpkinammo.name=Citrouille explosive
+
+item.pumpkinammo.power=Puissance détonante:
+item.pumpkinammo.isfiery=Ardente
+item.pumpkinammo.nogriefing=Étouffée
+item.pumpkinammo.bounce=Rebond:
+
+entity.pumpkinprojectile.name=Citrouille explosive
