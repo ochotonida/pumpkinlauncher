@@ -4,11 +4,13 @@ import com.google.common.collect.Lists;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFireworkCharge;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -35,6 +37,13 @@ public class ItemPumpkinAmmo extends Item {
         NBTTagCompound nbttagcompound = stack.getTagCompound();
 
         if (nbttagcompound != null) {
+            if (nbttagcompound.hasKey("potionTag")) {
+                ItemStack potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
+                PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
+                if (potionStack.getItem() == Items.LINGERING_POTION) {
+                    tooltip.add(1, I18n.translateToLocal("item.pumpkinammo.lingering"));
+                }
+            }
             if (nbttagcompound.hasKey("power") && nbttagcompound.getByte("power") > 0) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.power") + " " + nbttagcompound.getByte("power"));
             }

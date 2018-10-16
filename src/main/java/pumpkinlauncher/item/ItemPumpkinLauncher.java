@@ -56,6 +56,8 @@ public class ItemPumpkinLauncher extends Item {
                 boolean isFiery = false;
                 boolean canDestroyBlocks = true;
                 NBTTagCompound fireworkCompound = null;
+                ItemStack potionStack = null;
+
                 if (!stack.isEmpty() && stack.getTagCompound() != null) {
                     if (stack.getTagCompound().hasKey("power")) {
                         power = stack.getTagCompound().getByte("power");
@@ -73,8 +75,11 @@ public class ItemPumpkinLauncher extends Item {
                         world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 2.0F, 1.0F);
                         fireworkCompound = stack.getTagCompound().getCompoundTag("fireworks");
                     }
+                    if (stack.getTagCompound().hasKey("potionTag")) {
+                        potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
+                    }
                 }
-                EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound);
+                EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound, potionStack);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
                 world.spawnEntity(projectile);
                 if (!player.capabilities.isCreativeMode) {

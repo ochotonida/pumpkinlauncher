@@ -26,6 +26,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public boolean matches(InventoryCrafting inventory, World world) {
         this.resultItem = ItemStack.EMPTY;
 
@@ -35,6 +36,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         int woolAmount = 0;
         int slimeBallAmount = 0;
         NBTTagCompound fireworkNBT = null;
+        ItemStack potionStack = null;
 
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
@@ -58,9 +60,15 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     } else {
                         try {
                             fireworkNBT = (NBTTagCompound) stack.getTagCompound().getTag("Fireworks");
-                        } catch (ClassCastException e ) {
+                        } catch (ClassCastException e) {
                             return false;
                         }
+                    }
+                } else if (stack.getItem() == Items.SPLASH_POTION || stack.getItem() == Items.LINGERING_POTION) {
+                    if (stack.getTagCompound() == null || potionStack != null) {
+                        return false;
+                    } else {
+                        potionStack = stack;
                     }
                 } else {
                     return false;
@@ -68,8 +76,8 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             }
         }
 
-        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireworkNBT != null) && gunpowderAmount <= 4 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127) {
-            resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
+        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireworkNBT != null || potionStack != null) && gunpowderAmount <= 4 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127) {
+            resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setByte("power", (byte) gunpowderAmount);
             compound.setByte("bounceAmount", (byte) (slimeBallAmount));
@@ -77,6 +85,9 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             compound.setBoolean("canDestroyBlocks", woolAmount < 1);
             if (fireworkNBT != null) {
                 compound.setTag("fireworks", fireworkNBT);
+            }
+            if (potionStack != null) {
+                compound.setTag("potionTag", potionStack.writeToNBT(new NBTTagCompound()));
             }
             resultItem.setTagCompound(compound);
             return true;
