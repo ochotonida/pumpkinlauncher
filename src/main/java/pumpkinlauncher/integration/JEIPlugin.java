@@ -48,9 +48,9 @@ public class JEIPlugin implements IModPlugin {
         compound4.setTag("fireworks", fireworkCompound.copy());
         NBTTagCompound compound5 = compound.copy();
         compound5.setTag("fireworks", fireworkCompound.copy());
-        NBTTagCompound compound6 = compound.copy();
+        NBTTagCompound compound6 = new NBTTagCompound();
         compound6.setTag("potionTag", new ItemStack(Items.SPLASH_POTION).writeToNBT(new NBTTagCompound()));
-        NBTTagCompound compound7 = compound.copy();
+        NBTTagCompound compound7 = new NBTTagCompound();
         compound7.setTag("potionTag", new ItemStack(Items.LINGERING_POTION).writeToNBT(new NBTTagCompound()));
 
         ItemStack output0 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
