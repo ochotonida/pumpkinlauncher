@@ -1,16 +1,17 @@
-package pumpkinlauncher.item;
+package pumpkinlauncher.item.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentArrowInfinite;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import pumpkinlauncher.PumpkinLauncher;
 
 public class EnchantmentAmmoSaving extends Enchantment {
 
     public EnchantmentAmmoSaving() {
         super(Rarity.VERY_RARE, EnumEnchantmentType.BOW, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
-        this.setRegistryName("ammo_saving");
-        this.setName("ammo_saving");
+        this.setRegistryName(PumpkinLauncher.MODID + ":ammosaving");
+        this.setName("ammosaving");
     }
 
     @Override
@@ -20,12 +21,12 @@ public class EnchantmentAmmoSaving extends Enchantment {
 
     @Override
     public int getMinEnchantability(int enchantmentLevel) {
-        return 15;
+        return enchantmentLevel * 10;
     }
 
     @Override
     public int getMaxEnchantability(int enchantmentLevel) {
-        return 50;
+        return getMinEnchantability(enchantmentLevel) + 20;
     }
 
     @Override

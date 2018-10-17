@@ -11,10 +11,11 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
-import pumpkinlauncher.item.EnchantmentAmmoSaving;
+import pumpkinlauncher.item.enchantment.EnchantmentAmmoSaving;
 import pumpkinlauncher.item.ItemPumpkinAmmo;
 import pumpkinlauncher.item.ItemPumpkinLauncher;
 import pumpkinlauncher.item.RecipePumpkinAmmo;
+import pumpkinlauncher.item.enchantment.EnchantmentReloadingSpeed;
 import pumpkinlauncher.proxy.CommonProxy;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -29,6 +30,7 @@ public class PumpkinLauncher {
     public static final Item PUMPKIN_AMMO = new ItemPumpkinAmmo();
 
     public static final Enchantment AMMO_SAVING = new EnchantmentAmmoSaving();
+    public static final Enchantment RELOADING_SPEED = new EnchantmentReloadingSpeed();
 
     @Mod.Instance
     public static PumpkinLauncher instance;
@@ -70,6 +72,7 @@ public class PumpkinLauncher {
         @SubscribeEvent
         public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
             event.getRegistry().register(AMMO_SAVING);
+            event.getRegistry().register(RELOADING_SPEED);
         }
     }
 }

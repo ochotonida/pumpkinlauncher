@@ -49,9 +49,6 @@ public class ItemPumpkinLauncher extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         int infinityLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, player.getHeldItem(hand));
-        int powerLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, player.getHeldItem(hand));
-        int ammoSavingLevel = EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.AMMO_SAVING, player.getHeldItem(hand));
-
 
         ItemStack stack = findAmmo(player);
         if (stack.isEmpty() && (player.capabilities.isCreativeMode || infinityLevel > 0)){
@@ -60,7 +57,9 @@ public class ItemPumpkinLauncher extends Item {
         if (!stack.isEmpty()) {
             if (!world.isRemote) {
                 world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
-                player.getCooldownTracker().setCooldown(this, 20);
+
+                int reloadingSpeed = 40 - 6 * EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.RELOADING_SPEED, player.getHeldItem(hand));
+                player.getCooldownTracker().setCooldown(this, reloadingSpeed);
 
                 int power = 2;
                 int bounceAmount = 0;
@@ -90,10 +89,13 @@ public class ItemPumpkinLauncher extends Item {
                         potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
                     }
                 }
+
+                float velocity = 1.3F + 0.12F * EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, player.getHeldItem(hand));
                 EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound, potionStack);
-                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.15F * powerLevel, 5F);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, velocity, 5F);
                 world.spawnEntity(projectile);
-                if (itemRand.nextInt(1 + ammoSavingLevel) == 0) {
+
+                if (itemRand.nextInt(1 + EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.AMMO_SAVING, player.getHeldItem(hand))) == 0) {
                     stack.shrink(1);
                 }
             }
@@ -119,6 +121,6 @@ public class ItemPumpkinLauncher extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
-        return enchantment == Enchantments.INFINITY || enchantment == Enchantments.POWER || enchantment == Enchantments.MENDING || enchantment == Enchantments.UNBREAKING || enchantment == PumpkinLauncher.AMMO_SAVING;
+        return enchantment == Enchantments.POWER || enchantment == Enchantments.MENDING || enchantment == Enchantments.UNBREAKING || enchantment == PumpkinLauncher.AMMO_SAVING || enchantment == PumpkinLauncher.RELOADING_SPEED;
     }
 }

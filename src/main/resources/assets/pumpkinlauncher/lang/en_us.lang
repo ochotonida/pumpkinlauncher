@@ -7,4 +7,7 @@ item.pumpkinammo.nogriefing=Muffled
 item.pumpkinammo.bounce=Bounce:
 item.pumpkinammo.lingering=Lingering
 
+enchantment.ammosaving=Unwasting
+enchantment.reloadingspeed=Reloading
+
 entity.pumpkinprojectile.name=Exploding Jack o'Lantern
