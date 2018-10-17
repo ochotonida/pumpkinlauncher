@@ -48,8 +48,13 @@ public class ItemPumpkinLauncher extends Item {
     @Nonnull
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        int infinityLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, player.getHeldItem(hand));
+        int powerLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, player.getHeldItem(hand));
+        int ammoSavingLevel = EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.AMMO_SAVING, player.getHeldItem(hand));
+
+
         ItemStack stack = findAmmo(player);
-        if (stack.isEmpty() && (player.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, player.getHeldItem(hand)) > 0)){
+        if (stack.isEmpty() && (player.capabilities.isCreativeMode || infinityLevel > 0)){
             stack = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
         }
         if (!stack.isEmpty()) {
@@ -86,9 +91,11 @@ public class ItemPumpkinLauncher extends Item {
                     }
                 }
                 EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound, potionStack);
-                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.15F * EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, player.getHeldItem(hand)), 5F);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.15F * powerLevel, 5F);
                 world.spawnEntity(projectile);
-                stack.shrink(1);
+                if (itemRand.nextInt(1 + ammoSavingLevel) == 0) {
+                    stack.shrink(1);
+                }
             }
             player.getHeldItem(hand).damageItem(1, player);
             return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
