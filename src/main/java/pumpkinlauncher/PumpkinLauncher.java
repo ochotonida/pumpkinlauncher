@@ -1,5 +1,6 @@
 package pumpkinlauncher;
 
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
+import pumpkinlauncher.item.EnchantmentAmmoSaving;
 import pumpkinlauncher.item.ItemPumpkinAmmo;
 import pumpkinlauncher.item.ItemPumpkinLauncher;
 import pumpkinlauncher.item.RecipePumpkinAmmo;
@@ -25,6 +27,8 @@ public class PumpkinLauncher {
 
     public static final Item PUMPKIN_LAUNCHER = new ItemPumpkinLauncher();
     public static final Item PUMPKIN_AMMO = new ItemPumpkinAmmo();
+
+    public static final Enchantment AMMO_SAVING = new EnchantmentAmmoSaving();
 
     @Mod.Instance
     public static PumpkinLauncher instance;
@@ -61,6 +65,11 @@ public class PumpkinLauncher {
         @SubscribeEvent
         public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
             event.getRegistry().register(new RecipePumpkinAmmo());
+        }
+
+        @SubscribeEvent
+        public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
+            event.getRegistry().register(AMMO_SAVING);
         }
     }
 }

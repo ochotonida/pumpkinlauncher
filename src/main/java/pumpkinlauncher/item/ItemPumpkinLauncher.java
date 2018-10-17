@@ -1,7 +1,9 @@
 package pumpkinlauncher.item;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,6 +18,7 @@ import pumpkinlauncher.entity.EntityPumpkinProjectile;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class ItemPumpkinLauncher extends Item {
 
     public ItemPumpkinLauncher() {
@@ -23,6 +26,7 @@ public class ItemPumpkinLauncher extends Item {
         setUnlocalizedName("pumpkinlauncher");
         setCreativeTab(CreativeTabs.COMBAT);
         setMaxStackSize(1);
+        setMaxDamage(95);
     }
 
     private ItemStack findAmmo(EntityPlayer player) {
@@ -43,15 +47,17 @@ public class ItemPumpkinLauncher extends Item {
 
     @Nonnull
     @Override
-    @ParametersAreNonnullByDefault
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = findAmmo(player);
-        if (!stack.isEmpty() || player.capabilities.isCreativeMode) {
+        if (stack.isEmpty() && (player.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, player.getHeldItem(hand)) > 0)){
+            stack = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO);
+        }
+        if (!stack.isEmpty()) {
             if (!world.isRemote) {
                 world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
                 player.getCooldownTracker().setCooldown(this, 20);
 
-                int power = 3;
+                int power = 2;
                 int bounceAmount = 0;
                 boolean isFiery = false;
                 boolean canDestroyBlocks = true;
@@ -80,12 +86,11 @@ public class ItemPumpkinLauncher extends Item {
                     }
                 }
                 EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, fireworkCompound, potionStack);
-                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F, 5F);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.15F * EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, player.getHeldItem(hand)), 5F);
                 world.spawnEntity(projectile);
-                if (!player.capabilities.isCreativeMode) {
-                    stack.shrink(1);
-                }
+                stack.shrink(1);
             }
+            player.getHeldItem(hand).damageItem(1, player);
             return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
         } else {
             if (!world.isRemote) {
@@ -98,5 +103,15 @@ public class ItemPumpkinLauncher extends Item {
     @Override
     public boolean isFull3D() {
         return true;
+    }
+
+    @Override
+    public int getItemEnchantability() {
+        return 1;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
+        return enchantment == Enchantments.INFINITY || enchantment == Enchantments.POWER || enchantment == Enchantments.MENDING || enchantment == Enchantments.UNBREAKING || enchantment == PumpkinLauncher.AMMO_SAVING;
     }
 }

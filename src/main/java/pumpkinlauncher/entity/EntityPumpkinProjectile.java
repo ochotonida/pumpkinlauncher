@@ -167,6 +167,8 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
 
         Entity hitEntity = null;
         List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1));
+        list.remove(shootingEntity);
+
         double hitEntityDistance = 0.0D;
         boolean flag = false;
 
