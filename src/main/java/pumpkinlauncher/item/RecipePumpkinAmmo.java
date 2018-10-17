@@ -1,6 +1,8 @@
 package pumpkinlauncher.item;
 
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockPumpkin;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
@@ -41,7 +43,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
             if (!stack.isEmpty()) {
-                if (OreDictionary.itemMatches(new ItemStack(Blocks.LIT_PUMPKIN, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
+                if (Block.getBlockFromItem(stack.getItem()) instanceof BlockPumpkin ){
                     pumpkinAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Items.GUNPOWDER, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     gunpowderAmount++;
