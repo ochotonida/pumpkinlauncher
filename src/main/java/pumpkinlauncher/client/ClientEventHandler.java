@@ -8,7 +8,7 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pumpkinlauncher.item.ItemPumpkinLauncher;
+import pumpkinlauncher.common.item.ItemPumpkinLauncher;
 
 @SideOnly(Side.CLIENT)
 public class ClientEventHandler {

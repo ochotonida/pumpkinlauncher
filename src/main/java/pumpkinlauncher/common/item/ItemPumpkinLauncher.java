@@ -1,4 +1,4 @@
-package pumpkinlauncher.item;
+package pumpkinlauncher.common.item;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -13,7 +13,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import pumpkinlauncher.PumpkinLauncher;
-import pumpkinlauncher.entity.EntityPumpkinProjectile;
+import pumpkinlauncher.common.entity.EntityPumpkinProjectile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -95,7 +95,7 @@ public class ItemPumpkinLauncher extends Item {
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, velocity, 5F);
                 world.spawnEntity(projectile);
 
-                if (itemRand.nextInt(1 + EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.AMMO_SAVING, player.getHeldItem(hand))) == 0) {
+                if (!player.capabilities.isCreativeMode && itemRand.nextInt(1 + EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.AMMO_SAVING, player.getHeldItem(hand))) == 0) {
                     stack.shrink(1);
                 }
             }

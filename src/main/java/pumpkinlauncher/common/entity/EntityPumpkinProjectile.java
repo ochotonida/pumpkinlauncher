@@ -1,7 +1,5 @@
-package pumpkinlauncher.entity;
+package pumpkinlauncher.common.entity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.*;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -27,7 +25,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import pumpkinlauncher.client.ParticlePumpkin;
+import pumpkinlauncher.client.particle.Particles;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,14 +52,15 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private Entity ignoreEntity;
     private int power;
     private boolean canDestroyBlocks;
-    int rotation;
+    private boolean shouldHurtPlayer;
+    public int rotation;
 
     @Nullable
     private EntityLivingBase shootingEntity;
 
     public EntityPumpkinProjectile(World worldIn) {
         super(worldIn);
-        rotation = rand.nextInt(20000);
+        rotation = rand.nextInt(200);
         xTile = -1;
         yTile = -1;
         zTile = -1;
@@ -329,7 +328,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         if (!world.isRemote) {
             boolean canMobGrief = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
-                CustomExplosion.createExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks);
+                CustomExplosion.createExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer);
             } else {
                 // explode in particles
                 world.setEntityState(this, (byte) 101);
@@ -517,8 +516,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                     float x = MathHelper.sin(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float z = MathHelper.cos(rotationY) * distance;
-                    Particle particle = new ParticlePumpkin(world, posX + x, posY + y, posZ + z, 0, 0, 0);
-                    Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+                    Particles.PUMPKIN_BREAK.spawn(world, posX + x, posY + y, posZ + z, 0, 0, 0);
                 }
                 break;
             default:
@@ -618,13 +616,13 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
 
         private final EntityLivingBase shootingEntity;
 
-        private CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking) {
+        private CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
             super (world, explodingEntity, x, y, z, power, isFlaming, isSmoking);
             this.shootingEntity = shootingEntity;
         }
 
-        public static void createExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking) {
-            CustomExplosion explosion = new CustomExplosion(world, explodingEntity, shootingEntity, x, y, z, power, isFlaming, isSmoking);
+        public static void createExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
+            CustomExplosion explosion = new CustomExplosion(world, explodingEntity, shootingEntity, x, y, z, power, isFlaming, isSmoking, shouldHurtShootingEntity);
             if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) return;
             explosion.doExplosionA();
             if (world instanceof WorldServer) {

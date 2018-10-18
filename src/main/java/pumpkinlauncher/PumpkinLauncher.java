@@ -11,12 +11,12 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
-import pumpkinlauncher.item.enchantment.EnchantmentAmmoSaving;
-import pumpkinlauncher.item.ItemPumpkinAmmo;
-import pumpkinlauncher.item.ItemPumpkinLauncher;
-import pumpkinlauncher.item.RecipePumpkinAmmo;
-import pumpkinlauncher.item.enchantment.EnchantmentReloadingSpeed;
-import pumpkinlauncher.proxy.CommonProxy;
+import pumpkinlauncher.common.enchantment.EnchantmentAmmoSaving;
+import pumpkinlauncher.common.item.ItemPumpkinAmmo;
+import pumpkinlauncher.common.item.ItemPumpkinLauncher;
+import pumpkinlauncher.common.item.RecipePumpkinAmmo;
+import pumpkinlauncher.common.enchantment.EnchantmentReloadingSpeed;
+import pumpkinlauncher.common.CommonProxy;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 @Mod(modid=PumpkinLauncher.MODID, name=PumpkinLauncher.MODNAME, version=PumpkinLauncher.MODVERSION, updateJSON="https://github.com/ochotonida/pumpkinlauncher/blob/master/update.json")
@@ -35,7 +35,7 @@ public class PumpkinLauncher {
     @Mod.Instance
     public static PumpkinLauncher instance;
 
-    @SidedProxy(serverSide = "pumpkinlauncher.proxy.CommonProxy", clientSide = "pumpkinlauncher.proxy.ClientProxy")
+    @SidedProxy(serverSide = "pumpkinlauncher.common.CommonProxy", clientSide = "pumpkinlauncher.client.ClientProxy")
     public static CommonProxy proxy;
 
     @Mod.EventHandler

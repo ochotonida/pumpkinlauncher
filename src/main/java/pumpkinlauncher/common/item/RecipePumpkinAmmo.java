@@ -1,4 +1,4 @@
-package pumpkinlauncher.item;
+package pumpkinlauncher.common.item;
 
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;

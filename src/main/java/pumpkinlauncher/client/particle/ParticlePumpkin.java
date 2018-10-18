@@ -1,18 +1,22 @@
-package pumpkinlauncher.client;
+package pumpkinlauncher.client.particle;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@SideOnly(Side.CLIENT)
 @ParametersAreNonnullByDefault
 public class ParticlePumpkin extends Particle {
 
-    public ParticlePumpkin(World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    protected ParticlePumpkin(World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         super(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
         this.setParticleTexture(Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.PUMPKIN.getDefaultState()));
         this.particleGravity = Blocks.STONE.blockParticleGravity;
@@ -51,5 +55,13 @@ public class ParticlePumpkin extends Particle {
         buffer.pos((double)(f5 - rotationX * f4 + rotationXY * f4), (double)(f6 + rotationZ * f4), (double)(f7 - rotationYZ * f4 + rotationXZ * f4)).tex((double)f, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
         buffer.pos((double)(f5 + rotationX * f4 + rotationXY * f4), (double)(f6 + rotationZ * f4), (double)(f7 + rotationYZ * f4 + rotationXZ * f4)).tex((double)f1, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
         buffer.pos((double)(f5 + rotationX * f4 - rotationXY * f4), (double)(f6 - rotationZ * f4), (double)(f7 + rotationYZ * f4 - rotationXZ * f4)).tex((double)f1, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static class Factory implements IParticleFactory {
+        @Override
+        public Particle createParticle(int particleID, World world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, int... parameters) {
+            return new ParticlePumpkin(world, x, y, z, velocityX, velocityY, velocityZ);
+        }
     }
 }

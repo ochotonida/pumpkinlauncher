@@ -1,4 +1,4 @@
-package pumpkinlauncher.proxy;
+package pumpkinlauncher.common;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import pumpkinlauncher.PumpkinLauncher;
-import pumpkinlauncher.entity.EntityPumpkinProjectile;
+import pumpkinlauncher.common.entity.EntityPumpkinProjectile;
 
 public class CommonProxy {
 

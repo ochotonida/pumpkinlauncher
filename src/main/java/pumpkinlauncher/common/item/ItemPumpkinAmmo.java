@@ -1,4 +1,4 @@
-package pumpkinlauncher.item;
+package pumpkinlauncher.common.item;
 
 import com.google.common.collect.Lists;
 import mcp.MethodsReturnNonnullByDefault;

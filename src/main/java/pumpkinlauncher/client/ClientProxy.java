@@ -1,4 +1,4 @@
-package pumpkinlauncher.proxy;
+package pumpkinlauncher.client;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -7,10 +7,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import pumpkinlauncher.entity.EntityPumpkinProjectile;
+import pumpkinlauncher.common.entity.EntityPumpkinProjectile;
 import pumpkinlauncher.PumpkinLauncher;
-import pumpkinlauncher.entity.RenderPumpkinProjectile;
-import pumpkinlauncher.client.ClientEventHandler;
+import pumpkinlauncher.client.entity.RenderPumpkinProjectile;
+import pumpkinlauncher.common.CommonProxy;
 
 @SuppressWarnings("unused")
 public class ClientProxy extends CommonProxy {

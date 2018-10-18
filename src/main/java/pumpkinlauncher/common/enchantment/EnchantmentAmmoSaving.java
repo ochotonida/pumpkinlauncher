@@ -1,4 +1,4 @@
-package pumpkinlauncher.item.enchantment;
+package pumpkinlauncher.common.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentArrowInfinite;
