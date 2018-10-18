@@ -1,0 +1,13 @@
+item.pumpkinlauncher.name=Jack o'Launcher
+item.pumpkinammo.name=Exploderende Jack o'Lantern
+
+item.pumpkinammo.power=Explosieve Kracht:
+item.pumpkinammo.isfiery=Vlammend
+item.pumpkinammo.nogriefing=Gedempt
+item.pumpkinammo.bounce=Weerkaatsing:
+item.pumpkinammo.lingering=Aanhoudend
+
+enchantment.ammosaving=Spaarzaamheid
+enchantment.reloadingspeed=Herladingsversnelling
+
+entity.pumpkinprojectile.name=Exploderende Jack o'Lantern
