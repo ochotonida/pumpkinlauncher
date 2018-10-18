@@ -16,7 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ParticlePumpkin extends Particle {
 
-    protected ParticlePumpkin(World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+    private ParticlePumpkin(World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         super(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
         this.setParticleTexture(Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.PUMPKIN.getDefaultState()));
         this.particleGravity = Blocks.STONE.blockParticleGravity;

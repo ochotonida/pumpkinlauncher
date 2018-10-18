@@ -9,5 +9,6 @@ item.pumpkinammo.lingering=Lingering
 
 enchantment.ammosaving=Unwasting
 enchantment.reloadingspeed=Reloading
+enchantment.blastshield=Blast Shield
 
 entity.pumpkinprojectile.name=Exploding Jack o'Lantern

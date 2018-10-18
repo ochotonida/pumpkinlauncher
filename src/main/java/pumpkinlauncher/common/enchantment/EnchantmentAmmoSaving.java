@@ -2,21 +2,11 @@ package pumpkinlauncher.common.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentArrowInfinite;
-import net.minecraft.enchantment.EnumEnchantmentType;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import pumpkinlauncher.PumpkinLauncher;
 
-public class EnchantmentAmmoSaving extends Enchantment {
+public class EnchantmentAmmoSaving extends ModEnchantment {
 
     public EnchantmentAmmoSaving() {
-        super(Rarity.VERY_RARE, EnumEnchantmentType.BOW, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
-        this.setRegistryName(PumpkinLauncher.MODID + ":ammosaving");
-        this.setName("ammosaving");
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return 3;
+        super(Rarity.UNCOMMON, "ammosaving", 3);
     }
 
     @Override

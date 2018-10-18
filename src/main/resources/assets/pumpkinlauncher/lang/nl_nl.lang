@@ -9,5 +9,6 @@ item.pumpkinammo.lingering=Aanhoudend
 
 enchantment.ammosaving=Spaarzaamheid
 enchantment.reloadingspeed=Herladingsversnelling
+enchantment.blastshield=Explosieschild
 
 entity.pumpkinprojectile.name=Exploderende Jack-o'-lantern

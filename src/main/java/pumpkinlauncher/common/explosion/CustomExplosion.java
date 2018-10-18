@@ -33,9 +33,9 @@ import java.util.Set;
 @MethodsReturnNonnullByDefault
 public class CustomExplosion extends Explosion {
 
-    protected final boolean causesFire;
-    protected final boolean damagesTerrain;
-    protected final boolean damagesShooter;
+    protected final boolean shouldCauseFire;
+    protected final boolean shouldDamageTerrain;
+    protected final boolean shouldDamageShooter;
     protected final Random random;
     protected final World world;
     protected final double x;
@@ -56,9 +56,9 @@ public class CustomExplosion extends Explosion {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.causesFire = isFlaming;
-        this.damagesTerrain = isSmoking;
-        this.damagesShooter = shouldHurtShootingEntity;
+        this.shouldCauseFire = isFlaming;
+        this.shouldDamageTerrain = isSmoking;
+        this.shouldDamageShooter = shouldHurtShootingEntity;
     }
 
     public static void createExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
@@ -161,7 +161,11 @@ public class CustomExplosion extends Explosion {
                         distanceZ = distanceZ / distance;
                         double blockDensity = world.getBlockDensity(vec3d, entity.getEntityBoundingBox());
                         double damageMultiplier = (1 - d12) * blockDensity;
-                        entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) ((damageMultiplier * damageMultiplier + damageMultiplier) / 2 * 7 * size + 1)));
+                        damageMultiplier = damageMultiplier * damageMultiplier + damageMultiplier;
+                        if (entity == shootingEntity && !shouldDamageShooter) {
+                            damageMultiplier /= 32;
+                        }
+                        entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) (damageMultiplier / 2 * 7 * size + 1)));
                         double knockbackMultiplier = damageMultiplier;
 
                         if (entity instanceof EntityLivingBase) {
@@ -193,7 +197,7 @@ public class CustomExplosion extends Explosion {
             spawnParticles();
         }
 
-        if (this.damagesTerrain) {
+        if (this.shouldDamageTerrain) {
             for (BlockPos blockpos : getAffectedBlockPositions()) {
                 IBlockState state = world.getBlockState(blockpos);
                 Block block = state.getBlock();
@@ -211,7 +215,7 @@ public class CustomExplosion extends Explosion {
             }
         }
 
-        if (this.causesFire)
+        if (this.shouldCauseFire)
         {
             for (BlockPos pos : getAffectedBlockPositions())
             {
@@ -244,7 +248,7 @@ public class CustomExplosion extends Explosion {
     }
 
     protected void spawnParticles() {
-        if (this.size >= 2.0F && this.damagesTerrain) {
+        if (this.size >= 2.0F && this.shouldDamageTerrain) {
             this.world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
         } else {
             this.world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);

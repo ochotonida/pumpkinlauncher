@@ -70,11 +70,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setPosition(x, y, z);
     }
 
-    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks, @Nullable NBTTagCompound fireworkCompound, @Nullable ItemStack potionItem) {
+    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks, boolean shouldHurtPlayer, @Nullable NBTTagCompound fireworkCompound, @Nullable ItemStack potionItem) {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
         this.power = power;
         this.canDestroyBlocks = canDestroyBlocks;
+        this.shouldHurtPlayer = shouldHurtPlayer;
         setIsSmoking(power > 0);
         setIsFlaming(isFiery);
         setBouncesLeft(bounces);
