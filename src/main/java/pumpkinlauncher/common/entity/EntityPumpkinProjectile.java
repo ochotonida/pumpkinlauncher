@@ -4,7 +4,6 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -13,19 +12,17 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.play.server.SPacketExplosion;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
-import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pumpkinlauncher.client.particle.Particles;
+import pumpkinlauncher.common.explosion.CustomExplosion;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -612,38 +609,4 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         }
     }
 
-    private static class CustomExplosion extends Explosion {
-
-        private final EntityLivingBase shootingEntity;
-
-        private CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
-            super (world, explodingEntity, x, y, z, power, isFlaming, isSmoking);
-            this.shootingEntity = shootingEntity;
-        }
-
-        public static void createExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
-            CustomExplosion explosion = new CustomExplosion(world, explodingEntity, shootingEntity, x, y, z, power, isFlaming, isSmoking, shouldHurtShootingEntity);
-            if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) return;
-            explosion.doExplosionA();
-            if (world instanceof WorldServer) {
-                explosion.doExplosionB(false);
-                if (!isSmoking) {
-                    explosion.clearAffectedBlockPositions();
-                }
-                for (EntityPlayer entityplayer : world.playerEntities) {
-                    if (entityplayer.getDistanceSq(x, y, z) < 4096.0D) {
-                        ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, power, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
-                    }
-                }
-            } else {
-                explosion.doExplosionB(true);
-            }
-        }
-
-        @Override
-        @Nullable
-        public EntityLivingBase getExplosivePlacedBy() {
-            return shootingEntity != null ? shootingEntity : super.getExplosivePlacedBy();
-        }
-    }
 }
