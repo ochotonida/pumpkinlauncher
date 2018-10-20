@@ -6,6 +6,7 @@ item.pumpkinammo.isfiery=Flaming
 item.pumpkinammo.nogriefing=Muffled
 item.pumpkinammo.bounce=Bounce:
 item.pumpkinammo.lingering=Lingering
+item.pumpkinammo.bonemeal=Fertilizing
 
 enchantment.ammosaving=Unwasting
 enchantment.reloadingspeed=Reloading

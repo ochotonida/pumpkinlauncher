@@ -13,6 +13,7 @@ import pumpkinlauncher.PumpkinLauncher;
 
 import java.util.Arrays;
 
+@SuppressWarnings("unused")
 @mezz.jei.api.JEIPlugin
 public class JEIPlugin implements IModPlugin {
 
@@ -52,6 +53,8 @@ public class JEIPlugin implements IModPlugin {
         compound6.setTag("potionTag", new ItemStack(Items.SPLASH_POTION).writeToNBT(new NBTTagCompound()));
         NBTTagCompound compound7 = new NBTTagCompound();
         compound7.setTag("potionTag", new ItemStack(Items.LINGERING_POTION).writeToNBT(new NBTTagCompound()));
+        NBTTagCompound compound8 = new NBTTagCompound();
+        compound8.setBoolean("hasBonemeal", true);
 
         ItemStack output0 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
         output0.setTagCompound(compound0);
@@ -69,14 +72,11 @@ public class JEIPlugin implements IModPlugin {
         output6.setTagCompound(compound6);
         ItemStack output7 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
         output7.setTagCompound(compound7);
+        ItemStack output8 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        output8.setTagCompound(compound8);
 
         ItemStack pumpkin = new ItemStack(Blocks.LIT_PUMPKIN, 1, OreDictionary.WILDCARD_VALUE);
         ItemStack gunpowder = new ItemStack(Items.GUNPOWDER, 1, OreDictionary.WILDCARD_VALUE);
-        ItemStack fireCharge = new ItemStack(Items.FIRE_CHARGE, 1, OreDictionary.WILDCARD_VALUE);
-        ItemStack woolBlock = new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE);
-        ItemStack slimeBall = new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE);
-        ItemStack potionSplash = new ItemStack(Items.SPLASH_POTION, 1, OreDictionary.WILDCARD_VALUE);
-        ItemStack potionLingering = new ItemStack(Items.LINGERING_POTION, 1, OreDictionary.WILDCARD_VALUE);
         ItemStack firework = new ItemStack(Items.FIREWORKS);
         NBTTagCompound fireworkItemCompound = new NBTTagCompound();
         fireworkItemCompound.setTag("Fireworks", fireworkCompound);
@@ -84,13 +84,14 @@ public class JEIPlugin implements IModPlugin {
 
         registry.addRecipes(Arrays.asList(
                 new ItemStackRecipeWrapper(output0, pumpkin, gunpowder),
-                new ItemStackRecipeWrapper(output1, pumpkin, gunpowder, fireCharge),
-                new ItemStackRecipeWrapper(output2, pumpkin, gunpowder, woolBlock),
-                new ItemStackRecipeWrapper(output3, pumpkin, gunpowder, slimeBall),
+                new ItemStackRecipeWrapper(output1, pumpkin, gunpowder, new ItemStack(Items.FIRE_CHARGE, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output2, pumpkin, gunpowder, new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output3, pumpkin, gunpowder, new ItemStack(Items.SLIME_BALL, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output4, pumpkin, firework),
                 new ItemStackRecipeWrapper(output5, pumpkin, gunpowder, firework),
-                new ItemStackRecipeWrapper(output6, pumpkin, potionSplash),
-                new ItemStackRecipeWrapper(output7, pumpkin, potionLingering)
+                new ItemStackRecipeWrapper(output6, pumpkin, new ItemStack(Items.SPLASH_POTION, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output7, pumpkin, new ItemStack(Items.LINGERING_POTION, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output8, pumpkin, new ItemStack(Blocks.BONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE))
         ));
     }
 }

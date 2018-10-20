@@ -1,10 +1,13 @@
 package pumpkinlauncher.common.entity;
 
 import net.minecraft.entity.*;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.*;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -38,6 +41,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private static final DataParameter<Integer> BOUNCES_LEFT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> IS_FLAMING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_SMOKING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> HAS_BONEMEAL = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
     private static final DataParameter<ItemStack> POTION_ITEM = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.ITEM_STACK);
 
@@ -45,11 +49,13 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private int yTile;
     private int zTile;
     private int ignoreTime;
-    private int lifetimeRemaining = -1;
+    private int fireworkLifetime = 0;
+    private int fireworkLifetimeMax = -1;
     private Entity ignoreEntity;
     private int power;
     private boolean canDestroyBlocks;
     private boolean shouldHurtPlayer;
+    private boolean shouldSpawnLightning;
     public int rotation;
 
     @Nullable
@@ -70,21 +76,79 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setPosition(x, y, z);
     }
 
-    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, int power, int bounces, boolean isFiery, boolean canDestroyBlocks, boolean shouldHurtPlayer, @Nullable NBTTagCompound fireworkCompound, @Nullable ItemStack potionItem) {
+    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, ItemStack ammoStack, boolean shouldHurtPlayer) {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
         this.shootingEntity = shootingEntity;
-        this.power = power;
-        this.canDestroyBlocks = canDestroyBlocks;
         this.shouldHurtPlayer = shouldHurtPlayer;
-        setIsSmoking(power > 0);
-        setIsFlaming(isFiery);
-        setBouncesLeft(bounces);
-        if (fireworkCompound != null) {
-            this.lifetimeRemaining = 6 * (fireworkCompound.getByte("Flight") + 1) + this.rand.nextInt(5);
-            setFireworkNBT(fireworkCompound);
+        this.shouldSpawnLightning = false;
+
+        setPower(ammoStack);
+        setIsFlaming(ammoStack);
+        setCanDestroyBlocks(ammoStack);
+        setPotionItem(ammoStack);
+        setBouncesLeft(ammoStack);
+        setFireworkNBT(ammoStack);
+        setHasBonemeal(ammoStack);
+    }
+
+    private void setPower(ItemStack stack) {
+        if (!stack.isEmpty() && stack.getTagCompound() != null && stack.getTagCompound().hasKey("power")) {
+            power = stack.getTagCompound().getByte("power");
+        } else if (stack.getMetadata() == 1){
+            power = 0;
+        } else {
+            power = 2;
         }
-        if (potionItem != null && !potionItem.isEmpty()) {
-            setPotion(potionItem);
+        setIsSmoking(power > 0);
+    }
+
+    private void setIsFlaming(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("isFiery")) {
+            setIsFlaming(stack.getTagCompound().getBoolean("isFiery"));
+        } else {
+            setIsFlaming(false);
+        }
+    }
+
+    private void setCanDestroyBlocks(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("canDestroyBlocks")) {
+            canDestroyBlocks = stack.getTagCompound().getBoolean("canDestroyBlocks");
+        } else {
+            canDestroyBlocks = true;
+        }
+    }
+
+    private void setBouncesLeft(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("bounceAmount")) {
+            setBouncesLeft(stack.getTagCompound().getByte("bounceAmount"));
+        } else {
+            setBouncesLeft(0);
+        }
+    }
+
+    private void setPotionItem(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("potionTag")) {
+            setPotion(new ItemStack(stack.getTagCompound().getCompoundTag("potionTag")));
+        } else {
+            setPotion(ItemStack.EMPTY);
+        }
+    }
+
+    private void setFireworkNBT(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("fireworks")) {
+            NBTTagCompound fireworkCompound = stack.getTagCompound().getCompoundTag("fireworks");
+            fireworkLifetimeMax = 6 * (fireworkCompound.getByte("Flight") + 1) + rand.nextInt(5);
+            setFireworkNBT(fireworkCompound);
+        } else {
+            setFireworkNBT(new NBTTagCompound());
+        }
+    }
+
+    private void setHasBonemeal(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("hasBonemeal")) {
+            setHasBonemeal(stack.getTagCompound().getBoolean("hasBonemeal"));
+        } else {
+            setHasBonemeal(false);
         }
     }
 
@@ -93,6 +157,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         dataManager.register(BOUNCES_LEFT, 0);
         dataManager.register(IS_FLAMING, false);
         dataManager.register(IS_SMOKING, false);
+        dataManager.register(HAS_BONEMEAL, false);
         dataManager.register(FIREWORK_NBT, new NBTTagCompound());
         dataManager.register(POTION_ITEM, ItemStack.EMPTY);
     }
@@ -145,10 +210,13 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         super.onUpdate();
 
         if (isFirework() && !world.isRemote) {
-            if (lifetimeRemaining <= 0) {
+            if (fireworkLifetime == 0) {
+                world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_FIREWORK_LAUNCH, SoundCategory.NEUTRAL, 2.0F, 1.0F);
+            }
+            if (fireworkLifetime > fireworkLifetimeMax) {
                 detonate(null);
             } else {
-                lifetimeRemaining -= 1;
+                fireworkLifetime += 1;
             }
         }
 
@@ -254,6 +322,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 if (isFirework()) {
                     world.spawnParticle(EnumParticleTypes.FIREWORKS_SPARK, posX, posY - 0.3D, posZ, rand.nextGaussian() * 0.05D, - motionY * 0.5D, rand.nextGaussian() * 0.05D);
                 }
+                if (hasBonemeal() && ticksExisted % 3 == 0) {
+                    world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, posX + rand.nextDouble() * 0.5, posY + rand.nextDouble() * 0.5, posZ + rand.nextDouble() * 0.5, rand.nextGaussian() * 0.02, rand.nextGaussian() * 0.02, rand.nextGaussian() * 0.02);
+                }
                 if (!getPotion().isEmpty()) {
                     int color = PotionUtils.getColor(getPotion());
                     if (color > 0) {
@@ -288,9 +359,11 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
                 if (shootingEntity instanceof EntityPlayer) {
                     raytraceresult.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) shootingEntity), 1);
+                } else {
+                    raytraceresult.entityHit.attackEntityFrom(DamageSource.GENERIC, 1);
                 }
                 if (isFlaming()) {
-                    raytraceresult.entityHit.setFire(power + 3);
+                    raytraceresult.entityHit.setFire(4);
                 }
             }
             if (getBouncesLeft() > 0 && !isInWater()) {
@@ -301,41 +374,56 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 }
             } else {
                 detonate(raytraceresult);
+                return;
             }
         }
-
         if (getBouncesLeft() > 0 && !isInWater()) {
-            setBouncesLeft(getBouncesLeft() - 1);
-            world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
-            if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
-                if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.X) {
-                    motionX = - motionX * 0.75;
-                } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Y) {
-                    motionY = - motionY * 0.75;
-                } else if (raytraceresult.sideHit.getAxis() == EnumFacing.Axis.Z) {
-                    motionZ = - motionZ * 0.75;
-                }
-                world.setEntityState(this, (byte) 100);
-            } else if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY) {
-                detonate(raytraceresult);
+            bounce(raytraceresult);
+        }
+    }
+
+    private void bounce(RayTraceResult result) {
+        setBouncesLeft(getBouncesLeft() - 1);
+        world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+        if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
+            if (result.sideHit.getAxis() == EnumFacing.Axis.X) {
+                motionX = - motionX * 0.75;
+            } else if (result.sideHit.getAxis() == EnumFacing.Axis.Y) {
+                motionY = - motionY * 0.75;
+            } else if (result.sideHit.getAxis() == EnumFacing.Axis.Z) {
+                motionZ = - motionZ * 0.75;
             }
+            world.setEntityState(this, (byte) 100);
+            if (hasBonemeal() && !world.isRemote) {
+                if (ItemDye.applyBonemeal(new ItemStack(Items.DYE, EnumDyeColor.WHITE.getDyeDamage()), world, result.getBlockPos())) {
+                    world.playEvent(2005, result.getBlockPos(), 0);
+                }
+            }
+        } else if (result.typeOfHit == RayTraceResult.Type.ENTITY) {
+            detonate(result);
         }
     }
 
     private void detonate(@Nullable RayTraceResult result) {
         if (!world.isRemote) {
+            if (shouldSpawnLightning) {
+                world.addWeatherEffect(new EntityLightningBolt(world, posX, posY, posZ, false));
+            }
+
             boolean canMobGrief = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
                 new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
             }
+            if (hasBonemeal()) {
+                doBoneMealThings();
+            }
             if (!getPotion().isEmpty() && (getPotion().getItem() == Items.SPLASH_POTION || getPotion().getItem() == Items.LINGERING_POTION)) {
                 doPotionThings(result);
             }
             if (isFirework()) {
                 dealFireworkDamage();
-                // explode fireworks
                 world.setEntityState(this, (byte) 17);
             }
             setDead();
@@ -374,6 +462,14 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             // spawn particles
             int eventType = type.hasInstantEffect() ? 2007 : 2002;
             this.world.playEvent(eventType, new BlockPos(this), PotionUtils.getColor(stack));
+        }
+    }
+
+    private void doBoneMealThings() {
+        for (BlockPos pos : BlockPos.getAllInBox((int) (posX + 0.5) - 5, (int) (posY + 0.5) - 5, (int) (posZ + 0.5) - 5, (int) (posX + 0.5) + 5, (int) (posY + 0.5) + 5, (int) (posZ + 0.5) + 5)) {
+            if (rand.nextInt(8) == 0 && ItemDye.applyBonemeal(new ItemStack(Items.DYE, EnumDyeColor.WHITE.getDyeDamage()), world, pos)) {
+                world.playEvent(2005, pos, 0);
+            }
         }
     }
 
@@ -549,6 +645,15 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         dataManager.setDirty(IS_SMOKING);
     }
 
+    private boolean hasBonemeal() {
+        return dataManager.get(HAS_BONEMEAL);
+    }
+
+    private void setHasBonemeal(boolean hasBonemeal) {
+        dataManager.set(HAS_BONEMEAL, hasBonemeal);
+        dataManager.setDirty(HAS_BONEMEAL);
+    }
+
     public @Nonnull NBTTagCompound getFireworkNBT() {
         return dataManager.get(FIREWORK_NBT);
     }
@@ -587,7 +692,10 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         compound.setByte("bouncesLeft", (byte) getBouncesLeft());
         compound.setBoolean("isFiery", isFlaming());
         compound.setBoolean("isSmoking", isSmoking());
+        compound.setBoolean("hasBonemeal", hasBonemeal());
         compound.setTag("fireworkTag", getFireworkNBT());
+        compound.setInteger("fireworkLifetime", fireworkLifetime);
+        compound.setInteger("fireworkLifetimeMax", fireworkLifetimeMax);
         if (!getPotion().isEmpty()) {
             compound.setTag("potionTag", getPotion().writeToNBT(new NBTTagCompound()));
         }
@@ -603,7 +711,10 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setBouncesLeft(compound.getByte("bouncesLeft"));
         setIsFlaming(compound.getBoolean("isFiery"));
         setIsSmoking(compound.getBoolean("isSmoking"));
+        setHasBonemeal(compound.getBoolean("hasBonemeal"));
         setFireworkNBT(compound.getTag("fireworkTag"));
+        this.fireworkLifetime = compound.getInteger("fireworkLifetime");
+        this.fireworkLifetimeMax = compound.getInteger("fireworkLifetimeMax");
         if (compound.hasKey("potionTag") && !compound.getTag("potionTag").hasNoTags()) {
             setPotion(new ItemStack(compound.getCompoundTag("potionTag")));
         }

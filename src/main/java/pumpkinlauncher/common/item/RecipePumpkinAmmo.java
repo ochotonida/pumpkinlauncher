@@ -37,6 +37,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         int fireChargeAmount = 0;
         int woolAmount = 0;
         int slimeBallAmount = 0;
+        int bonemealAmount = 0;
         NBTTagCompound fireworkNBT = null;
         ItemStack potionStack = null;
 
@@ -51,6 +52,8 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     fireChargeAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     woolAmount++;
+                } else if (OreDictionary.itemMatches(new ItemStack(Blocks.BONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
+                    bonemealAmount++;
                 } else if (new OreIngredient("slimeball").apply(stack)) {
                     slimeBallAmount++;
                 } else  if (OreDictionary.itemMatches(new ItemStack(Items.FIREWORKS, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
@@ -78,13 +81,14 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             }
         }
 
-        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireworkNBT != null || potionStack != null) && gunpowderAmount <= 4 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127) {
+        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireChargeAmount != 0 || slimeBallAmount != 0 || bonemealAmount != 0 || fireworkNBT != null || potionStack != null) && gunpowderAmount <= 4 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127 && bonemealAmount <= 1) {
             resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setByte("power", (byte) gunpowderAmount);
             compound.setByte("bounceAmount", (byte) (slimeBallAmount));
             compound.setBoolean("isFiery", fireChargeAmount > 0);
             compound.setBoolean("canDestroyBlocks", woolAmount < 1);
+            compound.setBoolean("hasBonemeal", bonemealAmount > 0);
             if (fireworkNBT != null) {
                 compound.setTag("fireworks", fireworkNBT);
             }

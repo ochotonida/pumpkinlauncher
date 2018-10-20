@@ -34,8 +34,11 @@ public class ItemPumpkinAmmo extends Item {
     @SideOnly(Side.CLIENT)
     @SuppressWarnings("deprecation")
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        NBTTagCompound nbttagcompound = stack.getTagCompound();
+        //if (stack.getMetadata() == 1) {
+        //    tooltip.add(TextFormatting.AQUA + "Lightning");
+        //}
 
+        NBTTagCompound nbttagcompound = stack.getTagCompound();
         if (nbttagcompound != null) {
             if (nbttagcompound.hasKey("potionTag")) {
                 ItemStack potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
@@ -55,6 +58,9 @@ public class ItemPumpkinAmmo extends Item {
             }
             if (nbttagcompound.hasKey("canDestroyBlocks") && !nbttagcompound.getBoolean("canDestroyBlocks")) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.nogriefing"));
+            }
+            if (nbttagcompound.hasKey("hasBonemeal") && nbttagcompound.getBoolean("hasBonemeal")) {
+                tooltip.add(I18n.translateToLocal("item.pumpkinammo.bonemeal"));
             }
             if (nbttagcompound.hasKey("fireworks")) {
                 NBTTagCompound fireworksCompound = (NBTTagCompound) nbttagcompound.getTag("fireworks");
