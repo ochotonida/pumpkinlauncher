@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import pumpkinlauncher.common.enchantment.EnchantmentAmmoSaving;
 import pumpkinlauncher.common.enchantment.EnchantmentBlastShield;
+import pumpkinlauncher.common.enchantment.EnchantmentLaunching;
 import pumpkinlauncher.common.item.ItemPumpkinAmmo;
 import pumpkinlauncher.common.item.ItemPumpkinLauncher;
 import pumpkinlauncher.common.item.RecipePumpkinAmmo;
@@ -33,6 +34,7 @@ public class PumpkinLauncher {
     public static final Enchantment AMMO_SAVING = new EnchantmentAmmoSaving();
     public static final Enchantment RELOADING_SPEED = new EnchantmentReloadingSpeed();
     public static final Enchantment BLAST_SHIELD = new EnchantmentBlastShield();
+    public static final Enchantment LAUNCHING = new EnchantmentLaunching();
 
     @Mod.Instance
     public static PumpkinLauncher instance;
@@ -76,6 +78,7 @@ public class PumpkinLauncher {
             event.getRegistry().register(AMMO_SAVING);
             event.getRegistry().register(RELOADING_SPEED);
             event.getRegistry().register(BLAST_SHIELD);
+            event.getRegistry().register(LAUNCHING);
         }
     }
 }

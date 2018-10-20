@@ -91,7 +91,7 @@ public class ItemPumpkinLauncher extends Item {
                     }
                 }
 
-                float velocity = 1.3F + 0.12F * EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, player.getHeldItem(hand));
+                float velocity = 1.3F + 0.12F * EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.LAUNCHING, player.getHeldItem(hand));
                 EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, power, bounceAmount, isFiery, canDestroyBlocks, shouldHurtPlayer, fireworkCompound, potionStack);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, velocity, 5F);
                 world.spawnEntity(projectile);
@@ -122,6 +122,6 @@ public class ItemPumpkinLauncher extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
-        return enchantment == Enchantments.POWER || enchantment == Enchantments.MENDING || enchantment == Enchantments.UNBREAKING || enchantment == PumpkinLauncher.AMMO_SAVING || enchantment == PumpkinLauncher.RELOADING_SPEED || enchantment == PumpkinLauncher.BLAST_SHIELD;
+        return enchantment == Enchantments.MENDING || enchantment == Enchantments.UNBREAKING || enchantment == PumpkinLauncher.AMMO_SAVING || enchantment == PumpkinLauncher.RELOADING_SPEED || enchantment == PumpkinLauncher.BLAST_SHIELD || enchantment == PumpkinLauncher.LAUNCHING;
     }
 }

@@ -10,9 +10,11 @@ item.pumpkinammo.lingering=Lingering
 enchantment.ammosaving=Unwasting
 enchantment.reloadingspeed=Reloading
 enchantment.blastshield=Blast Shield
+enchantment.launching=Launching
 
 enchantment.pumpkinlauncher.ammosaving.desc=Decreases the chance of Jack o'Launcher ammo being consumed
 enchantment.pumpkinlauncher.reloadingspeed.desc=Decreases the cooldown time of the Jack o'Launcher
 enchantment.pumpkinlauncher.blastshield.desc=Massively decreases explosion damage done to the shooter of Jack o'Launcher projectiles
+enchantment.pumpkinlauncher.launching.desc=Increases the speed of projectiles fired by the Jack o'Launcher
 
 entity.pumpkinprojectile.name=Exploding Jack o'Lantern
