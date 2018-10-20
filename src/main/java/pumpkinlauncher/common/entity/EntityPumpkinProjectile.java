@@ -71,16 +71,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         power = 1;
     }
 
-    public EntityPumpkinProjectile(World worldIn, double x, double y, double z) {
+    public EntityPumpkinProjectile(World worldIn, double x, double y, double z, ItemStack ammoStack) {
         this(worldIn);
         setPosition(x, y, z);
-    }
-
-    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, ItemStack ammoStack, boolean shouldHurtPlayer) {
-        this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ);
-        this.shootingEntity = shootingEntity;
-        this.shouldHurtPlayer = shouldHurtPlayer;
-        this.shouldSpawnLightning = false;
 
         setPower(ammoStack);
         setIsFlaming(ammoStack);
@@ -89,6 +82,15 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setBouncesLeft(ammoStack);
         setFireworkNBT(ammoStack);
         setHasBonemeal(ammoStack);
+
+        this.shouldSpawnLightning = false;
+        this.shouldHurtPlayer = false;
+    }
+
+    public EntityPumpkinProjectile(World worldIn, EntityLivingBase shootingEntity, ItemStack ammoStack, boolean shouldHurtPlayer) {
+        this(worldIn, shootingEntity.posX, shootingEntity.posY + (double)shootingEntity.getEyeHeight() - 0.1D, shootingEntity.posZ, ammoStack);
+        this.shootingEntity = shootingEntity;
+        this.shouldHurtPlayer = shouldHurtPlayer;
     }
 
     private void setPower(ItemStack stack) {
@@ -410,7 +412,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 world.addWeatherEffect(new EntityLightningBolt(world, posX, posY, posZ, false));
             }
 
-            boolean canMobGrief = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
+            boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
                 new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
             } else {
