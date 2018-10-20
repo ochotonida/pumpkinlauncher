@@ -46,7 +46,7 @@ public class CustomExplosion extends Explosion {
     protected final float size;
     protected static boolean shouldFireExplosionEvent = true;
 
-    protected CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
+    public CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
         super(world, explodingEntity, x, y, z, power, isFlaming, isSmoking);
         this.random = new Random();
         this.world = world;
@@ -61,28 +61,26 @@ public class CustomExplosion extends Explosion {
         this.shouldDamageShooter = shouldHurtShootingEntity;
     }
 
-    public static void createExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
-        CustomExplosion explosion = new CustomExplosion(world, explodingEntity, shootingEntity, x, y, z, power, isFlaming, isSmoking, shouldHurtShootingEntity);
-
-        if (shouldFireExplosionEvent && net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) {
+    public void detonate() {
+        if (shouldFireExplosionEvent && net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, this)) {
             return;
         }
 
-        explosion.doExplosionA();
+        this.doExplosionA();
 
         if (world instanceof WorldServer) {
-            explosion.doExplosionB(false);
-            if (!isSmoking) {
-                explosion.clearAffectedBlockPositions();
+            doExplosionB(false);
+            if (!shouldDamageTerrain) {
+                clearAffectedBlockPositions();
             }
 
             for (EntityPlayer entityplayer : world.playerEntities) {
                 if (entityplayer.getDistanceSq(x, y, z) < 4096) {
-                    ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, power, explosion.getAffectedBlockPositions(), explosion.getPlayerKnockbackMap().get(entityplayer)));
+                    ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, size, getAffectedBlockPositions(), getPlayerKnockbackMap().get(entityplayer)));
                 }
             }
         } else {
-            explosion.doExplosionB(true);
+            doExplosionB(true);
         }
     }
 
@@ -228,30 +226,30 @@ public class CustomExplosion extends Explosion {
     }
 
     protected void spawnParticles(BlockPos pos) {
-        double d0 = pos.getX() + world.rand.nextFloat();
-        double d1 = pos.getY() + world.rand.nextFloat();
-        double d2 = pos.getZ() + world.rand.nextFloat();
-        double d3 = d0 - this.x;
-        double d4 = d1 - this.y;
-        double d5 = d2 - this.z;
-        double d6 = (double)MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
-        d3 = d3 / d6;
-        d4 = d4 / d6;
-        d5 = d5 / d6;
-        double d7 = 0.5D / (d6 / (double)this.size + 0.1D);
-        d7 = d7 * (double)(this.world.rand.nextFloat() * this.world.rand.nextFloat() + 0.3F);
-        d3 = d3 * d7;
-        d4 = d4 * d7;
-        d5 = d5 * d7;
-        this.world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, (d0 + this.x) / 2.0D, (d1 + this.y) / 2.0D, (d2 + this.z) / 2.0D, d3, d4, d5);
-        this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, d3, d4, d5);
+        double xCoord = pos.getX() + world.rand.nextFloat();
+        double yCoord = pos.getY() + world.rand.nextFloat();
+        double zCoord = pos.getZ() + world.rand.nextFloat();
+        double xSpeed = xCoord - x;
+        double ySpeed = yCoord - y;
+        double zSpeed = zCoord - z;
+        double d6 = MathHelper.sqrt(xSpeed * xSpeed + ySpeed * ySpeed + zSpeed * zSpeed);
+        xSpeed = xSpeed / d6;
+        ySpeed = ySpeed / d6;
+        zSpeed = zSpeed / d6;
+        double d7 = 0.5D / (d6 / size + 0.1);
+        d7 = d7 * (world.rand.nextFloat() * world.rand.nextFloat() + 0.3);
+        xSpeed = xSpeed * d7;
+        ySpeed = ySpeed * d7;
+        zSpeed = zSpeed * d7;
+        this.world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, (xCoord + x) / 2, (yCoord + y) / 2, (zCoord + z) / 2, xSpeed, ySpeed, zSpeed);
+        this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
     }
 
     protected void spawnParticles() {
-        if (this.size >= 2.0F && this.shouldDamageTerrain) {
-            this.world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
+        if (size >= 2.0F && shouldDamageTerrain) {
+            world.spawnParticle(EnumParticleTypes.EXPLOSION_HUGE, x, y, z, 1, 0, 0);
         } else {
-            this.world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, this.x, this.y, this.z, 1.0D, 0.0D, 0.0D);
+            world.spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, x, y, z, 1, 0, 0);
         }
     }
 

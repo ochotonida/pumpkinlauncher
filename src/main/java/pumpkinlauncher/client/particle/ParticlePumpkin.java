@@ -16,14 +16,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ParticlePumpkin extends Particle {
 
-    private ParticlePumpkin(World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        super(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
-        this.setParticleTexture(Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.PUMPKIN.getDefaultState()));
-        this.particleGravity = Blocks.STONE.blockParticleGravity;
-        this.particleRed = 0.6F;
-        this.particleGreen = 0.6F;
-        this.particleBlue = 0.6F;
-        this.particleScale /= 2.0F;
+    private ParticlePumpkin(World worldIn, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed) {
+        super(worldIn, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
+        setParticleTexture(Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(Blocks.PUMPKIN.getDefaultState()));
+        particleGravity = Blocks.STONE.blockParticleGravity;
+        particleRed = 0.6F;
+        particleGreen = 0.6F;
+        particleBlue = 0.6F;
+        particleScale /= 2.0F;
     }
 
     public int getFXLayer() {
@@ -31,30 +31,30 @@ public class ParticlePumpkin extends Particle {
     }
 
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        float f = ((float)this.particleTextureIndexX + this.particleTextureJitterX / 4.0F) / 16.0F;
+        float f = (particleTextureIndexX + particleTextureJitterX / 4) / 16;
         float f1 = f + 0.015609375F;
-        float f2 = ((float)this.particleTextureIndexY + this.particleTextureJitterY / 4.0F) / 16.0F;
+        float f2 = (particleTextureIndexY + particleTextureJitterY / 4) / 16;
         float f3 = f2 + 0.015609375F;
-        float f4 = 0.1F * this.particleScale;
+        float f4 = 0.1F * particleScale;
 
-        if (this.particleTexture != null)
+        if (particleTexture != null)
         {
-            f = this.particleTexture.getInterpolatedU((double)(this.particleTextureJitterX / 4.0F * 16.0F));
-            f1 = this.particleTexture.getInterpolatedU((double)((this.particleTextureJitterX + 1.0F) / 4.0F * 16.0F));
-            f2 = this.particleTexture.getInterpolatedV((double)(this.particleTextureJitterY / 4.0F * 16.0F));
-            f3 = this.particleTexture.getInterpolatedV((double)((this.particleTextureJitterY + 1.0F) / 4.0F * 16.0F));
+            f = particleTexture.getInterpolatedU(particleTextureJitterX / 4 * 16);
+            f1 = particleTexture.getInterpolatedU((particleTextureJitterX + 1) / 4 * 16);
+            f2 = particleTexture.getInterpolatedV(particleTextureJitterY / 4 * 16);
+            f3 = particleTexture.getInterpolatedV((particleTextureJitterY + 1) / 4 * 16);
         }
 
-        float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
-        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
-        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
-        int i = this.getBrightnessForRender(partialTicks);
+        float f5 = (float)(prevPosX + (posX - prevPosX) * partialTicks - interpPosX);
+        float f6 = (float)(prevPosY + (posY - prevPosY) * partialTicks - interpPosY);
+        float f7 = (float)(prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ);
+        int i = getBrightnessForRender(partialTicks);
         int j = i >> 16 & 65535;
         int k = i & 65535;
-        buffer.pos((double)(f5 - rotationX * f4 - rotationXY * f4), (double)(f6 - rotationZ * f4), (double)(f7 - rotationYZ * f4 - rotationXZ * f4)).tex((double)f, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
-        buffer.pos((double)(f5 - rotationX * f4 + rotationXY * f4), (double)(f6 + rotationZ * f4), (double)(f7 - rotationYZ * f4 + rotationXZ * f4)).tex((double)f, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
-        buffer.pos((double)(f5 + rotationX * f4 + rotationXY * f4), (double)(f6 + rotationZ * f4), (double)(f7 + rotationYZ * f4 + rotationXZ * f4)).tex((double)f1, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
-        buffer.pos((double)(f5 + rotationX * f4 - rotationXY * f4), (double)(f6 - rotationZ * f4), (double)(f7 + rotationYZ * f4 - rotationXZ * f4)).tex((double)f1, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F).lightmap(j, k).endVertex();
+        buffer.pos(f5 - rotationX * f4 - rotationXY * f4, f6 - rotationZ * f4, f7 - rotationYZ * f4 - rotationXZ * f4).tex(f, f3).color(particleRed, particleGreen, particleBlue, 1).lightmap(j, k).endVertex();
+        buffer.pos(f5 - rotationX * f4 + rotationXY * f4, f6 + rotationZ * f4, f7 - rotationYZ * f4 + rotationXZ * f4).tex(f, f2).color(particleRed, particleGreen, particleBlue, 1).lightmap(j, k).endVertex();
+        buffer.pos(f5 + rotationX * f4 + rotationXY * f4, f6 + rotationZ * f4, f7 + rotationYZ * f4 + rotationXZ * f4).tex(f1, f2).color(particleRed, particleGreen, particleBlue, 1).lightmap(j, k).endVertex();
+        buffer.pos(f5 + rotationX * f4 - rotationXY * f4, f6 - rotationZ * f4, f7 + rotationYZ * f4 - rotationXZ * f4).tex(f1, f3).color(particleRed, particleGreen, particleBlue, 1).lightmap(j, k).endVertex();
     }
 
     @SideOnly(Side.CLIENT)
