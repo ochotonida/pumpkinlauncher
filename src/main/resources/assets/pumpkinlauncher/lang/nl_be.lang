@@ -11,4 +11,8 @@ enchantment.ammosaving=Spaarzaamheid
 enchantment.reloadingspeed=Herladingsversnelling
 enchantment.blastshield=Explosieschild
 
+enchantment.pumpkinlauncher.ammosaving.desc=Verkleint de kans dat een Exploderende Jack o'Lantern wordt opgebruikt
+enchantment.pumpkinlauncher.reloadingspeed.desc=Verkort de cooldowntijd van de Jack o'Launcher
+enchantment.pumpkinlauncher.blastshield.desc=Verkleint de explosieshade dat aan de gebruiker wordt toegebracht door zijn eigen Exploderende Jack o'Lanterns
+
 entity.pumpkinprojectile.name=Exploderende Jack o'Lantern
