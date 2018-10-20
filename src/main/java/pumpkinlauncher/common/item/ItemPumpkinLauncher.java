@@ -65,7 +65,7 @@ public class ItemPumpkinLauncher extends Item {
                 int bounceAmount = 0;
                 boolean isFiery = false;
                 boolean canDestroyBlocks = true;
-                boolean shouldHurtPlayer = EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.BLAST_SHIELD, player.getHeldItem(hand)) > 0;
+                boolean shouldHurtPlayer = EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.BLAST_SHIELD, player.getHeldItem(hand)) == 0;
                 NBTTagCompound fireworkCompound = null;
                 ItemStack potionStack = null;
 
