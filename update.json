@@ -10,7 +10,7 @@
     "1.12.2-1.5.1": "added enchantment descriptions,\nreplaced power enchant with custom 'launching' enchant,\nfixed blast shield enchant being inverted"
   },
   "promos": {
-    "1.12.2-latest": "1.5.1",
-    "1.12.2-recommended": "1.5.1"
+    "1.12.2-latest": "1.12.2-1.5.1",
+    "1.12.2-recommended": "1.12.2-1.5.1"
   }
 }
