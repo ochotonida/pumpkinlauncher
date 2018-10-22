@@ -84,7 +84,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             }
         }
 
-        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireChargeAmount != 0 || slimeBallAmount != 0 || bonemealAmount != 0 || enderPearlAmount != 0 || fireworkNBT != null || potionStack != null) && gunpowderAmount <= 4 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127 && bonemealAmount <= 1 && enderPearlAmount <= 1) {
+        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireChargeAmount != 0 || slimeBallAmount != 0 || bonemealAmount != 0 || enderPearlAmount != 0 || fireworkNBT != null || potionStack != null) && gunpowderAmount <= 12 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127 && bonemealAmount <= 1 && enderPearlAmount <= 1) {
             resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setByte("power", (byte) gunpowderAmount);

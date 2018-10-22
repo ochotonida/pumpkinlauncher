@@ -436,7 +436,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             }
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
-                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
+                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (power + 3)/2F, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
             }
