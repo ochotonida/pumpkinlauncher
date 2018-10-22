@@ -44,15 +44,17 @@ public class CustomExplosion extends Explosion {
     protected final Entity exploder;
     protected final EntityLivingBase shootingEntity;
     protected final float size;
+    protected final int extraDamage;
     protected static boolean shouldFireExplosionEvent = true;
 
-    public CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
+    public CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, int extraDamage, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
         super(world, explodingEntity, x, y, z, power, isFlaming, isSmoking);
         this.random = new Random();
         this.world = world;
         this.exploder = explodingEntity;
         this.shootingEntity = shootingEntity;
         this.size = power;
+        this.extraDamage = extraDamage;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -163,7 +165,7 @@ public class CustomExplosion extends Explosion {
                         if (entity == shootingEntity && !shouldDamageShooter) {
                             damageMultiplier /= 32;
                         }
-                        entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) (damageMultiplier / 2 * 7 * size + 1)));
+                        entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) (damageMultiplier / 2 * 7 * size + 1)) + extraDamage * 1.25F);
                         double knockbackMultiplier = damageMultiplier;
 
                         if (entity instanceof EntityLivingBase) {

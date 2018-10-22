@@ -8,6 +8,7 @@ item.pumpkinammo.bounce=Weerkaatsing:
 item.pumpkinammo.lingering=Aanhoudend
 item.pumpkinammo.bonemeal=Bemesting
 item.pumpkinammo.enderpearl=Teleporteren
+item.pumpkinammo.extradamage=Shrapnel
 
 enchantment.ammosaving=Spaarzaamheid
 enchantment.reloadingspeed=Herladingsversnelling

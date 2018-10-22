@@ -53,8 +53,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private int ignoreTime;
     private int fireworkLifetime = 0;
     private int fireworkLifetimeMax = -1;
-    private Entity ignoreEntity;
     private int power;
+    private int extraDamage;
+    private Entity ignoreEntity;
     private boolean canDestroyBlocks;
     private boolean shouldHurtPlayer;
     private boolean shouldSpawnLightning;
@@ -85,6 +86,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setFireworkNBT(ammoStack);
         setHasBonemeal(ammoStack);
         setIsEnderPearl(ammoStack);
+        setExtraDamage(ammoStack);
 
         this.shouldSpawnLightning = false;
         this.shouldHurtPlayer = false;
@@ -162,6 +164,14 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             setIsEnderPearl(stack.getTagCompound().getBoolean("isEnderPearl"));
         } else {
             setIsEnderPearl(false);
+        }
+    }
+
+    private void setExtraDamage(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("extraDamage")) {
+            extraDamage = stack.getTagCompound().getByte("extraDamage");
+        } else {
+            extraDamage = 0;
         }
     }
 
@@ -381,9 +391,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         if (!world.isRemote) {
             if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
                 if (shootingEntity instanceof EntityPlayer) {
-                    raytraceresult.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) shootingEntity), 1);
+                    raytraceresult.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) shootingEntity), 1 + 2 * extraDamage);
                 } else {
-                    raytraceresult.entityHit.attackEntityFrom(DamageSource.GENERIC, 1);
+                    raytraceresult.entityHit.attackEntityFrom(DamageSource.GENERIC, 1 + 2 * extraDamage);
                 }
                 if (isFlaming()) {
                     raytraceresult.entityHit.setFire(4);
@@ -436,7 +446,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             }
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
-                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (power + 3)/2F, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
+                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (power + 3)/2F, extraDamage, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
             }

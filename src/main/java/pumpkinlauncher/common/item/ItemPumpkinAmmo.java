@@ -53,6 +53,9 @@ public class ItemPumpkinAmmo extends Item {
             if (nbttagcompound.hasKey("bounceAmount") && nbttagcompound.getByte("bounceAmount") > 0) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.bounce") + " " + nbttagcompound.getByte("bounceAmount"));
             }
+            if (nbttagcompound.hasKey("extraDamage") && nbttagcompound.getByte("extraDamage") > 0) {
+                tooltip.add(I18n.translateToLocal("item.pumpkinammo.extradamage") + " " + nbttagcompound.getByte("extraDamage"));
+            }
             if (nbttagcompound.hasKey("isFiery") && nbttagcompound.getBoolean("isFiery")) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.isfiery"));
             }

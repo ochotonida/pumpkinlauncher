@@ -39,6 +39,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         int slimeBallAmount = 0;
         int bonemealAmount = 0;
         int enderPearlAmount = 0;
+        int ironNuggetAmount = 0;
         NBTTagCompound fireworkNBT = null;
         ItemStack potionStack = null;
 
@@ -57,6 +58,8 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     bonemealAmount++;
                 } else if (OreDictionary.itemMatches(new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
                     enderPearlAmount++;
+                } else if (new OreIngredient("nuggetIron").apply(stack)) {
+                    ironNuggetAmount++;
                 } else if (new OreIngredient("slimeball").apply(stack)) {
                     slimeBallAmount++;
                 } else  if (OreDictionary.itemMatches(new ItemStack(Items.FIREWORKS, 1, OreDictionary.WILDCARD_VALUE), stack, false)) {
@@ -84,11 +87,27 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             }
         }
 
-        if (pumpkinAmount == 1 && (gunpowderAmount != 0 || fireChargeAmount != 0 || slimeBallAmount != 0 || bonemealAmount != 0 || enderPearlAmount != 0 || fireworkNBT != null || potionStack != null) && gunpowderAmount <= 12 && fireChargeAmount <= 1 && woolAmount <= 1 && slimeBallAmount <= 127 && bonemealAmount <= 1 && enderPearlAmount <= 1) {
+        if (pumpkinAmount == 1
+                && (gunpowderAmount != 0
+                || fireChargeAmount != 0
+                || slimeBallAmount != 0
+                || bonemealAmount != 0
+                || enderPearlAmount != 0
+                || ironNuggetAmount != 0
+                || fireworkNBT != null
+                || potionStack != null)
+                && gunpowderAmount <= 12
+                && fireChargeAmount <= 1
+                && woolAmount <= 1
+                && slimeBallAmount <= 127
+                && bonemealAmount <= 1
+                && enderPearlAmount <= 1
+                && ironNuggetAmount <= 4) {
             resultItem = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
             NBTTagCompound compound = new NBTTagCompound();
             compound.setByte("power", (byte) gunpowderAmount);
-            compound.setByte("bounceAmount", (byte) (slimeBallAmount));
+            compound.setByte("bounceAmount", (byte) slimeBallAmount);
+            compound.setByte("extraDamage", (byte) ironNuggetAmount);
             compound.setBoolean("isFiery", fireChargeAmount > 0);
             compound.setBoolean("canDestroyBlocks", woolAmount < 1);
             compound.setBoolean("hasBonemeal", bonemealAmount > 0);

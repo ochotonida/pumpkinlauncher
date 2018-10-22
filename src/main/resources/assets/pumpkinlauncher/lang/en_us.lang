@@ -8,6 +8,7 @@ item.pumpkinammo.bounce=Bounce:
 item.pumpkinammo.lingering=Lingering
 item.pumpkinammo.bonemeal=Fertilizing
 item.pumpkinammo.enderpearl=Teleporting
+item.pumpkinammo.extradamage=Shrapnel
 
 enchantment.ammosaving=Unwasting
 enchantment.reloadingspeed=Reloading
