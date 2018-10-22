@@ -58,25 +58,25 @@ public class JEIPlugin implements IModPlugin {
         NBTTagCompound compound9 = new NBTTagCompound();
         compound9.setBoolean("isEnderPearl", true);
 
-        ItemStack output0 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output0 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output0.setTagCompound(compound0);
-        ItemStack output1 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output1 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output1.setTagCompound(compound1);
-        ItemStack output2 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output2 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output2.setTagCompound(compound2);
-        ItemStack output3 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output3 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output3.setTagCompound(compound3);
-        ItemStack output4 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output4 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output4.setTagCompound(compound4);
-        ItemStack output5 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output5 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output5.setTagCompound(compound5);
-        ItemStack output6 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output6 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output6.setTagCompound(compound6);
-        ItemStack output7 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output7 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output7.setTagCompound(compound7);
-        ItemStack output8 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output8 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output8.setTagCompound(compound8);
-        ItemStack output9 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        ItemStack output9 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output9.setTagCompound(compound9);
 
         ItemStack pumpkin = new ItemStack(Blocks.LIT_PUMPKIN, 1, OreDictionary.WILDCARD_VALUE);
