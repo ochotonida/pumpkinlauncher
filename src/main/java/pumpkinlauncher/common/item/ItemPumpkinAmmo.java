@@ -62,6 +62,9 @@ public class ItemPumpkinAmmo extends Item {
             if (nbttagcompound.hasKey("hasBonemeal") && nbttagcompound.getBoolean("hasBonemeal")) {
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.bonemeal"));
             }
+            if (nbttagcompound.hasKey("isEnderPearl") && nbttagcompound.getBoolean("isEnderPearl")) {
+                tooltip.add(I18n.translateToLocal("item.pumpkinammo.enderpearl"));
+            }
             if (nbttagcompound.hasKey("fireworks")) {
                 NBTTagCompound fireworksCompound = (NBTTagCompound) nbttagcompound.getTag("fireworks");
                 if (fireworksCompound.hasKey("Flight", 99)) {

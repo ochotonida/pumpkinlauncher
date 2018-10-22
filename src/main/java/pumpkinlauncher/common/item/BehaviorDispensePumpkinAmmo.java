@@ -19,10 +19,6 @@ public class BehaviorDispensePumpkinAmmo extends BehaviorProjectileDispense {
         return new EntityPumpkinProjectile(world, position.getX(), position.getY(), position.getZ(), stack);
     }
 
-    protected float getProjectileInaccuracy() {
-        return 4;
-    }
-
     protected float getProjectileVelocity() {
         return 1.3F;
     }

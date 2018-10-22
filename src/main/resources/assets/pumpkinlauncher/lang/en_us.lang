@@ -7,6 +7,7 @@ item.pumpkinammo.nogriefing=Muffled
 item.pumpkinammo.bounce=Bounce:
 item.pumpkinammo.lingering=Lingering
 item.pumpkinammo.bonemeal=Fertilizing
+item.pumpkinammo.enderpearl=Teleporting
 
 enchantment.ammosaving=Unwasting
 enchantment.reloadingspeed=Reloading

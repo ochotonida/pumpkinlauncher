@@ -61,7 +61,7 @@ public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
 
         ModelPumpkinProjectile() {
             textureWidth = 64;
-            textureHeight = 32;
+            textureHeight = 64;
             cube = new ModelRenderer(this, 0, 0);
             cube.setRotationPoint(0, 0, 0);
             cube.addBox(-8, -8, -8, 16, 16, 16, 0);

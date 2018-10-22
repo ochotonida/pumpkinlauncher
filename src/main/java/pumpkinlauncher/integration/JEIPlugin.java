@@ -55,6 +55,8 @@ public class JEIPlugin implements IModPlugin {
         compound7.setTag("potionTag", new ItemStack(Items.LINGERING_POTION).writeToNBT(new NBTTagCompound()));
         NBTTagCompound compound8 = new NBTTagCompound();
         compound8.setBoolean("hasBonemeal", true);
+        NBTTagCompound compound9 = new NBTTagCompound();
+        compound9.setBoolean("isEnderPearl", true);
 
         ItemStack output0 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
         output0.setTagCompound(compound0);
@@ -74,6 +76,8 @@ public class JEIPlugin implements IModPlugin {
         output7.setTagCompound(compound7);
         ItemStack output8 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
         output8.setTagCompound(compound8);
+        ItemStack output9 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 2);
+        output9.setTagCompound(compound9);
 
         ItemStack pumpkin = new ItemStack(Blocks.LIT_PUMPKIN, 1, OreDictionary.WILDCARD_VALUE);
         ItemStack gunpowder = new ItemStack(Items.GUNPOWDER, 1, OreDictionary.WILDCARD_VALUE);
@@ -91,7 +95,8 @@ public class JEIPlugin implements IModPlugin {
                 new ItemStackRecipeWrapper(output5, pumpkin, gunpowder, firework),
                 new ItemStackRecipeWrapper(output6, pumpkin, new ItemStack(Items.SPLASH_POTION, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output7, pumpkin, new ItemStack(Items.LINGERING_POTION, 1, OreDictionary.WILDCARD_VALUE)),
-                new ItemStackRecipeWrapper(output8, pumpkin, new ItemStack(Blocks.BONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE))
+                new ItemStackRecipeWrapper(output8, pumpkin, new ItemStack(Blocks.BONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output9, pumpkin, new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE))
         ));
     }
 }

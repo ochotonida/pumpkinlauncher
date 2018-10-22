@@ -5,6 +5,7 @@ import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.*;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemDye;
@@ -41,6 +42,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private static final DataParameter<Integer> BOUNCES_LEFT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> IS_FLAMING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_SMOKING = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> IS_ENDER_PEARL = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> HAS_BONEMEAL = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORK_NBT = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.COMPOUND_TAG);
     private static final DataParameter<ItemStack> POTION_ITEM = EntityDataManager.createKey(EntityPumpkinProjectile.class, DataSerializers.ITEM_STACK);
@@ -82,6 +84,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setBouncesLeft(ammoStack);
         setFireworkNBT(ammoStack);
         setHasBonemeal(ammoStack);
+        setIsEnderPearl(ammoStack);
 
         this.shouldSpawnLightning = false;
         this.shouldHurtPlayer = false;
@@ -154,6 +157,14 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         }
     }
 
+    private void setIsEnderPearl(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("isEnderPearl")) {
+            setIsEnderPearl(stack.getTagCompound().getBoolean("isEnderPearl"));
+        } else {
+            setIsEnderPearl(false);
+        }
+    }
+
     @Override
     protected void entityInit() {
         dataManager.register(BOUNCES_LEFT, 0);
@@ -162,6 +173,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         dataManager.register(HAS_BONEMEAL, false);
         dataManager.register(FIREWORK_NBT, new NBTTagCompound());
         dataManager.register(POTION_ITEM, ItemStack.EMPTY);
+        dataManager.register(IS_ENDER_PEARL, false);
     }
 
     @Override
@@ -210,6 +222,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     @Override
     public void onUpdate() {
         super.onUpdate();
+
+        if (isEnderPearl() && shootingEntity != null) {
+            if (!shootingEntity.isEntityAlive()) {
+                setIsEnderPearl(false);
+            }
+        }
 
         if (isFirework() && !world.isRemote) {
             if (fireworkLifetime == 0) {
@@ -327,6 +345,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                 if (hasBonemeal() && ticksExisted % 3 == 0) {
                     world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, posX + rand.nextDouble() * 0.5, posY + rand.nextDouble() * 0.5, posZ + rand.nextDouble() * 0.5, rand.nextGaussian() * 0.02, rand.nextGaussian() * 0.02, rand.nextGaussian() * 0.02);
                 }
+                if (isEnderPearl()) {
+                    world.spawnParticle(EnumParticleTypes.PORTAL, posX + rand.nextDouble() * 0.5, posY + rand.nextDouble() * 0.5, posZ + rand.nextDouble() * 0.5, rand.nextGaussian() * 0.08, rand.nextGaussian() * 0.08, rand.nextGaussian() * 0.08);
+                }
                 if (!getPotion().isEmpty()) {
                     int color = PotionUtils.getColor(getPotion());
                     if (color > 0) {
@@ -368,13 +389,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
                     raytraceresult.entityHit.setFire(4);
                 }
             }
-            if (getBouncesLeft() > 0 && !isInWater()) {
-                if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    if (isFlaming() && world.isAirBlock(raytraceresult.getBlockPos().offset(raytraceresult.sideHit)) && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity)) {
-                        world.setBlockState(raytraceresult.getBlockPos().offset(raytraceresult.sideHit), Blocks.FIRE.getDefaultState(), 11);
-                    }
+            if (raytraceresult.typeOfHit == RayTraceResult.Type.BLOCK) {
+                if (isFlaming() && world.isAirBlock(raytraceresult.getBlockPos().offset(raytraceresult.sideHit)) && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity)) {
+                    world.setBlockState(raytraceresult.getBlockPos().offset(raytraceresult.sideHit), Blocks.FIRE.getDefaultState(), 11);
                 }
-            } else {
+            }
+            if (getBouncesLeft() <= 0 || isInWater()) {
                 detonate(raytraceresult);
                 return;
             }
@@ -408,10 +428,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
 
     private void detonate(@Nullable RayTraceResult result) {
         if (!world.isRemote) {
+            if (isEnderPearl()) {
+                doEnderPearlThings(result);
+            }
             if (shouldSpawnLightning) {
                 world.addWeatherEffect(new EntityLightningBolt(world, posX, posY, posZ, false));
             }
-
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
                 new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, power + 1, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
@@ -432,6 +454,45 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         }
         if (power <= 0) {
             world.playSound(null, posX, posY, posZ, SoundEvents.BLOCK_WOOD_BREAK, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+        }
+    }
+
+    private void doEnderPearlThings(@Nullable RayTraceResult result) {
+        if (result != null && result.entityHit != null) {
+            if (result.entityHit == shootingEntity) {
+                return;
+            }
+            result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, shootingEntity), 0.0F);
+        }
+
+        for (int i = 0; i < 32; ++i) {
+            world.spawnParticle(EnumParticleTypes.PORTAL, posX, posY + rand.nextDouble() * 2.0D, posZ, rand.nextGaussian(), 0.0D, rand.nextGaussian());
+        }
+
+        if (!this.world.isRemote && shootingEntity != null) {
+            // if (result != null && result.entityHit != shootingEntity && result.entityHit instanceof EntityLivingBase) {
+            //     teleportEntity((EntityLivingBase) result.entityHit, shootingEntity.posX, shootingEntity.posY, shootingEntity.posZ);
+            // }
+            teleportEntity(shootingEntity, posX, posY, posZ);
+        }
+    }
+
+    private void teleportEntity(EntityLivingBase entity, double posX, double posY, double posZ) {
+        if (entity instanceof EntityPlayerMP) {
+            EntityPlayerMP entityplayermp = (EntityPlayerMP) entity;
+
+            if (entityplayermp.connection.getNetworkManager().isChannelOpen() && entityplayermp.world == world && !entityplayermp.isPlayerSleeping()) {
+                if (entity.isRiding()) {
+                    entity.dismountRidingEntity();
+                }
+
+                entity.setPositionAndUpdate(posX, posY, posZ);
+                entity.fallDistance = 0.0F;
+                entity.attackEntityFrom(DamageSource.FALL, 3);
+            }
+        } else {
+            entity.setPositionAndUpdate(posX, posY, posZ);
+            entity.fallDistance = 0.0F;
         }
     }
 
@@ -620,6 +681,15 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         }
     }
 
+    @Nullable
+    public Entity changeDimension(int dimensionIn, net.minecraftforge.common.util.ITeleporter teleporter) {
+        if (shootingEntity != null && shootingEntity.dimension != dimensionIn) {
+            setIsEnderPearl(false);
+        }
+
+        return super.changeDimension(dimensionIn, teleporter);
+    }
+
     public int getBouncesLeft() {
         return dataManager.get(BOUNCES_LEFT);
     }
@@ -684,6 +754,15 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         }
     }
 
+    public boolean isEnderPearl() {
+        return dataManager.get(IS_ENDER_PEARL);
+    }
+
+    private void setIsEnderPearl(boolean isEnderPearl) {
+        dataManager.set(IS_ENDER_PEARL, isEnderPearl);
+        dataManager.setDirty(IS_ENDER_PEARL);
+    }
+
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
         compound.setInteger("xTile", this.xTile);
@@ -694,6 +773,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         compound.setByte("bouncesLeft", (byte) getBouncesLeft());
         compound.setBoolean("isFiery", isFlaming());
         compound.setBoolean("isSmoking", isSmoking());
+        compound.setBoolean("isEnderPearl", isEnderPearl());
         compound.setBoolean("hasBonemeal", hasBonemeal());
         compound.setTag("fireworkTag", getFireworkNBT());
         compound.setInteger("fireworkLifetime", fireworkLifetime);
@@ -713,6 +793,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setBouncesLeft(compound.getByte("bouncesLeft"));
         setIsFlaming(compound.getBoolean("isFiery"));
         setIsSmoking(compound.getBoolean("isSmoking"));
+        setIsEnderPearl(compound.getBoolean("isEnderPearl"));
         setHasBonemeal(compound.getBoolean("hasBonemeal"));
         setFireworkNBT(compound.getTag("fireworkTag"));
         this.fireworkLifetime = compound.getInteger("fireworkLifetime");
@@ -721,5 +802,4 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             setPotion(new ItemStack(compound.getCompoundTag("potionTag")));
         }
     }
-
 }
