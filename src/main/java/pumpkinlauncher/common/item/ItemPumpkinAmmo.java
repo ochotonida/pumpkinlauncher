@@ -8,6 +8,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
+@SuppressWarnings("deprecation")
 public class ItemPumpkinAmmo extends Item {
 
     public ItemPumpkinAmmo() {
@@ -31,24 +34,40 @@ public class ItemPumpkinAmmo extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    @SuppressWarnings("deprecation")
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         NBTTagCompound nbttagcompound = stack.getTagCompound();
         if (nbttagcompound != null) {
-            if (nbttagcompound.hasKey("potionTag")) {
-                ItemStack potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
-                PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
-                if (potionStack.getItem() == Items.LINGERING_POTION) {
-                    tooltip.add(I18n.translateToLocal("item.pumpkinammo.lingering"));
-                }
-            }
             if (nbttagcompound.hasKey("arrowTag") && !nbttagcompound.getCompoundTag("arrowTag").hasNoTags()) {
                 ItemStack arrowStack = new ItemStack(nbttagcompound.getCompoundTag("arrowTag"));
+
                 tooltip.add(I18n.translateToLocal("item.pumpkinammo.arrows") + " " + arrowStack.getCount());
+
                 if (arrowStack.getItem() instanceof ItemTippedArrow) {
-                    PotionUtils.addPotionTooltip(arrowStack, tooltip, 0.125F);
+                    List<PotionEffect> list = PotionUtils.getEffectsFromStack(arrowStack);
+                    if (list.isEmpty()) {
+                        tooltip.add(TextFormatting.GRAY + "  " + I18n.translateToLocal("effect.none").trim());
+                    } else {
+                        for (PotionEffect potioneffect : list) {
+                            String effectString = I18n.translateToLocal(potioneffect.getEffectName()).trim();
+
+                            if (potioneffect.getAmplifier() > 0) {
+                                effectString = effectString + " " + I18n.translateToLocal("potion.potency." + potioneffect.getAmplifier()).trim();
+                            }
+
+                            if (potioneffect.getDuration() > 20) {
+                                effectString = effectString + " (" + Potion.getPotionDurationString(potioneffect, 0.125F) + ")";
+                            }
+
+                            if (potioneffect.getPotion().isBadEffect()) {
+                                tooltip.add(TextFormatting.RED + "  " + effectString);
+                            }
+                            else {
+                                tooltip.add(TextFormatting.BLUE + "  " + effectString);
+                            }
+                        }
+                    }
                 } else if (arrowStack.getItem() instanceof ItemSpectralArrow) {
-                    tooltip.add(TextFormatting.AQUA + I18n.translateToLocal("item.pumpkinammo.spectral"));
+                    tooltip.add(TextFormatting.AQUA + "  " + I18n.translateToLocal("item.pumpkinammo.spectral"));
                 }
             }
             if (nbttagcompound.hasKey("power") && nbttagcompound.getByte("power") > 0) {
@@ -92,6 +111,13 @@ public class ItemPumpkinAmmo extends Item {
                             tooltip.addAll(list);
                         }
                     }
+                }
+            }
+            if (nbttagcompound.hasKey("potionTag")) {
+                ItemStack potionStack = new ItemStack(stack.getTagCompound().getCompoundTag("potionTag"));
+                PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
+                if (potionStack.getItem() == Items.LINGERING_POTION) {
+                    tooltip.add(I18n.translateToLocal("item.pumpkinammo.lingering"));
                 }
             }
         }
