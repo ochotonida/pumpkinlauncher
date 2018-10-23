@@ -60,7 +60,7 @@ public class JEIPlugin implements IModPlugin {
         NBTTagCompound compound10 = new NBTTagCompound();
         compound10.setByte("extraDamage", (byte) 1);
         NBTTagCompound compound11 = new NBTTagCompound();
-        compound11.setTag("arrowTag", new ItemStack(Items.ARROW).writeToNBT(new NBTTagCompound()));
+        compound11.setTag("arrowTag", new ItemStack(Items.ARROW, 3).writeToNBT(new NBTTagCompound()));
         NBTTagCompound compound12 = new NBTTagCompound();
         compound12.setTag("arrowTag", new ItemStack(Items.TIPPED_ARROW).writeToNBT(new NBTTagCompound()));
         NBTTagCompound compound13 = new NBTTagCompound();
@@ -115,7 +115,7 @@ public class JEIPlugin implements IModPlugin {
                 new ItemStackRecipeWrapper(output8, pumpkin, new ItemStack(Blocks.BONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output9, pumpkin, new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output10, pumpkin, new ItemStack(Items.IRON_NUGGET, 1, OreDictionary.WILDCARD_VALUE)),
-                new ItemStackRecipeWrapper(output11, pumpkin, arrow),
+                new ItemStackRecipeWrapper(output11, pumpkin, arrow, arrow, arrow),
                 new ItemStackRecipeWrapper(output12, pumpkin, new ItemStack(Items.TIPPED_ARROW, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output13, pumpkin, new ItemStack(Items.SPECTRAL_ARROW, 1, OreDictionary.WILDCARD_VALUE))
         ));
