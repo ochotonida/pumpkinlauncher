@@ -59,6 +59,12 @@ public class JEIPlugin implements IModPlugin {
         compound9.setBoolean("isEnderPearl", true);
         NBTTagCompound compound10 = new NBTTagCompound();
         compound10.setByte("extraDamage", (byte) 1);
+        NBTTagCompound compound11 = new NBTTagCompound();
+        compound11.setTag("arrowTag", new ItemStack(Items.ARROW).writeToNBT(new NBTTagCompound()));
+        NBTTagCompound compound12 = new NBTTagCompound();
+        compound12.setTag("arrowTag", new ItemStack(Items.TIPPED_ARROW).writeToNBT(new NBTTagCompound()));
+        NBTTagCompound compound13 = new NBTTagCompound();
+        compound13.setTag("arrowTag", new ItemStack(Items.SPECTRAL_ARROW).writeToNBT(new NBTTagCompound()));
 
         ItemStack output0 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output0.setTagCompound(compound0);
@@ -82,9 +88,16 @@ public class JEIPlugin implements IModPlugin {
         output9.setTagCompound(compound9);
         ItemStack output10 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
         output10.setTagCompound(compound10);
+        ItemStack output11 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
+        output11.setTagCompound(compound11);
+        ItemStack output12 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
+        output12.setTagCompound(compound12);
+        ItemStack output13 = new ItemStack(PumpkinLauncher.PUMPKIN_AMMO, 3);
+        output13.setTagCompound(compound13);
 
         ItemStack pumpkin = new ItemStack(Blocks.LIT_PUMPKIN, 1, OreDictionary.WILDCARD_VALUE);
         ItemStack gunpowder = new ItemStack(Items.GUNPOWDER, 1, OreDictionary.WILDCARD_VALUE);
+        ItemStack arrow = new ItemStack(Items.ARROW, 1, OreDictionary.WILDCARD_VALUE);
         ItemStack firework = new ItemStack(Items.FIREWORKS);
         NBTTagCompound fireworkItemCompound = new NBTTagCompound();
         fireworkItemCompound.setTag("Fireworks", fireworkCompound);
@@ -101,7 +114,10 @@ public class JEIPlugin implements IModPlugin {
                 new ItemStackRecipeWrapper(output7, pumpkin, new ItemStack(Items.LINGERING_POTION, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output8, pumpkin, new ItemStack(Blocks.BONE_BLOCK, 1, OreDictionary.WILDCARD_VALUE)),
                 new ItemStackRecipeWrapper(output9, pumpkin, new ItemStack(Items.ENDER_PEARL, 1, OreDictionary.WILDCARD_VALUE)),
-                new ItemStackRecipeWrapper(output10, pumpkin, new ItemStack(Items.IRON_NUGGET, 1, OreDictionary.WILDCARD_VALUE))
+                new ItemStackRecipeWrapper(output10, pumpkin, new ItemStack(Items.IRON_NUGGET, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output11, pumpkin, arrow),
+                new ItemStackRecipeWrapper(output12, pumpkin, new ItemStack(Items.TIPPED_ARROW, 1, OreDictionary.WILDCARD_VALUE)),
+                new ItemStackRecipeWrapper(output13, pumpkin, new ItemStack(Items.SPECTRAL_ARROW, 1, OreDictionary.WILDCARD_VALUE))
         ));
     }
 }
