@@ -84,6 +84,12 @@ public class ItemPumpkinLauncher extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
-        return enchantment == Enchantments.MENDING || enchantment == Enchantments.UNBREAKING || enchantment == PumpkinLauncher.AMMO_SAVING || enchantment == PumpkinLauncher.RELOADING_SPEED || enchantment == PumpkinLauncher.BLAST_SHIELD || enchantment == PumpkinLauncher.LAUNCHING;
+        return enchantment == Enchantments.MENDING
+            || enchantment == Enchantments.UNBREAKING
+            || enchantment == Enchantments.LOOTING
+            || enchantment == PumpkinLauncher.AMMO_SAVING
+            || enchantment == PumpkinLauncher.RELOADING_SPEED
+            || enchantment == PumpkinLauncher.BLAST_SHIELD
+            || enchantment == PumpkinLauncher.LAUNCHING;
     }
 }
