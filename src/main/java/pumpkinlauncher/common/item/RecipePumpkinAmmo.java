@@ -6,6 +6,7 @@ import net.minecraft.block.BlockPumpkin;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.ItemArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
@@ -42,6 +43,7 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
         int ironNuggetAmount = 0;
         NBTTagCompound fireworkNBT = null;
         ItemStack potionStack = null;
+        ItemStack arrowStack = null;
 
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack stack = inventory.getStackInSlot(i);
@@ -81,6 +83,19 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                     } else {
                         potionStack = stack;
                     }
+                } else if (stack.getItem() instanceof ItemArrow) {
+                    if (arrowStack == null) {
+                        arrowStack = stack.copy();
+                        arrowStack.setCount(1);
+                    } else {
+                        ItemStack otherStack = stack.copy();
+                        otherStack.setCount(arrowStack.getCount());
+                        if (ItemStack.areItemStacksEqual(arrowStack, otherStack)) {
+                            arrowStack.grow(1);
+                        } else {
+                            return false;
+                        }
+                    }
                 } else {
                     return false;
                 }
@@ -95,7 +110,8 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                 || enderPearlAmount != 0
                 || ironNuggetAmount != 0
                 || fireworkNBT != null
-                || potionStack != null)
+                || potionStack != null
+                || arrowStack != null)
                 && gunpowderAmount <= 12
                 && fireChargeAmount <= 1
                 && woolAmount <= 1
@@ -117,6 +133,9 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
             }
             if (potionStack != null) {
                 compound.setTag("potionTag", potionStack.writeToNBT(new NBTTagCompound()));
+            }
+            if (arrowStack != null) {
+                compound.setTag("arrowTag", arrowStack.writeToNBT(new NBTTagCompound()));
             }
             resultItem.setTagCompound(compound);
             return true;

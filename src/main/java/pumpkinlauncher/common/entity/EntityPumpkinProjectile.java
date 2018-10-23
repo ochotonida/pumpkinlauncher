@@ -6,10 +6,11 @@ import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntitySpectralArrow;
+import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.init.*;
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -59,6 +60,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     private boolean canDestroyBlocks;
     private boolean shouldHurtPlayer;
     private boolean shouldSpawnLightning;
+    private ItemStack arrowStack;
     public int rotation;
 
     @Nullable
@@ -87,6 +89,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setHasBonemeal(ammoStack);
         setIsEnderPearl(ammoStack);
         setExtraDamage(ammoStack);
+        setArrowItem(ammoStack);
 
         this.shouldSpawnLightning = false;
         this.shouldHurtPlayer = false;
@@ -173,6 +176,17 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         } else {
             extraDamage = 0;
         }
+    }
+
+    private void setArrowItem(ItemStack stack) {
+        if (stack.getTagCompound() != null && stack.getTagCompound().hasKey("arrowTag")) {
+            NBTTagCompound arrowTag = stack.getTagCompound().getCompoundTag("arrowTag");
+            if (!arrowTag.hasNoTags()) {
+                arrowStack = new ItemStack(arrowTag);
+                return;
+            }
+        }
+        arrowStack = ItemStack.EMPTY;
     }
 
     @Override
@@ -390,7 +404,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     protected void onImpact(RayTraceResult raytraceresult) {
         if (!world.isRemote) {
             if (raytraceresult.typeOfHit == RayTraceResult.Type.ENTITY && raytraceresult.entityHit instanceof EntityLiving) {
-                if (shootingEntity instanceof EntityPlayer) {
+                if (shootingEntity instanceof EntityPlayer && raytraceresult.entityHit != shootingEntity) {
                     raytraceresult.entityHit.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) shootingEntity), 1 + 2 * extraDamage);
                 } else {
                     raytraceresult.entityHit.attackEntityFrom(DamageSource.GENERIC, 1 + 2 * extraDamage);
@@ -444,9 +458,12 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             if (shouldSpawnLightning) {
                 world.addWeatherEffect(new EntityLightningBolt(world, posX, posY, posZ, false));
             }
+            if (!arrowStack.isEmpty()) {
+                spawnArrows(result);
+            }
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (power > 0) {
-                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (power + 3)/2F, extraDamage, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
+                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (power + 2)/2.25F, extraDamage, canMobGrief && isFlaming(), canMobGrief && canDestroyBlocks, shouldHurtPlayer).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
             }
@@ -503,6 +520,45 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         } else {
             entity.setPositionAndUpdate(posX, posY, posZ);
             entity.fallDistance = 0.0F;
+        }
+    }
+
+    private void spawnArrows(@Nullable RayTraceResult result) {
+        for (int i = 0; i < arrowStack.getCount() * 1.4; i++) {
+            EntityArrow arrow;
+            if (arrowStack.getItem() instanceof ItemSpectralArrow) {
+                arrow = new EntitySpectralArrow(world, posX, posY, posZ);
+            } else if (arrowStack.getItem() instanceof ItemTippedArrow) {
+                arrow = new EntityTippedArrow(world, posX, posY, posZ);
+                ((EntityTippedArrow) arrow).setPotionEffect(arrowStack);
+            } else if (arrowStack.getItem() instanceof ItemArrow) {
+                arrow = new EntityTippedArrow(world, posX, posY, posZ);
+            } else {
+                return;
+            }
+            arrow.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
+            arrow.setDamage(arrow.getDamage() * 2.5);
+            if (shootingEntity != null) {
+                arrow.shootingEntity = shootingEntity;
+            }
+            double x = motionX;
+            double y = motionY;
+            double z = motionZ;
+            if (result != null && result.typeOfHit == RayTraceResult.Type.BLOCK) {
+                if (result.sideHit.getAxis() == EnumFacing.Axis.X) {
+                    x = - motionX;
+                } else if (result.sideHit.getAxis() == EnumFacing.Axis.Y) {
+                    y = - motionY;
+                } else if (result.sideHit.getAxis() == EnumFacing.Axis.Z) {
+                    z = - motionZ;
+                }
+            } else if (result != null && result.typeOfHit == RayTraceResult.Type.ENTITY) {
+                x = rand.nextDouble() * 2 - 1;
+                y = rand.nextDouble();
+                z = rand.nextDouble() * 2 - 1;
+            }
+            arrow.shoot(x, y, z, MathHelper.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ), 10);
+            world.spawnEntity(arrow);
         }
     }
 
@@ -788,6 +844,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         compound.setTag("fireworkTag", getFireworkNBT());
         compound.setInteger("fireworkLifetime", fireworkLifetime);
         compound.setInteger("fireworkLifetimeMax", fireworkLifetimeMax);
+        if (!arrowStack.isEmpty()) {
+            compound.setTag("arrowTag", arrowStack.writeToNBT(new NBTTagCompound()));
+        }
         if (!getPotion().isEmpty()) {
             compound.setTag("potionTag", getPotion().writeToNBT(new NBTTagCompound()));
         }
@@ -808,6 +867,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         setFireworkNBT(compound.getTag("fireworkTag"));
         this.fireworkLifetime = compound.getInteger("fireworkLifetime");
         this.fireworkLifetimeMax = compound.getInteger("fireworkLifetimeMax");
+        if (compound.hasKey("arrowTag") && !compound.getTag("arrowTag").hasNoTags()) {
+            arrowStack = new ItemStack(compound.getCompoundTag("arrowTag"));
+        }
         if (compound.hasKey("potionTag") && !compound.getTag("potionTag").hasNoTags()) {
             setPotion(new ItemStack(compound.getCompoundTag("potionTag")));
         }

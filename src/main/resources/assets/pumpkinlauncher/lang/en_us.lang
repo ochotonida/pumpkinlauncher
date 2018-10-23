@@ -9,6 +9,8 @@ item.pumpkinammo.lingering=Lingering
 item.pumpkinammo.bonemeal=Fertilizing
 item.pumpkinammo.enderpearl=Teleporting
 item.pumpkinammo.extradamage=Shrapnel
+item.pumpkinammo.arrows=Arrows:
+item.pumpkinammo.spectral=Spectral
 
 enchantment.ammosaving=Unwasting
 enchantment.reloadingspeed=Reloading

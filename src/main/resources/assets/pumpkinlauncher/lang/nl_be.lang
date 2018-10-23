@@ -9,11 +9,13 @@ item.pumpkinammo.lingering=Aanhoudend
 item.pumpkinammo.bonemeal=Bemesting
 item.pumpkinammo.enderpearl=Teleporteren
 item.pumpkinammo.extradamage=Shrapnel
+item.pumpkinammo.arrows=Pijlen:
+item.pumpkinammo.spectral=Spectraal
 
 enchantment.ammosaving=Spaarzaamheid
 enchantment.reloadingspeed=Herladingsversnelling
 enchantment.blastshield=Explosieschild
-enchantment.launching=Launching=Afvuring
+enchantment.launching=Afvuring
 
 enchantment.pumpkinlauncher.ammosaving.desc=Verkleint de kans dat een Exploderende Jack o'Lantern wordt opgebruikt.
 enchantment.pumpkinlauncher.reloadingspeed.desc=Verkort de cooldowntijd van de Jack o'Launcher.

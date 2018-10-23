@@ -5,12 +5,11 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemFireworkCharge;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.potion.PotionUtils;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -34,10 +33,6 @@ public class ItemPumpkinAmmo extends Item {
     @SideOnly(Side.CLIENT)
     @SuppressWarnings("deprecation")
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        //if (stack.getMetadata() == 1) {
-        //    tooltip.add(TextFormatting.AQUA + "Lightning");
-        //}
-
         NBTTagCompound nbttagcompound = stack.getTagCompound();
         if (nbttagcompound != null) {
             if (nbttagcompound.hasKey("potionTag")) {
@@ -45,6 +40,15 @@ public class ItemPumpkinAmmo extends Item {
                 PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
                 if (potionStack.getItem() == Items.LINGERING_POTION) {
                     tooltip.add(I18n.translateToLocal("item.pumpkinammo.lingering"));
+                }
+            }
+            if (nbttagcompound.hasKey("arrowTag") && !nbttagcompound.getCompoundTag("arrowTag").hasNoTags()) {
+                ItemStack arrowStack = new ItemStack(nbttagcompound.getCompoundTag("arrowTag"));
+                tooltip.add(I18n.translateToLocal("item.pumpkinammo.arrows") + " " + arrowStack.getCount());
+                if (arrowStack.getItem() instanceof ItemTippedArrow) {
+                    PotionUtils.addPotionTooltip(arrowStack, tooltip, 0.125F);
+                } else if (arrowStack.getItem() instanceof ItemSpectralArrow) {
+                    tooltip.add(TextFormatting.AQUA + I18n.translateToLocal("item.pumpkinammo.spectral"));
                 }
             }
             if (nbttagcompound.hasKey("power") && nbttagcompound.getByte("power") > 0) {

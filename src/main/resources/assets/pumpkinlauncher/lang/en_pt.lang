@@ -9,6 +9,8 @@ item.pumpkinammo.lingering=Bottled fog
 item.pumpkinammo.bonemeal=Plant Food
 item.pumpkinammo.enderpearl=Tall One's Prowess
 item.pumpkinammo.extradamage=Shrapnel
+item.pumpkinammo.arrows=Bolts:
+item.pumpkinammo.spectral=Glowy
 
 enchantment.ammosaving=Unwastin'
 enchantment.reloadingspeed=Reloadin'
