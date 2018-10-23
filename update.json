@@ -8,7 +8,8 @@
     "1.12.2-1.4.0": "splash- & lingering potions can now be used in the exploding jack o'lantern recipe to add effects to exploding jack o'lanterns,\nadded french translation (by pyrofab),\nincreased amount of exploding jack o'lanterns obtained from crafting to 2,\nfixed exploding jack o'lanterns being uncraftable with fireworks without nbt",
     "1.12.2-1.5.0": "jack o'launchers can now be enchanted and have durability,\nadded 'reloading', 'blast shield' and 'unwasting' enchantments,\nfixed JEI potion recipes,\nany pumpkin can now be used for crafting,\nadded various translations",
     "1.12.2-1.5.1": "added enchantment descriptions,\nreplaced power enchant with custom 'launching' enchant,\nfixed blast shield enchant being inverted",
-    "1.12.2-1.6.0": "iron nuggets, arrows, ender pearls and bone blocks can now be used in crafting,\nincreased crafted ammo from 2 to 3,\nincreased maximum gunpowder and decreased explosion power"
+    "1.12.2-1.6.0": "iron nuggets, arrows, ender pearls and bone blocks can now be used in crafting,\nincreased crafted ammo from 2 to 3,\nincreased maximum gunpowder and decreased explosion power",
+    "1.12.2-1.6.1": "looting can now be applied to the jack o'launcher,\nadded JEI support for arrows"
   },
   "promos": {
     "1.12.2-latest": "1.12.2-1.6.0",
