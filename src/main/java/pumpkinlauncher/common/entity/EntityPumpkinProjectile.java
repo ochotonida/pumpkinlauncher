@@ -458,7 +458,7 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
             if (shouldSpawnLightning) {
                 world.addWeatherEffect(new EntityLightningBolt(world, posX, posY, posZ, false));
             }
-            if (!arrowStack.isEmpty()) {
+            if (arrowStack != null && !arrowStack.isEmpty()) {
                 spawnArrows(result);
             }
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
