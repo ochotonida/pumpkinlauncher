@@ -113,8 +113,8 @@ public class RecipePumpkinAmmo extends net.minecraftforge.registries.IForgeRegis
                 || potionStack != null
                 || arrowStack != null)
                 && gunpowderAmount <= 12
+                && (woolAmount == 0 || gunpowderAmount > 1 && woolAmount == 1)
                 && fireChargeAmount <= 1
-                && woolAmount <= 1
                 && slimeBallAmount <= 127
                 && bonemealAmount <= 1
                 && enderPearlAmount <= 1
