@@ -13,7 +13,7 @@
     "1.12.2-1.6.2": "renamed 'exploding jack o'lantern' to 'jack o'launcher ammo',\nfixed enchantment glint on jack o'launcher,\noverhauled textures,\nrecipes with wool now require at least 1 gunpowder,\nfixed tooltips for exploding jack o'lanterns with potion effects,\nfixed a crash in worlds with exploding jack o'launcher entities generated before 1.6.0"
   },
   "promos": {
-    "1.12.2-latest": "1.12.2-1.6.1",
-    "1.12.2-recommended": "1.12.2-1.6.1"
+    "1.12.2-latest": "1.12.2-1.6.2",
+    "1.12.2-recommended": "1.12.2-1.6.2"
   }
 }
