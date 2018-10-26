@@ -1,5 +1,5 @@
 item.pumpkinlauncher.name=Explodin' Gourd Squash Cannon
-item.pumpkinammo.name=Explodin' Gourd Squash
+item.pumpkinammo.name=Gourd Squash Cannonball
 
 item.pumpkinammo.power=Explodin' Power:
 item.pumpkinammo.isfiery=Burnin'
@@ -17,4 +17,4 @@ enchantment.reloadingspeed=Reloadin'
 enchantment.blastshield=Cannon's Mercy
 enchantment.launching=Hurlin'
 
-entity.pumpkinprojectile.name=Explodin' Gourd Squash
+entity.pumpkinprojectile.name=Gourd Squash Cannonball

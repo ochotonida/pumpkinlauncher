@@ -1,5 +1,5 @@
 item.pumpkinlauncher.name=Jack-o'-launcher
-item.pumpkinammo.name=Exploderende Jack-o'-lantern
+item.pumpkinammo.name=Jack-o'-Launcher-munitie
 
 item.pumpkinammo.power=Explosieve Kracht:
 item.pumpkinammo.isfiery=Vlammend
@@ -17,9 +17,9 @@ enchantment.reloadingspeed=Herladingsversnelling
 enchantment.blastshield=Explosieschild
 enchantment.launching=Afvuring
 
-enchantment.pumpkinlauncher.ammosaving.desc=Verkleint de kans dat een Exploderende Jack-o'-Lantern wordt opgebruikt.
+enchantment.pumpkinlauncher.ammosaving.desc=Verkleint de kans dat Jack-o'-Launcher-munitie wordt opgebruikt.
 enchantment.pumpkinlauncher.reloadingspeed.desc=Verkort de cooldowntijd van de Jack-o'-Launcher.
-enchantment.pumpkinlauncher.blastshield.desc=Verkleint de explosieshade dat aan de gebruiker wordt toegebracht door zijn eigen Exploderende Jack-o'-Lanterns.
+enchantment.pumpkinlauncher.blastshield.desc=Verkleint de explosieshade dat aan de gebruiker wordt toegebracht door zijn eigen Jack-o'-Launcher-projectielen.
 enchantment.pumpkinlauncher.launching.desc=Vergroot de snelheid van projectielen afgevuurd door de Jack-o'-Launcher.
 
-entity.pumpkinprojectile.name=Exploderende Jack-o'-lantern
+entity.pumpkinprojectile.name=Jack-o'-Launcher-projectiel
