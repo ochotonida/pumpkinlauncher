@@ -2,14 +2,15 @@
   "homepage": "https://github.com/ochotonida/pumpkinlauncher",
   "1.12.2": {
     "1.12.2-1.0.0": "initial release",
-    "1.12.2-1.1.0": "recipe for exploding jack-o'-lantern can now take up to 4 gunpowder,\nexploding jack-o'-lanterns withouth proper nbt tags now get a tooltip with crafting info,\nslime balls can now be used as a crafting ingredient to make jack-o'-lanterns bouncy,\nspelling of 'Jack o'Lantern' is now consistent with the spelling used by minecraft",
+    "1.12.2-1.1.0": "recipe for exploding jack-o'-lantern can now take up to 4 gunpowder,\nexploding jack-o'-lanterns without proper nbt tags now get a tooltip with crafting info,\nslime balls can now be used as a crafting ingredient to make jack-o'-lanterns bouncy,\nspelling of 'Jack o'Lantern' is now consistent with the spelling used by minecraft",
     "1.12.2-1.2.0": "added JEI support,\nadded better particles,\nmade some minor changes to projectile behaviour",
     "1.12.2-1.3.0": "fireworks can now be used in the exploding jack o'lantern recipe to remove gravity from the projectile, set a maximum flight time before exploding, and optionally adding particle effects,\nfixed a few desynchronisation issues,\nrenamed 'Bounce' to 'Bounce:'",
     "1.12.2-1.4.0": "splash- & lingering potions can now be used in the exploding jack o'lantern recipe to add effects to exploding jack o'lanterns,\nadded french translation (by pyrofab),\nincreased amount of exploding jack o'lanterns obtained from crafting to 2,\nfixed exploding jack o'lanterns being uncraftable with fireworks without nbt",
     "1.12.2-1.5.0": "jack o'launchers can now be enchanted and have durability,\nadded 'reloading', 'blast shield' and 'unwasting' enchantments,\nfixed JEI potion recipes,\nany pumpkin can now be used for crafting,\nadded various translations",
     "1.12.2-1.5.1": "added enchantment descriptions,\nreplaced power enchant with custom 'launching' enchant,\nfixed blast shield enchant being inverted",
     "1.12.2-1.6.0": "iron nuggets, arrows, ender pearls and bone blocks can now be used in crafting,\nincreased crafted ammo from 2 to 3,\nincreased maximum gunpowder and decreased explosion power",
-    "1.12.2-1.6.1": "looting can now be applied to the jack o'launcher,\nadded JEI support for arrows"
+    "1.12.2-1.6.1": "looting can now be applied to the jack o'launcher,\nadded JEI support for arrows",
+    "1.12.2-1.6.2": "overhauled textures,\nrecipes with wool now require at least 1 gunpowder,\nfixed tooltips for exploding jack o'lanterns with potion effects,\nfixed a crash in worlds with exploding jack o'launcher entities generated before 1.6.0"
   },
   "promos": {
     "1.12.2-latest": "1.12.2-1.6.0",

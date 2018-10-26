@@ -57,13 +57,13 @@ public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
     }
 
     private static class ModelPumpkinProjectile extends ModelBase {
-        private ModelRenderer cube;
+
+        private final ModelRenderer cube;
 
         ModelPumpkinProjectile() {
             textureWidth = 64;
-            textureHeight = 64;
+            textureHeight = 32;
             cube = new ModelRenderer(this, 0, 0);
-            cube.setRotationPoint(0, 0, 0);
             cube.addBox(-8, -8, -8, 16, 16, 16, 0);
         }
 
@@ -74,11 +74,6 @@ public class RenderPumpkinProjectile extends Render<EntityPumpkinProjectile> {
             GlStateManager.rotate(limbSwingAmount, 0.0F, 1.0F, 0.0F);
             cube.render(scale);
             GlStateManager.popMatrix();
-        }
-
-        @Override
-        public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
-            cube.rotateAngleX = entityIn.rotationPitch;
         }
     }
 }
