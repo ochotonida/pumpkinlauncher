@@ -7,8 +7,6 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntitySpectralArrow;
-import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.init.*;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTBase;
@@ -24,6 +22,8 @@ import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import pumpkinlauncher.client.particle.Particles;
@@ -587,20 +587,20 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
         }
     }
 
-    // arrows detonate
     private void spawnArrows(@Nullable RayTraceResult result) {
-        for (int i = 0; i < arrowStack.getCount() * 1.4; i++) {
+        for (int i = 0; i < arrowStack.getCount(); i++) {
             EntityArrow arrow;
-            if (arrowStack.getItem() instanceof ItemSpectralArrow) {
-                arrow = new EntitySpectralArrow(world, posX, posY, posZ);
-            } else if (arrowStack.getItem() instanceof ItemTippedArrow) {
-                arrow = new EntityTippedArrow(world, posX, posY, posZ);
-                ((EntityTippedArrow) arrow).setPotionEffect(arrowStack);
-            } else if (arrowStack.getItem() instanceof ItemArrow) {
-                arrow = new EntityTippedArrow(world, posX, posY, posZ);
+            if (shootingEntity != null) {
+                arrow = ((ItemArrow) arrowStack.getItem()).createArrow(world, arrowStack, shootingEntity);
             } else {
-                return;
+                if (!(world instanceof WorldServer)) {
+                    return;
+                }
+                arrow = ((ItemArrow) arrowStack.getItem()).createArrow(world, arrowStack, FakePlayerFactory.getMinecraft((WorldServer) world));
             }
+            arrow.posX = posX;
+            arrow.posY = posY;
+            arrow.posZ = posZ;
             arrow.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
             arrow.setDamage(arrow.getDamage() * 2.5);
             if (shootingEntity != null) {

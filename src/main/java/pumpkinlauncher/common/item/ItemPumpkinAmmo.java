@@ -68,6 +68,8 @@ public class ItemPumpkinAmmo extends Item {
                     }
                 } else if (arrowStack.getItem() instanceof ItemSpectralArrow) {
                     tooltip.add(TextFormatting.AQUA + "  " + I18n.translateToLocal("item.pumpkinammo.spectral"));
+                } else if (arrowStack.getItem() != Items.ARROW) {
+                    tooltip.add("  " + arrowStack.getTextComponent().getUnformattedText());
                 }
             }
             if (nbttagcompound.hasKey("power") && nbttagcompound.getByte("power") > 0) {
