@@ -56,7 +56,7 @@ public class ItemPumpkinLauncher extends Item {
                 world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
                 player.getCooldownTracker().setCooldown(this, 40 - 6 * EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.RELOADING_SPEED, player.getHeldItem(hand)));
                 EntityPumpkinProjectile projectile = new EntityPumpkinProjectile(world, player, stack, EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.BLAST_SHIELD, player.getHeldItem(hand)) == 0);
-                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.12F * EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.LAUNCHING, player.getHeldItem(hand)), 5F);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.13F * EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.LAUNCHING, player.getHeldItem(hand)), 3F);
                 world.spawnEntity(projectile);
                 if (!player.capabilities.isCreativeMode && itemRand.nextInt(1 + EnchantmentHelper.getEnchantmentLevel(PumpkinLauncher.AMMO_SAVING, player.getHeldItem(hand))) == 0) {
                     stack.shrink(1);
