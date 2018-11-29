@@ -273,9 +273,9 @@ public class EntityPumpkinProjectile extends Entity implements IProjectile {
     @Override
     public void shoot(double x, double y, double z, float velocity, float inaccuracy) {
         float f = MathHelper.sqrt(x * x + y * y + z * z);
-        motionX = x / f + rand.nextGaussian() * 0.0075 * inaccuracy * velocity;
-        motionY = y / f + rand.nextGaussian() * 0.0075 * inaccuracy * velocity;
-        motionZ = z / f + rand.nextGaussian() * 0.0075 * inaccuracy * velocity;
+        motionX = x * velocity / f + rand.nextGaussian() * 0.0075 * inaccuracy;
+        motionY = y * velocity / f + rand.nextGaussian() * 0.0075 * inaccuracy;
+        motionZ = z * velocity / f + rand.nextGaussian() * 0.0075 * inaccuracy;
     }
 
     public void shoot(Entity shooter, float pitch, float yaw, float velocity, float inaccuracy) {
