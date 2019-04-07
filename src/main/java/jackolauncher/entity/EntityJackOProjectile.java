@@ -572,8 +572,8 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
                 }
                 if (!dataManager.get(POTION_STACK).isEmpty()) {
                     int color = PotionUtils.getColor(dataManager.get(POTION_STACK));
-                    if (color > 0) { // TODO fix this
-                        world.spawnParticle(Particles.EFFECT, posX + (rand.nextDouble() - 0.5) * width, posY + rand.nextDouble() * height, posZ + (rand.nextDouble() - 0.5) * width, (color >> 16 & 255) / 255D, (color >> 8 & 255) / 255D, (color & 255) / 255D);
+                    if (color > 0) {
+                        world.addOptionalParticle(Particles.ENTITY_EFFECT, posX + (rand.nextDouble() - 0.5) * width, posY + rand.nextDouble() * height, posZ + (rand.nextDouble() - 0.5) * width, (color >> 16 & 255) / 255D, (color >> 8 & 255) / 255D, (color & 255) / 255D);
                     }
                 }
             }
