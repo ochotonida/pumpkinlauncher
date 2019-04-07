@@ -67,7 +67,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
         setSize(1F, 1F);
     }
 
-    private EntityJackOProjectile(World worldIn, double x, double y, double z, NBTTagCompound ammoNBT) {
+    public EntityJackOProjectile(World worldIn, double x, double y, double z, NBTTagCompound ammoNBT) {
         this(worldIn);
         setPosition(x, y, z);
 

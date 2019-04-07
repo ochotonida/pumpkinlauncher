@@ -5,9 +5,11 @@ import jackolauncher.enchantment.EnchantmentLaunching;
 import jackolauncher.enchantment.EnchantmentReloading;
 import jackolauncher.enchantment.EnchantmentUnwasting;
 import jackolauncher.entity.EntityJackOProjectile;
+import jackolauncher.item.BehaviorDispenseJackOAmmo;
 import jackolauncher.item.ItemJackOAmmo;
 import jackolauncher.item.ItemJackOLauncher;
 import jackolauncher.item.JackOAmmoRecipe;
+import net.minecraft.block.BlockDispenser;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
@@ -15,6 +17,7 @@ import net.minecraft.item.crafting.RecipeSerializers;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import static jackolauncher.JackOLauncher.MODID;
 
@@ -36,6 +39,11 @@ public class JackOLauncher {
     public static final Enchantment RELOADING = new EnchantmentReloading();
     public static final Enchantment BLAST_SHIELD = new EnchantmentBlastShield();
     public static final Enchantment LAUNCHING = new EnchantmentLaunching();
+
+    @SubscribeEvent
+    public static void setup(FMLCommonSetupEvent event) {
+        BlockDispenser.registerDispenseBehavior(JackOLauncher.JACK_O_AMMO, new BehaviorDispenseJackOAmmo());
+    }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
