@@ -9,7 +9,7 @@ authors="ochotonida"
 
 [[mods]]
 modId="jack_o_launcher"
-version="1.13.2-0.1.0"
+version="1.13.2-0.1.1"
 displayName="Jack-O'-Launcher"
 ## updateJSONURL="http://myurl.me/"
 description='''Exploding jack-o'-lanterns and stuff'''

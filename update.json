@@ -15,7 +15,7 @@
   },
   "1.13.2": {
     "1.13.2-0.1.0": "ported to 1.13.2",
-    "1.13.2-0.1.1": "fixed arrows,\nfixed potion effect trail colors"
+    "1.13.2-0.1.1": "fixed arrows,\nfixed potion effect trail colors,\nadded tooltips"
   },
   "promos": {
     "1.12.2-latest": "1.12.2-1.6.2",
