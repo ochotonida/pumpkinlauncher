@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[24,)"
+
+issueTrackerURL="https://github.com/ochotonida/pumpkinlauncher/issues"
+displayURL="https://minecraft.curseforge.com/projects/jack-o-launcher"
+## logoFile=""
+credits=""
+authors="ochotonida"
+
+[[mods]]
+modId="jack_o_launcher"
+version="1.13.2-0.1.0"
+displayName="Jack-O'-Launcher"
+## updateJSONURL="http://myurl.me/"
+description='''Exploding jack-o'-lanterns and stuff'''
+
+[[dependencies.jack_o_launcher]]
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[24,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.jack_o_launcher]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.13.2]"
+    ordering="NONE"
+    side="BOTH"

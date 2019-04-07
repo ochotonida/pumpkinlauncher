@@ -1,0 +1,28 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    " GI",
+    "IDC",
+    "SGI"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "item": "minecraft:dispenser"
+    },
+    "C": {
+      "item": "minecraft:cauldron"
+    }
+  },
+  "result": {
+    "item": "jack_o_launcher:jack_o_launcher"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "item.jack_o_launcher.jack_o_launcher": "Jack o'Launcher",
+  "item.jack_o_launcher.jack_o_ammo": "Jack o'Launcher Ammo",
+  "item.jack_o_launcher.jack_o_ammo.power": "Explosion Power:",
+  "item.jack_o_launcher.jack_o_ammo.is_fiery": "Flaming",
+  "item.jack_o_launcher.jack_o_ammo.no_griefing": "Muffled",
+  "item.jack_o_launcher.jack_o_ammo.bounce": "Bounce:",
+  "item.jack_o_launcher.jack_o_ammo.lingering": "Lingering",
+  "item.jack_o_launcher.jack_o_ammo.bone_meal": "Fertilizing",
+  "item.jack_o_launcher.jack_o_ammo.ender_pearl": "Teleporting",
+  "item.jack_o_launcher.jack_o_ammo.extra_damage": "Shrapnel",
+  "item.jack_o_launcher.jack_o_ammo.arrows": "Arrows:",
+  "item.jack_o_launcher.jack_o_ammo.spectral": "Spectral",
+  "enchantment.jack_o_launcher.unwasting": "Unwasting",
+  "enchantment.jack_o_launcher.reloading": "Reloading",
+  "enchantment.jack_o_launcher.blast_shield": "Blast Shield",
+  "enchantment.jack_o_launcher.launching": "Launching",
+  "enchantment.jack_o_launcher.unwasting.desc": "Decreases the chance of Jack o'Launcher Ammo being consumed.",
+  "enchantment.jack_o_launcher.reloading.desc": "Decreases the cooldown time of the Jack o'Launcher.",
+  "enchantment.jack_o_launcher.blast_shield.desc": "Massively decreases explosion damage done to the shooter from Jack o'Projectiles.",
+  "enchantment.jack_o_launcher.launching.desc": "Increases the speed of projectiles fired by the Jack o'Launcher.",
+  "entity.jack_o_launcher.jack_o_projectile.name": "Jack o'Projectile"
+}

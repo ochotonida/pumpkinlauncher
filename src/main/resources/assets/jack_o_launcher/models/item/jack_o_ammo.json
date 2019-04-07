@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "jack_o_launcher:jack_o_ammo"
+  }
+}
