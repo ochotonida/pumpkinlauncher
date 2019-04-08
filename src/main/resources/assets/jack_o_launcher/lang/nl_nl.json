@@ -1,0 +1,23 @@
+{
+  "item.jack_o_launcher.jack_o_launcher": "Jack-o'-Launcher",
+  "item.jack_o_launcher.jack_o_ammo": "Jack-o'-Launcher-Munitie",
+  "item.jack_o_launcher.jack_o_ammo.explosion_power": "Explosieve Kracht:",
+  "item.jack_o_launcher.jack_o_ammo.flaming": "Vlammend",
+  "item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks": "Gedempt",
+  "item.jack_o_launcher.jack_o_ammo.bounce": "Weerkaatsing:",
+  "item.jack_o_launcher.jack_o_ammo.lingering": "Aanhoudend",
+  "item.jack_o_launcher.jack_o_ammo.bone_meal": "Bemesting",
+  "item.jack_o_launcher.jack_o_ammo.ender_pearl": "Teleporterend",
+  "item.jack_o_launcher.jack_o_ammo.extra_damage": "Shrapnel",
+  "item.jack_o_launcher.jack_o_ammo.arrows": "Pijlen:",
+  "item.jack_o_launcher.jack_o_ammo.spectral": "Spectraal",
+  "enchantment.jack_o_launcher.unwasting": "Spaarzaamheid",
+  "enchantment.jack_o_launcher.reloading": "Herladingsversnelling",
+  "enchantment.jack_o_launcher.blast_shield": "Explosieschild",
+  "enchantment.jack_o_launcher.launching": "Lancering",
+  "enchantment.jack_o_launcher.unwasting.desc": "Verkleint de kans dat Jack-o'-Launcher-Munitie wordt opgebruikt.",
+  "enchantment.jack_o_launcher.reloading.desc": "Verkort de cooldowntijd van de Jack-o'-Launcher.",
+  "enchantment.jack_o_launcher.blast_shield.desc": "Verkleint de explosieshade dat aan de gebruiker wordt toegebracht door zijn eigen Jack-o'-Projectielen.",
+  "enchantment.jack_o_launcher.launching.desc": "Vergroot de snelheid van projectielen afgevuurd door de Jack-o'-Launcher.",
+  "entity.jack_o_launcher.jack_o_projectile.name": "Jack-o'-Projectiel"
+}

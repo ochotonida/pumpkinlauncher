@@ -1,0 +1,23 @@
+{
+  "item.jack_o_launcher.jack_o_launcher": "ɹǝɥɔunɐ˥,o ʞɔɐſ",
+  "item.jack_o_launcher.jack_o_ammo": "oɯɯ∀ ɹǝɥɔunɐ˥,o ʞɔɐſ",
+  "item.jack_o_launcher.jack_o_ammo.explosion_power": "ɹǝʍoԀ uoᴉsoldxƎ:",
+  "item.jack_o_launcher.jack_o_ammo.flaming": "ƃuᴉɯɐlℲ",
+  "item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks": "pǝlɟɟnW",
+  "item.jack_o_launcher.jack_o_ammo.bounce": "ǝɔuno𐐒:",
+  "item.jack_o_launcher.jack_o_ammo.lingering": "ƃuᴉɹǝƃuᴉ˥",
+  "item.jack_o_launcher.jack_o_ammo.bone_meal": "ƃuᴉzᴉlᴉʇɹǝℲ",
+  "item.jack_o_launcher.jack_o_ammo.ender_pearl": "pǝsnɟuI-ɹǝpuƎ",
+  "item.jack_o_launcher.jack_o_ammo.extra_damage": "lǝudɐɹɥS",
+  "item.jack_o_launcher.jack_o_ammo.arrows": "sʍoɹɹ∀:",
+  "item.jack_o_launcher.jack_o_ammo.spectral": "lɐɹʇɔǝdS",
+  "enchantment.jack_o_launcher.unwasting": "ƃuᴉʇsɐʍu∩",
+  "enchantment.jack_o_launcher.reloading": "ƃuᴉpɐolǝᴚ",
+  "enchantment.jack_o_launcher.blast_shield": "plǝᴉɥS ʇsɐl𐐒",
+  "enchantment.jack_o_launcher.launching": "ƃuᴉɥɔunɐ˥",
+  "enchantment.jack_o_launcher.unwasting.desc": "pǝɯnsuoɔ ƃuᴉǝq oɯɯɐ ɹǝɥɔunɐ˥,o ʞɔɐſ ɟo ǝɔuɐɥɔ ǝɥʇ sǝsɐǝɹɔǝp.",
+  "enchantment.jack_o_launcher.reloading.desc": "˙ɹǝɥɔunɐ˥,o ʞɔɐſ ǝɥʇ ɟo ǝɯᴉʇ uʍoplooɔ ǝɥʇ sǝsɐǝɹɔǝp",
+  "enchantment.jack_o_launcher.blast_shield.desc": "˙sǝlᴉʇɔǝɾoɹd ɹǝɥɔunɐ˥,o ʞɔɐſ ɯoɹɟ ɹǝʇooɥs ǝɥʇ oʇ ǝuop ǝƃɐɯɐp uoᴉsoldxǝ sǝsɐǝɹɔǝp ʎlǝʌᴉssɐW",
+  "enchantment.jack_o_launcher.launching.desc": "˙ɹǝɥɔunɐ˥,o ʞɔɐſ ǝɥʇ ʎq pǝɹᴉɟ sǝlᴉʇɔǝɾoɹd ɟo pǝǝds ǝɥʇ sǝsɐǝɹɔuI",
+  "entity.jack_o_launcher.jack_o_projectile.name": "ǝlᴉʇɔǝɾoɹԀ,o ʞɔɐſ"
+}

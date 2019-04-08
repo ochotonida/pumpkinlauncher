@@ -1,0 +1,10 @@
+{
+  "item.jack_o_launcher.jack_o_launcher": "Lance-citrouilles",
+  "item.jack_o_launcher.jack_o_ammo": "Citrouille explosive",
+  "item.jack_o_launcher.jack_o_ammo.explosion_power": "Puissance détonante:",
+  "item.jack_o_launcher.jack_o_ammo.flaming": "Ardente",
+  "item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks": "Étouffée",
+  "item.jack_o_launcher.jack_o_ammo.bounce": "Rebond:",
+  "item.jack_o_launcher.jack_o_ammo.lingering": "Persistante",
+  "entity.jack_o_launcher.jack_o_projectile.name": "Citrouille explosive"
+}

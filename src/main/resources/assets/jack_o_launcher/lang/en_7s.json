@@ -1,0 +1,23 @@
+{
+  "item.jack_o_launcher.jack_o_launcher": "Explodin' Gourd Squash Cannon",
+  "item.jack_o_launcher.jack_o_ammo": "Gourd Squash Cannonball",
+  "item.jack_o_launcher.jack_o_ammo.explosion_power": "Explodin' Power:",
+  "item.jack_o_launcher.jack_o_ammo.flaming": "Burnin'",
+  "item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks": "Muffled",
+  "item.jack_o_launcher.jack_o_ammo.bounce": "Bouncin':",
+  "item.jack_o_launcher.jack_o_ammo.lingering": "Bottled fog",
+  "item.jack_o_launcher.jack_o_ammo.bone_meal": "Plant Food",
+  "item.jack_o_launcher.jack_o_ammo.ender_pearl": "Tall One's Prowess",
+  "item.jack_o_launcher.jack_o_ammo.extra_damage": "Shrapnel",
+  "item.jack_o_launcher.jack_o_ammo.arrows": "Bolts:",
+  "item.jack_o_launcher.jack_o_ammo.spectral": "Glowy",
+  "enchantment.jack_o_launcher.unwasting": "Unwastin'",
+  "enchantment.jack_o_launcher.reloading": "Shortened fuse'",
+  "enchantment.jack_o_launcher.blast_shield": "Cannon's Mercy",
+  "enchantment.jack_o_launcher.launching": "Hurlin'",
+  "enchantment.jack_o_launcher.unwasting.desc": "Plunges th' chance o' Gourd Squash Cannonballs bein' gobbled up.",
+  "enchantment.jack_o_launcher.reloading.desc": "Shortens the fuse o' th' Gourd Squash Cannon.",
+  "enchantment.jack_o_launcher.blast_shield.desc": "Plunges explosion damage done to th' shooter.",
+  "enchantment.jack_o_launcher.launching.desc": "Makes Gourd Squashes fly farther.",
+  "entity.jack_o_launcher.jack_o_projectile.name": "Flyin' Gourd Squash"
+}
