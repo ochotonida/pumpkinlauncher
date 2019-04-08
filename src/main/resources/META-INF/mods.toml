@@ -9,14 +9,14 @@ authors="ochotonida"
 
 [[mods]]
 modId="jack_o_launcher"
-version="1.13.2-0.1.1"
+version="1.13.2-0.1.2"
 displayName="Jack-O'-Launcher"
-## updateJSONURL="http://myurl.me/"
+updateJSONURL="https://github.com/ochotonida/pumpkinlauncher/blob/master/update.json"
 description='''Exploding jack-o'-lanterns and stuff'''
 
 [[dependencies.jack_o_launcher]]
-    modId="forge" #mandatory
-    mandatory=true #mandatory
+    modId="forge"
+    mandatory=true
     versionRange="[24,)"
     ordering="NONE"
     side="BOTH"

@@ -215,10 +215,11 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
 
         if (dataManager.get(FIREWORKS_NBT).isEmpty()) {
             motionY -= 0.08;
-            double motionMultiplier = isInWater() ? 0.9 : 0.99;
-            motionX *= motionMultiplier;
-            motionY *= motionMultiplier;
-            motionZ *= motionMultiplier;
+            if (isInWater()) {
+                motionX *= 0.9;
+                motionY *= 0.9;
+                motionZ *= 0.9;
+            }
         }
         posX += motionX;
         posY += motionY;
