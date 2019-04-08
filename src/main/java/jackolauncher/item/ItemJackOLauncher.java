@@ -3,6 +3,7 @@ package jackolauncher.item;
 import jackolauncher.JackOLauncher;
 import jackolauncher.entity.EntityJackOProjectile;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
@@ -17,10 +18,14 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemJackOLauncher extends Item {
+
+    public static final List<Enchantment> VALID_ENCHANTMENTS = Arrays.asList(Enchantments.MENDING, Enchantments.UNBREAKING, Enchantments.LOOTING, JackOLauncher.UNWASTING, JackOLauncher.BLAST_SHIELD, JackOLauncher.LAUNCHING, JackOLauncher.RELOADING);
 
     public ItemJackOLauncher() {
         super(new Properties().defaultMaxDamage(95).group(ItemGroup.COMBAT));
@@ -78,12 +83,6 @@ public class ItemJackOLauncher extends Item {
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, net.minecraft.enchantment.Enchantment enchantment) {
-        return enchantment == Enchantments.MENDING
-                || enchantment == Enchantments.UNBREAKING
-                || enchantment == Enchantments.LOOTING
-                || enchantment == JackOLauncher.UNWASTING
-                || enchantment == JackOLauncher.RELOADING
-                || enchantment == JackOLauncher.BLAST_SHIELD
-                || enchantment == JackOLauncher.LAUNCHING;
+        return VALID_ENCHANTMENTS.contains(enchantment);
     }
 }

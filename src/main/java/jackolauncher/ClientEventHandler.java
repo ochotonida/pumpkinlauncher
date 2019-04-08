@@ -19,22 +19,22 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientEventHandler {
 
     @SubscribeEvent
-    public static void registerAllModels(ModelRegistryEvent event) {
+    public static void registerJackOProjectileModel(ModelRegistryEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(EntityJackOProjectile.class, RenderJackOProjectile::new);
     }
 
     @SubscribeEvent
-    public static void onEntityLiving(RenderLivingEvent.Pre<EntityPlayer> event) {
+    public static void setJackOLauncherArmPose(RenderLivingEvent.Pre<EntityPlayer> event) {
         if (!(event.getEntity() instanceof EntityPlayer)) {
             return;
         }
 
         EntityPlayer player = (EntityPlayer) event.getEntity();
-        boolean isHoldingOffhand = player.getHeldItemOffhand().getItem() instanceof ItemJackOLauncher;
-        boolean isHoldingMainhand = player.getHeldItemMainhand().getItem() instanceof ItemJackOLauncher;
-        if ((isHoldingMainhand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.RIGHT) || (isHoldingOffhand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.LEFT)) {
+        boolean isHoldingOffHand = player.getHeldItemOffhand().getItem() instanceof ItemJackOLauncher;
+        boolean isHoldingMainHand = player.getHeldItemMainhand().getItem() instanceof ItemJackOLauncher;
+        if ((isHoldingMainHand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.RIGHT) || (isHoldingOffHand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.LEFT)) {
             ((ModelBiped) event.getRenderer().getMainModel()).rightArmPose = ModelBiped.ArmPose.BOW_AND_ARROW;
-        } else if ((isHoldingMainhand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.LEFT) || (isHoldingOffhand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.RIGHT)) {
+        } else if ((isHoldingMainHand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.LEFT) || (isHoldingOffHand && Minecraft.getInstance().gameSettings.mainHand == EnumHandSide.RIGHT)) {
             ((ModelBiped) event.getRenderer().getMainModel()).leftArmPose = ModelBiped.ArmPose.BOW_AND_ARROW;
         }
     }
