@@ -8,7 +8,7 @@ import jackolauncher.entity.EntityJackOProjectile;
 import jackolauncher.item.BehaviorDispenseJackOAmmo;
 import jackolauncher.item.ItemJackOAmmo;
 import jackolauncher.item.ItemJackOLauncher;
-import jackolauncher.item.JackOAmmoRecipe;
+import jackolauncher.item.RecipeJackOAmmo;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
@@ -33,7 +33,7 @@ public class JackOLauncher {
 
     public static final EntityType<EntityJackOProjectile> JACK_O_PROJECTILE_ENTITY_TYPE = EntityType.register(MODID + ":jack_o_projectile", EntityType.Builder.create(EntityJackOProjectile.class, EntityJackOProjectile::new).tracker(128, 1, true));
 
-    public static final RecipeSerializers.SimpleSerializer<JackOAmmoRecipe> CRAFTING_SPECIAL_JACK_O_AMMO = RecipeSerializers.register(new RecipeSerializers.SimpleSerializer<>("jack_o_launcher:crafting_special_jack_o_ammo", JackOAmmoRecipe::new));
+    public static final RecipeSerializers.SimpleSerializer<RecipeJackOAmmo> CRAFTING_SPECIAL_JACK_O_AMMO = RecipeSerializers.register(new RecipeSerializers.SimpleSerializer<>("jack_o_launcher:crafting_special_jack_o_ammo", RecipeJackOAmmo::new));
 
     public static final Enchantment UNWASTING = new EnchantmentUnwasting();
     public static final Enchantment RELOADING = new EnchantmentReloading();

@@ -22,6 +22,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.BlockParticleData;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionType;
@@ -40,6 +41,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -119,7 +121,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     }
 
     public EntityJackOProjectile(World worldIn, EntityLivingBase shootingEntity, NBTTagCompound ammoNBT, boolean shouldHurtShooter) {
-        this(worldIn, shootingEntity.posX, shootingEntity.posY + (double) shootingEntity.getEyeHeight() - 0.1, shootingEntity.posZ, ammoNBT);
+        this(worldIn, shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ, ammoNBT);
         this.shootingEntity = shootingEntity;
         this.shouldHurtShooter = shouldHurtShooter;
     }
@@ -130,7 +132,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
 
     @Override
     protected void registerData() {
-        dataManager.register(BOUNCES_LEFT, 1);
+        dataManager.register(BOUNCES_LEFT, 0);
         dataManager.register(IS_FLAMING, false);
         dataManager.register(IS_SMOKING, false);
         dataManager.register(HAS_BONE_MEAL, false);
@@ -149,7 +151,6 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
         if (!blockState.isAir()) {
             dataManager.set(BLOCKSTATE, Optional.of(blockState));
         }
-        System.out.println(compound.hasKey("BlockState"));
         dataManager.set(BOUNCES_LEFT, (int) compound.getByte("BouncesLeft"));
         dataManager.set(IS_FLAMING, compound.getBoolean("IsFiery"));
         dataManager.set(IS_SMOKING, compound.getBoolean("IsSmoking"));
@@ -561,6 +562,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     @Nullable
     public Entity changeDimension(DimensionType dimension, net.minecraftforge.common.util.ITeleporter teleporter) {
         if (shootingEntity != null && shootingEntity.dimension != dimension) {
+            // prevent players from moving though dimensions with projectiles
             dataManager.set(IS_ENDER_PEARL, false);
         }
 
@@ -575,24 +577,24 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
                 }
             } else {
                 if (dataManager.get(IS_FLAMING)) {
-                    world.spawnParticle(Particles.FLAME, posX - motionX * 0.25 + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25D + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25 + rand.nextDouble() * 0.5 - 0.25, motionX * 0.6, motionY * 0.6, motionZ * 0.6);
+                    spawnParticle(Particles.FLAME, 0.25, 0.6, 0);
                 }
                 if (dataManager.get(IS_SMOKING)) {
                     for (int i = 0; i < 3; i++) {
-                        world.spawnParticle(Particles.SMOKE, posX - motionX * 0.25 + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25 + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25 + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+                        spawnParticle(Particles.SMOKE, 0.25, 0.3, 0);
                     }
                     if (ticksExisted % 2 == 0) {
-                        world.spawnParticle(Particles.LARGE_SMOKE, posX - motionX * 0.25 + rand.nextDouble() * 0.5 - 0.25, posY - motionY * 0.25 + rand.nextDouble() * 0.5 - 0.25, posZ - motionZ * 0.25 + rand.nextDouble() * 0.5 - 0.25, motionX * 0.3, motionY * 0.3, motionZ * 0.3);
+                        spawnParticle(Particles.LARGE_SMOKE, 0.4, 0.3, 0);
                     }
                 }
                 if (!dataManager.get(FIREWORKS_NBT).isEmpty()) {
                     world.spawnParticle(Particles.FIREWORK, posX, posY - 0.3, posZ, rand.nextGaussian() * 0.05, -motionY * 0.5, rand.nextGaussian() * 0.05);
                 }
                 if (dataManager.get(HAS_BONE_MEAL) && ticksExisted % 3 == 0) {
-                    world.spawnParticle(Particles.HAPPY_VILLAGER, posX + rand.nextDouble() * 0.5, posY + rand.nextDouble() * 0.5, posZ + rand.nextDouble() * 0.5, rand.nextGaussian() * 0.02, rand.nextGaussian() * 0.02, rand.nextGaussian() * 0.02);
+                    spawnParticle(Particles.HAPPY_VILLAGER, 0.1, 0, 0.02);
                 }
                 if (dataManager.get(IS_ENDER_PEARL)) {
-                    world.spawnParticle(Particles.PORTAL, posX + rand.nextDouble() * 0.5, posY + rand.nextDouble() * 0.5, posZ + rand.nextDouble() * 0.5, rand.nextGaussian() * 0.08, rand.nextGaussian() * 0.08, rand.nextGaussian() * 0.08);
+                    spawnParticle(Particles.PORTAL, 0.3, 0, 0.08);
                 }
                 if (!dataManager.get(POTION_STACK).isEmpty()) {
                     int color = PotionUtils.getColor(dataManager.get(POTION_STACK));
@@ -602,6 +604,10 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
                 }
             }
         }
+    }
+
+    private void spawnParticle(IParticleData particle, double spreadMultiplier, double motionMultiplier, double motionSpreadMultiplier) {
+        world.spawnParticle(particle, posX + rand.nextGaussian() * spreadMultiplier, posY + rand.nextGaussian() * spreadMultiplier + 0.5, posZ + rand.nextGaussian() * spreadMultiplier, motionX * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier, motionY * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier, motionZ * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier);
     }
 
     @Override
@@ -630,8 +636,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
                     float x = MathHelper.sin(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float z = MathHelper.cos(rotationY) * distance;
-                    world.spawnParticle(new BlockParticleData(Particles.BLOCK, Blocks.PUMPKIN.getDefaultState()), posX + x, posY + y, posZ + z, 0, 0, 0);
-
+                    world.spawnParticle(new BlockParticleData(Particles.BLOCK, getBlockState()), posX + x, posY + y, posZ + z, 0, 0, 0);
                 }
                 break;
             default:
