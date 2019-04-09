@@ -19,5 +19,7 @@
   "enchantment.jack_o_launcher.reloading.desc": "Shortens the fuse o' th' Gourd Squash Cannon.",
   "enchantment.jack_o_launcher.blast_shield.desc": "Plunges explosion damage done to th' shooter.",
   "enchantment.jack_o_launcher.launching.desc": "Makes Gourd Squashes fly farther.",
-  "entity.jack_o_launcher.jack_o_projectile.name": "Flyin' Gourd Squash"
+  "entity.jack_o_launcher.jack_o_projectile.name": "Flyin' Gourd Squash",
+  "death.attack.jack_o_launcher.jack_o_projectile_impact": "%s was cannonballed by a flyin' Gourd Squash",
+  "death.attack.jack_o_launcher.jack_o_projectile_impact.player": "%1$s was cannonballed by %2$s's flyin' Gourd Squash"
 }

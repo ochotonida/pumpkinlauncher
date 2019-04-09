@@ -19,5 +19,7 @@
   "enchantment.jack_o_launcher.reloading.desc": "˙ɹǝɥɔunɐ˥,o ʞɔɐſ ǝɥʇ ɟo ǝɯᴉʇ uʍoplooɔ ǝɥʇ sǝsɐǝɹɔǝp",
   "enchantment.jack_o_launcher.blast_shield.desc": "˙sǝlᴉʇɔǝɾoɹd ɹǝɥɔunɐ˥,o ʞɔɐſ ɯoɹɟ ɹǝʇooɥs ǝɥʇ oʇ ǝuop ǝƃɐɯɐp uoᴉsoldxǝ sǝsɐǝɹɔǝp ʎlǝʌᴉssɐW",
   "enchantment.jack_o_launcher.launching.desc": "˙ɹǝɥɔunɐ˥,o ʞɔɐſ ǝɥʇ ʎq pǝɹᴉɟ sǝlᴉʇɔǝɾoɹd ɟo pǝǝds ǝɥʇ sǝsɐǝɹɔuI",
-  "entity.jack_o_launcher.jack_o_projectile.name": "ǝlᴉʇɔǝɾoɹԀ,o ʞɔɐſ"
+  "entity.jack_o_launcher.jack_o_projectile.name": "ǝlᴉʇɔǝɾoɹԀ,o ʞɔɐſ",
+  "death.attack.jack_o_launcher.jack_o_projectile_impact": "uɹǝʇuɐ˥,o ʞɔɐſ ƃuᴉʎlɟ ɐ ʎq pǝllᴉʞ sɐʍ %s",
+  "death.attack.jack_o_launcher.jack_o_projectile_impact.player": "uɹǝʇuɐ˥,o ʞɔɐſ ƃuᴉʎlɟ s,%2$s ʎq pǝllᴉʞ sɐʍ %1$s"
 }

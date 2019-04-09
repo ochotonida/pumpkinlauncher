@@ -19,5 +19,6 @@
   "enchantment.jack_o_launcher.reloading.desc": "Verkort de cooldowntijd van de Jack-o'-Launcher.",
   "enchantment.jack_o_launcher.blast_shield.desc": "Verkleint de explosieshade dat aan de gebruiker wordt toegebracht door zijn eigen Jack-o'-Projectielen.",
   "enchantment.jack_o_launcher.launching.desc": "Vergroot de snelheid van projectielen afgevuurd door de Jack-o'-Launcher.",
-  "entity.jack_o_launcher.jack_o_projectile.name": "Jack-o'-Projectiel"
+  "entity.jack_o_launcher.jack_o_projectile.name": "Jack-o'-Projectiel",
+  "death.attack.jack_o_launcher.jack_o_projectile_impact": "%s werd gedood door een Jack-o'-Lantern"
 }
