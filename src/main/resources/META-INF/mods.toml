@@ -11,7 +11,7 @@ authors="ochotonida"
 modId="jack_o_launcher"
 version="1.13.2-0.1.2"
 displayName="Jack-O'-Launcher"
-updateJSONURL="https://github.com/ochotonida/pumpkinlauncher/blob/master/update.json"
+updateJSONURL="https://raw.githubusercontent.com/ochotonida/pumpkinlauncher/1.13.2/update.json"
 description='''Exploding jack-o'-lanterns and stuff'''
 
 [[dependencies.jack_o_launcher]]
