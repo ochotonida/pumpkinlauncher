@@ -3,10 +3,12 @@ package jackolauncher.entity;
 import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityAreaEffectCloud;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityPotion;
@@ -28,6 +30,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.*;
@@ -54,7 +57,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     private static final DataParameter<Boolean> HAS_BONE_MEAL = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORKS_NBT = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.COMPOUND_TAG);
     private static final DataParameter<ItemStack> POTION_STACK = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.ITEM_STACK);
-    private static final DataParameter<Optional<IBlockState>> BLOCKSTATE = EntityDataManager.createKey(EntityEnderman.class, DataSerializers.OPTIONAL_BLOCK_STATE);
+    private static final DataParameter<Optional<IBlockState>> BLOCKSTATE = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.OPTIONAL_BLOCK_STATE);
 
     @Nullable
     private EntityLivingBase shootingEntity;
@@ -231,7 +234,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
         ++ticksInAir;
         spawnParticles();
 
-        RayTraceResult rayTraceResult = ProjectileHelper.forwardsRaycast(this, true, ticksInAir >= 25, shootingEntity);
+        RayTraceResult rayTraceResult = ProjectileHelper.forwardsRaycast(this, true, ticksInAir >= 5, shootingEntity);
         //noinspection ConstantConditions
         if (rayTraceResult != null && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, rayTraceResult)) {
             onImpact(rayTraceResult);
@@ -256,12 +259,12 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
 
     private void onImpact(RayTraceResult rayTraceResult) {
         if (!world.isRemote) {
-            if (rayTraceResult.type == RayTraceResult.Type.ENTITY && rayTraceResult.entity instanceof EntityLiving) {
-                if (shootingEntity instanceof EntityPlayer && rayTraceResult.entity != shootingEntity) {
-                    rayTraceResult.entity.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer) shootingEntity), 1 + 2 * extraDamage);
-                } else {
-                    rayTraceResult.entity.attackEntityFrom(DamageSource.GENERIC, 1 + 2 * extraDamage);
+            if (rayTraceResult.type == RayTraceResult.Type.ENTITY && rayTraceResult.entity instanceof EntityLivingBase) {
+                if (rayTraceResult.entity == shootingEntity && ticksInAir < 5) {
+                    return;
                 }
+                rayTraceResult.entity.attackEntityFrom(new EntityDamageSourceIndirect(JackOLauncher.MODID + ".jack_o_projectile_impact", this, shootingEntity), 1 + 2 * extraDamage);
+
                 if (dataManager.get(IS_FLAMING)) {
                     rayTraceResult.entity.setFire(4);
                 }
