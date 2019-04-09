@@ -2,6 +2,7 @@ package jackolauncher.item;
 
 import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -12,6 +13,7 @@ import net.minecraft.item.crafting.IRecipeHidden;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -21,7 +23,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class JackOAmmoRecipe extends IRecipeHidden {
+public class RecipeJackOAmmo extends IRecipeHidden {
 
     private static final Ingredient INGREDIENT_GUNPOWDER = Ingredient.fromItems(Items.GUNPOWDER);
     private static final Ingredient INGREDIENT_SLIME_BALL = Ingredient.fromItems(Items.SLIME_BALL);
@@ -30,9 +32,9 @@ public class JackOAmmoRecipe extends IRecipeHidden {
     private static final Ingredient INGREDIENT_ENDER_PEARL = Ingredient.fromItems(Items.ENDER_PEARL);
     private static final Ingredient INGREDIENT_FIREWORK_ROCKET = Ingredient.fromItems(Items.FIREWORK_ROCKET);
     private static final Ingredient INGREDIENT_POTION = Ingredient.fromItems(Items.SPLASH_POTION, Items.LINGERING_POTION);
-    private static final Ingredient INGREDIENT_PUMPKIN = Ingredient.fromItems(Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.JACK_O_LANTERN);
+    private static final Ingredient INGREDIENT_PUMPKIN = Ingredient.fromItems(Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.JACK_O_LANTERN, Blocks.MELON);
 
-    public JackOAmmoRecipe(ResourceLocation resourceLocation) {
+    public RecipeJackOAmmo(ResourceLocation resourceLocation) {
         super(resourceLocation);
     }
 
@@ -140,7 +142,9 @@ public class JackOAmmoRecipe extends IRecipeHidden {
         for (int slotId = 0; slotId < inventory.getSizeInventory(); ++slotId) {
             ItemStack stackInSlot = inventory.getStackInSlot(slotId);
             if (!stackInSlot.isEmpty()) {
-                if (INGREDIENT_BONE_BLOCK.test(stackInSlot)) {
+                if (INGREDIENT_PUMPKIN.test(stackInSlot)) {
+                    ammoNBT.setTag("BlockState", NBTUtil.writeBlockState(Block.getBlockFromItem(stackInSlot.getItem()).getDefaultState()));
+                } else if (INGREDIENT_BONE_BLOCK.test(stackInSlot)) {
                     ammoNBT.setBoolean("HasBoneMeal", true);
                 } else if (INGREDIENT_ENDER_PEARL.test(stackInSlot)) {
                     ammoNBT.setBoolean("IsEnderPearl", true);

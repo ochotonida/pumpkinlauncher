@@ -2,6 +2,7 @@ package jackolauncher.entity;
 
 import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.*;
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -16,6 +17,7 @@ import net.minecraft.item.ItemBoneMeal;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -50,6 +52,10 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     private static final DataParameter<Boolean> HAS_BONE_MEAL = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.BOOLEAN);
     private static final DataParameter<NBTTagCompound> FIREWORKS_NBT = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.COMPOUND_TAG);
     private static final DataParameter<ItemStack> POTION_STACK = EntityDataManager.createKey(EntityJackOProjectile.class, DataSerializers.ITEM_STACK);
+    private static final DataParameter<Optional<IBlockState>> BLOCKSTATE = EntityDataManager.createKey(EntityEnderman.class, DataSerializers.OPTIONAL_BLOCK_STATE);
+
+    @Nullable
+    private EntityLivingBase shootingEntity;
     protected int ticksInAir = 0;
     protected int randomRotationOffset;
     protected boolean shouldHurtShooter = true;
@@ -58,13 +64,11 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     private int fireworkLifetime = 0;
     private boolean canDestroyBlocks = true;
     private ItemStack arrowStack = ItemStack.EMPTY;
-    private @Nullable
-    EntityLivingBase shootingEntity;
 
     public EntityJackOProjectile(World world) {
         super(JackOLauncher.JACK_O_PROJECTILE_ENTITY_TYPE, world);
         randomRotationOffset = rand.nextInt(1000);
-        setSize(1F, 1F);
+        setSize(1, 1);
     }
 
     public EntityJackOProjectile(World worldIn, double x, double y, double z, NBTTagCompound ammoNBT) {
@@ -103,6 +107,13 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
             fireworkLifetime = 6 * (fireworkCompound.getByte("Flight") + 1) + rand.nextInt(5);
             dataManager.set(FIREWORKS_NBT, fireworkCompound);
         }
+        if (ammoNBT.hasKey("BlockState")) {
+            IBlockState blockState = NBTUtil.readBlockState(ammoNBT.getCompound("BlockState"));
+            // noinspection deprecation
+            if (!blockState.isAir()) {
+                dataManager.set(BLOCKSTATE, Optional.of(blockState));
+            }
+        }
 
         dataManager.set(IS_SMOKING, explosionPower > 0);
     }
@@ -111,6 +122,10 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
         this(worldIn, shootingEntity.posX, shootingEntity.posY + (double) shootingEntity.getEyeHeight() - 0.1, shootingEntity.posZ, ammoNBT);
         this.shootingEntity = shootingEntity;
         this.shouldHurtShooter = shouldHurtShooter;
+    }
+
+    public IBlockState getBlockState() {
+        return dataManager.get(BLOCKSTATE).orElse(Blocks.PUMPKIN.getDefaultState());
     }
 
     @Override
@@ -122,12 +137,19 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
         dataManager.register(FIREWORKS_NBT, new NBTTagCompound());
         dataManager.register(POTION_STACK, ItemStack.EMPTY);
         dataManager.register(IS_ENDER_PEARL, false);
+        dataManager.register(BLOCKSTATE, Optional.empty());
     }
 
     @Override
     protected void readAdditional(NBTTagCompound compound) {
-        this.explosionPower = compound.getByte("ExplosionPower");
-        this.canDestroyBlocks = compound.getBoolean("CanDestroyBlocks");
+        explosionPower = compound.getByte("ExplosionPower");
+        canDestroyBlocks = compound.getBoolean("CanDestroyBlocks");
+        IBlockState blockState = NBTUtil.readBlockState(compound.getCompound("BlockState"));
+        // noinspection deprecation
+        if (!blockState.isAir()) {
+            dataManager.set(BLOCKSTATE, Optional.of(blockState));
+        }
+        System.out.println(compound.hasKey("BlockState"));
         dataManager.set(BOUNCES_LEFT, (int) compound.getByte("BouncesLeft"));
         dataManager.set(IS_FLAMING, compound.getBoolean("IsFiery"));
         dataManager.set(IS_SMOKING, compound.getBoolean("IsSmoking"));
@@ -148,6 +170,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     protected void writeAdditional(NBTTagCompound compound) {
         compound.setByte("ExplosionPower", (byte) explosionPower);
         compound.setBoolean("CanDestroyBlocks", canDestroyBlocks);
+        compound.setTag("BlockState", NBTUtil.writeBlockState(dataManager.get(BLOCKSTATE).orElse(Blocks.AIR.getDefaultState())));
         compound.setByte("BouncesLeft", dataManager.get(BOUNCES_LEFT).byteValue());
         compound.setBoolean("IsFiery", dataManager.get(IS_FLAMING));
         compound.setBoolean("IsSmoking", dataManager.get(IS_SMOKING));
@@ -294,7 +317,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
                 new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && canDestroyBlocks, shouldHurtShooter).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
-                world.playSound(null, posX, posY, posZ, SoundEvents.BLOCK_WOOD_BREAK, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+                world.playSound(null, posX, posY, posZ, getBlockState().getSoundType(world, new BlockPos(posX, posY, posZ), null).getBreakSound(), SoundCategory.NEUTRAL, 1, 1);
             }
 
             if (dataManager.get(HAS_BONE_MEAL)) {
