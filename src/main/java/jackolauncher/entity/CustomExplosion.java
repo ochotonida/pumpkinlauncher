@@ -25,11 +25,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-@SuppressWarnings("WeakerAccess")
 @MethodsReturnNonnullByDefault
 public class CustomExplosion extends Explosion {
 
@@ -43,46 +43,43 @@ public class CustomExplosion extends Explosion {
     protected final double z;
     protected final Entity exploder;
     protected final EntityLivingBase shootingEntity;
-    protected final float size;
+    protected final float explosionPower;
     protected final int extraDamage;
-    protected static boolean shouldFireExplosionEvent = true;
 
-    public CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float power, int extraDamage, boolean isFlaming, boolean isSmoking, boolean shouldHurtShootingEntity) {
-        super(world, explodingEntity, x, y, z, power, isFlaming, isSmoking);
+    public CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float explosionPower, int extraDamage, boolean shouldCauseFire, boolean shouldDamageTerrain, boolean shouldDamageShooter) {
+        super(world, explodingEntity, x, y, z, explosionPower, shouldCauseFire, shouldDamageTerrain);
         this.random = new Random();
         this.world = world;
         this.exploder = explodingEntity;
         this.shootingEntity = shootingEntity;
-        this.size = power;
+        this.explosionPower = explosionPower;
         this.extraDamage = extraDamage;
         this.x = x;
         this.y = y;
         this.z = z;
-        this.shouldCauseFire = isFlaming;
-        this.shouldDamageTerrain = isSmoking;
-        this.shouldDamageShooter = shouldHurtShootingEntity;
+        this.shouldCauseFire = shouldCauseFire;
+        this.shouldDamageTerrain = shouldDamageTerrain;
+        this.shouldDamageShooter = shouldDamageShooter;
     }
 
     public void detonate() {
-        if (shouldFireExplosionEvent && net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, this)) {
-            return;
-        }
+        if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, this)) {
+            doExplosionA();
 
-        this.doExplosionA();
-
-        if (world instanceof WorldServer) {
-            doExplosionB(false);
-            if (!shouldDamageTerrain) {
-                clearAffectedBlockPositions();
-            }
-
-            for (EntityPlayer entityplayer : world.playerEntities) {
-                if (entityplayer.getDistanceSq(x, y, z) < 4096) {
-                    ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, size, getAffectedBlockPositions(), getPlayerKnockbackMap().get(entityplayer)));
+            if (world instanceof WorldServer) {
+                doExplosionB(false);
+                if (!shouldDamageTerrain) {
+                    clearAffectedBlockPositions();
                 }
+
+                for (EntityPlayer entityplayer : world.playerEntities) {
+                    if (entityplayer.getDistanceSq(x, y, z) < 4096) {
+                        ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, explosionPower, getAffectedBlockPositions(), getPlayerKnockbackMap().get(entityplayer)));
+                    }
+                }
+            } else {
+                doExplosionB(true);
             }
-        } else {
-            doExplosionB(true);
         }
     }
 
@@ -92,48 +89,13 @@ public class CustomExplosion extends Explosion {
         damageEntities();
     }
 
-    @SuppressWarnings("ConstantConditions")
     protected void calculateAffectedBlockPositions() {
         Set<BlockPos> affectedBlockPositions = Sets.newHashSet();
-        for (int j = 0; j < 16; ++j) {
-            for (int k = 0; k < 16; ++k) {
-                for (int l = 0; l < 16; ++l) {
-                    if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15) {
-                        double d0 = (j / 15F * 2 - 1);
-                        double d1 = (k / 15F * 2 - 1);
-                        double d2 = (l / 15F * 2 - 1);
-                        double distance = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-                        d0 = d0 / distance;
-                        d1 = d1 / distance;
-                        d2 = d2 / distance;
-                        float f = this.size * (0.7F + world.rand.nextFloat() * 0.6F);
-                        double x = this.x;
-                        double y = this.y;
-                        double z = this.z;
-
-                        for (; f > 0; f -= 0.225)
-                        {
-                            BlockPos pos = new BlockPos(x, y, z);
-                            IBlockState blockState = this.world.getBlockState(pos);
-                            IFluidState fluidState = world.getFluidState(pos);
-
-                            if (!blockState.isAir(world, pos) || !fluidState.isEmpty()) {
-                                float f2 = Math.max(blockState.getExplosionResistance(world, pos, exploder, this), fluidState.getExplosionResistance(world, pos, exploder, this));
-                                if (this.exploder != null) {
-                                    f2 = this.exploder.getExplosionResistance(this, this.world, pos, blockState, fluidState, f2);
-                                }
-
-                                f -= (f2 + 0.3F) * 0.3F;
-                            }
-
-                            if (f > 0.0F && (exploder == null || exploder.canExplosionDestroyBlock(this, world, pos, blockState, f))) {
-                                affectedBlockPositions.add(pos);
-                            }
-
-                            x += d0 * 0.3;
-                            y += d1 * 0.3;
-                            z += d2 * 0.3;
-                        }
+        for (int x = 0; x < 16; ++x) {
+            for (int y = 0; y < 16; ++y) {
+                for (int z = 0; z < 16; ++z) {
+                    if (x == 0 || x == 15 || y == 0 || y == 15 || z == 0 || z == 15) {
+                        affectedBlockPositions.addAll(calculateAffectedBlockPositionsInDirection(x, y, z));
                     }
                 }
             }
@@ -141,20 +103,60 @@ public class CustomExplosion extends Explosion {
         getAffectedBlockPositions().addAll(affectedBlockPositions);
     }
 
-    protected void damageEntities() {
-        float size = this.size * 2;
+    protected Set<BlockPos> calculateAffectedBlockPositionsInDirection(int directionX, int directionY, int directionZ) {
+        Set<BlockPos> affectedBlockPositions = new HashSet<>();
 
-        List<Entity> affectedEntities = world.getEntitiesWithinAABBExcludingEntity(exploder, new AxisAlignedBB(MathHelper.floor(x - size - 1), MathHelper.floor(y - size - 1), MathHelper.floor(z - size - 1), MathHelper.floor(x + size + 1), MathHelper.floor(y + size + 1), MathHelper.floor(z + size + 1)));
-        if (shouldFireExplosionEvent) {
-            net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(world, this, affectedEntities, size);
+        double motionX = (directionX / 15F * 2 - 1);
+        double motionY = (directionY / 15F * 2 - 1);
+        double motionZ = (directionZ / 15F * 2 - 1);
+        double distance = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+        motionX = motionX / distance;
+        motionY = motionY / distance;
+        motionZ = motionZ / distance;
+        float remainingExplosionPower = explosionPower * (0.7F + world.rand.nextFloat() * 0.6F);
+        double posX = x;
+        double posY = y;
+        double posZ = z;
+
+        while (remainingExplosionPower > 0) {
+            BlockPos pos = new BlockPos(posX, posY, posZ);
+            IBlockState blockState = world.getBlockState(pos);
+            IFluidState fluidState = world.getFluidState(pos);
+
+            if (!blockState.isAir(world, pos) || !fluidState.isEmpty()) {
+                float explosionResistance = Math.max(blockState.getExplosionResistance(world, pos, exploder, this), fluidState.getExplosionResistance(world, pos, exploder, this));
+                if (exploder != null) {
+                    explosionResistance = exploder.getExplosionResistance(this, world, pos, blockState, fluidState, explosionResistance);
+                }
+
+                remainingExplosionPower -= (explosionResistance + 0.3F) * 0.3F;
+            }
+
+            if (remainingExplosionPower > 0 && (exploder == null || exploder.canExplosionDestroyBlock(this, world, pos, blockState, remainingExplosionPower))) {
+                affectedBlockPositions.add(pos);
+            }
+
+            posX += motionX * 0.3;
+            posY += motionY * 0.3;
+            posZ += motionZ * 0.3;
+            remainingExplosionPower -= 0.225;
         }
+
+        return affectedBlockPositions;
+    }
+
+    protected void damageEntities() {
+        float explosionPower = this.explosionPower * 2;
+
+        List<Entity> affectedEntities = world.getEntitiesWithinAABBExcludingEntity(exploder, new AxisAlignedBB(MathHelper.floor(x - explosionPower - 1), MathHelper.floor(y - explosionPower - 1), MathHelper.floor(z - explosionPower - 1), MathHelper.floor(x + explosionPower + 1), MathHelper.floor(y + explosionPower + 1), MathHelper.floor(z + explosionPower + 1)));
+        net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(world, this, affectedEntities, explosionPower);
         Vec3d vec3d = new Vec3d(x, y, z);
 
         for (Entity entity : affectedEntities) {
             if (!entity.isImmuneToExplosions()) {
-                double d12 = entity.getDistance(x, y, z) / size;
+                double relativeDistance = entity.getDistance(x, y, z) / explosionPower;
 
-                if (d12 <= 1) {
+                if (relativeDistance <= 1) {
                     double distanceX = entity.posX - x;
                     double distanceY = entity.posY + entity.getEyeHeight() - y;
                     double distanceZ = entity.posZ - z;
@@ -165,12 +167,12 @@ public class CustomExplosion extends Explosion {
                         distanceY = distanceY / distance;
                         distanceZ = distanceZ / distance;
                         double blockDensity = world.getBlockDensity(vec3d, entity.getBoundingBox());
-                        double damageMultiplier = (1 - d12) * blockDensity;
+                        double damageMultiplier = (1 - relativeDistance) * blockDensity;
                         damageMultiplier = damageMultiplier * damageMultiplier + damageMultiplier;
                         if (entity == shootingEntity && !shouldDamageShooter) {
                             damageMultiplier /= 32;
                         }
-                        entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) (damageMultiplier / 2 * 7 * size + 1)) + extraDamage * 1.25F);
+                        entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) (damageMultiplier / 2 * 7 * explosionPower + 1)) + extraDamage * 1.25F);
                         double knockbackMultiplier = damageMultiplier;
 
                         if (entity instanceof EntityLivingBase) {
@@ -196,35 +198,35 @@ public class CustomExplosion extends Explosion {
 
     @Override
     public void doExplosionB(boolean spawnParticles) {
-        this.world.playSound(null, x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
+        this.world.playSound(null, x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4, (1 + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F);
 
         if (spawnParticles) {
             spawnParticles();
         }
 
         if (this.shouldDamageTerrain) {
-            for (BlockPos blockpos : getAffectedBlockPositions()) {
-                IBlockState blockState = world.getBlockState(blockpos);
+            for (BlockPos pos : getAffectedBlockPositions()) {
+                IBlockState blockState = world.getBlockState(pos);
                 Block block = blockState.getBlock();
 
                 if (spawnParticles) {
-                    spawnParticles(blockpos);
+                    spawnParticles(pos);
                 }
 
-                if (!blockState.isAir(world, blockpos)) {
+                if (!blockState.isAir(world, pos)) {
                     if (block.canDropFromExplosion(this)) {
-                        blockState.dropBlockAsItemWithChance(this.world, blockpos, 1 / size, 0);
+                        blockState.dropBlockAsItemWithChance(world, pos, 1 / explosionPower, 0);
                     }
 
-                    blockState.onBlockExploded(this.world, blockpos, this);
+                    blockState.onBlockExploded(world, pos, this);
                 }
             }
         }
 
         if (this.shouldCauseFire) {
-            for (BlockPos blockpos1 : getAffectedBlockPositions()) {
-                if (this.world.getBlockState(blockpos1).isAir(world, blockpos1) && this.world.getBlockState(blockpos1.down()).isOpaqueCube(this.world, blockpos1.down()) && this.random.nextInt(3) == 0) {
-                    this.world.setBlockState(blockpos1, Blocks.FIRE.getDefaultState());
+            for (BlockPos pos : getAffectedBlockPositions()) {
+                if (world.getBlockState(pos).isAir(world, pos) && world.getBlockState(pos.down()).isOpaqueCube(world, pos.down()) && random.nextInt(3) == 0) {
+                    world.setBlockState(pos, Blocks.FIRE.getDefaultState());
                 }
             }
         }
@@ -237,21 +239,21 @@ public class CustomExplosion extends Explosion {
         double xSpeed = xCoord - x;
         double ySpeed = yCoord - y;
         double zSpeed = zCoord - z;
-        double d6 = MathHelper.sqrt(xSpeed * xSpeed + ySpeed * ySpeed + zSpeed * zSpeed);
-        xSpeed = xSpeed / d6;
-        ySpeed = ySpeed / d6;
-        zSpeed = zSpeed / d6;
-        double d7 = 0.5D / (d6 / size + 0.1);
-        d7 = d7 * (world.rand.nextFloat() * world.rand.nextFloat() + 0.3);
-        xSpeed = xSpeed * d7;
-        ySpeed = ySpeed * d7;
-        zSpeed = zSpeed * d7;
-        this.world.spawnParticle(Particles.POOF, (xCoord + x) / 2, (yCoord + y) / 2, (zCoord + z) / 2, xSpeed, ySpeed, zSpeed);
-        this.world.spawnParticle(Particles.SMOKE, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
+        double speed = MathHelper.sqrt(xSpeed * xSpeed + ySpeed * ySpeed + zSpeed * zSpeed);
+        xSpeed = xSpeed / speed;
+        ySpeed = ySpeed / speed;
+        zSpeed = zSpeed / speed;
+        double speedMultiplier = 0.5 / (speed / explosionPower + 0.1);
+        speedMultiplier = speedMultiplier * (world.rand.nextFloat() * world.rand.nextFloat() + 0.3);
+        xSpeed = xSpeed * speedMultiplier;
+        ySpeed = ySpeed * speedMultiplier;
+        zSpeed = zSpeed * speedMultiplier;
+        world.spawnParticle(Particles.POOF, (xCoord + x) / 2, (yCoord + y) / 2, (zCoord + z) / 2, xSpeed, ySpeed, zSpeed);
+        world.spawnParticle(Particles.SMOKE, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
     }
 
     protected void spawnParticles() {
-        if (size >= 2.0F && shouldDamageTerrain) {
+        if (explosionPower >= 2 && shouldDamageTerrain) {
             world.spawnParticle(Particles.EXPLOSION_EMITTER, x, y, z, 1, 0, 0);
         } else {
             world.spawnParticle(Particles.EXPLOSION, x, y, z, 1, 0, 0);
