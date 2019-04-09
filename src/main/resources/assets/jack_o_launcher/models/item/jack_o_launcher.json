@@ -1,7 +1,7 @@
 {
   "textures": {
     "texture": "jack_o_launcher:jack_o_launcher",
-    "particle": "jack_o_launcher:jack_o_launcher"
+    "particle": "jack_o_launcher:jack_o_launcher_particle"
   },
   "elements": [
     {
