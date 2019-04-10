@@ -17,11 +17,13 @@
     "1.13.2-0.1.0": "ported to 1.13.2",
     "1.13.2-0.1.1": "fixed arrows,\nfixed potion effect trail colors,\nadded tooltips",
     "1.13.2-0.1.2": "overhauled jack o'launcher textures,\noverhauled jack o'projectile rendering,\nslightly tweaked jack o'projectile physics",
-    "1.13.2-0.1.3": "added a bunch of translations,\nadded impact death messages,\nadded jack o'projectile variants,\nadded a particle texture,\nfixed jack o'projectiles not dealing impact damage on players,\nfixed update.json,\nvarious other tweaks and fixes"
+    "1.13.2-0.1.3": "added a bunch of translations,\nadded impact death messages,\nadded jack o'projectile variants,\nadded a particle texture,\nfixed jack o'projectiles not dealing impact damage on players,\nfixed update.json,\nvarious other tweaks and fixes",
+    "1.13.2-1.0.0": "added jei support,\nfixed recipe output,\nfixed projectile spawning too high,\nslightly reduced projectile bounding box size"
   },
   "promos": {
     "1.12.2-latest": "1.12.2-1.6.2",
     "1.12.2-recommended": "1.12.2-1.6.2",
-    "1.13.2-latest": "1.13.2-0.1.3"
+    "1.13.2-latest": "1.13.2-1.0.0",
+    "1.13.2-recommended": "1.13.2-1.0.0"
   }
 }
