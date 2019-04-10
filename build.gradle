@@ -39,8 +39,15 @@ minecraft {
     }
 }
 
+repositories {
+    maven {
+        url = "http://dvs1.progwml6.com/files/maven/"
+    }
+}
+
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.107'
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.110'
+    deobf "mezz.jei:jei-1.13.2:5.0.0.20"
 }
 
 jar {
