@@ -8,6 +8,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.PotionUtils;
@@ -35,6 +36,9 @@ public class ItemJackOAmmo extends Item {
         super.addInformation(stack, worldIn, tooltip, flag);
         NBTTagCompound ammoNBT = stack.getOrCreateChildTag("AmmoNBT");
 
+        if (ammoNBT.hasKey("BlockState")) {
+            tooltip.add(NBTUtil.readBlockState(ammoNBT.getCompound("BlockState")).getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GRAY));
+        }
         if (!ammoNBT.getCompound("ArrowsNBT").isEmpty()) {
             ItemStack ArrowItemStack = ItemStack.read(ammoNBT.getCompound("ArrowsNBT"));
             if (ArrowItemStack.getCount() > 0) {
