@@ -129,7 +129,7 @@ public class RecipeJackOAmmo extends IRecipeHidden {
 
     @Override
     public ItemStack getCraftingResult(IInventory inventory) {
-        ItemStack resultStack = new ItemStack(JackOLauncher.JACK_O_AMMO);
+        ItemStack resultStack = new ItemStack(JackOLauncher.JACK_O_AMMO, 3);
         NBTTagCompound ammoNBT = resultStack.getOrCreateChildTag("AmmoNBT");
         ammoNBT.setBoolean("CanDestroyBlock", true);
 
