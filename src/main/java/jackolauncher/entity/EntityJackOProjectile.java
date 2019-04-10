@@ -73,7 +73,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     public EntityJackOProjectile(World world) {
         super(JackOLauncher.JACK_O_PROJECTILE_ENTITY_TYPE, world);
         randomRotationOffset = rand.nextInt(1000);
-        setSize(1, 1);
+        setSize(0.8F, 0.8F);
     }
 
     public EntityJackOProjectile(World worldIn, double x, double y, double z, NBTTagCompound ammoNBT) {
@@ -124,7 +124,7 @@ public class EntityJackOProjectile extends Entity implements IProjectile {
     }
 
     public EntityJackOProjectile(World worldIn, EntityLivingBase shootingEntity, NBTTagCompound ammoNBT, boolean shouldHurtShooter) {
-        this(worldIn, shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight(), shootingEntity.posZ, ammoNBT);
+        this(worldIn, shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight() - 0.8 / 2, shootingEntity.posZ, ammoNBT);
         this.shootingEntity = shootingEntity;
         this.shouldHurtShooter = shouldHurtShooter;
     }
