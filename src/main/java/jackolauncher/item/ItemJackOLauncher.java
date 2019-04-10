@@ -58,7 +58,7 @@ public class ItemJackOLauncher extends Item {
         if (!stack.isEmpty()) {
             if (!world.isRemote) {
                 player.getCooldownTracker().setCooldown(this, 40 - 6 * EnchantmentHelper.getEnchantmentLevel(JackOLauncher.RELOADING, player.getHeldItem(hand)));
-                EntityJackOProjectile projectile = new EntityJackOProjectile(world, player, stack.getOrCreateChildTag("AmmoNBT"), EnchantmentHelper.getEnchantmentLevel(JackOLauncher.BLAST_SHIELD, player.getHeldItem(hand)) == 0);
+                EntityJackOProjectile projectile = new EntityJackOProjectile(world, player, stack.getOrCreateChildTag("AmmoNBT"), EnchantmentHelper.getEnchantmentLevel(JackOLauncher.BLAST_SHIELD, player.getHeldItem(hand)) > 0);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.13F * EnchantmentHelper.getEnchantmentLevel(JackOLauncher.LAUNCHING, player.getHeldItem(hand)), 3F);
                 world.spawnEntity(projectile);
                 if (!player.abilities.isCreativeMode && random.nextInt(1 + EnchantmentHelper.getEnchantmentLevel(JackOLauncher.UNWASTING, player.getHeldItem(hand))) == 0) {
