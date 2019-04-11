@@ -26,7 +26,7 @@ public class PumpkinLauncher {
 
     public static final String MODID = "pumpkinlauncher";
     public static final String MODNAME = "Jack-O'-Launcher";
-    public static final String MODVERSION = "1.12.2-1.6.3";
+    public static final String MODVERSION = "1.12.2-1.7.0";
 
     public static final Item PUMPKIN_LAUNCHER = new ItemPumpkinLauncher();
     public static final Item PUMPKIN_AMMO = new ItemPumpkinAmmo();
