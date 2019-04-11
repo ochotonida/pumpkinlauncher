@@ -11,7 +11,8 @@
     "1.12.2-1.6.0": "iron nuggets, arrows, ender pearls and bone blocks can now be used in crafting,\nincreased crafted ammo from 2 to 3,\nincreased maximum gunpowder and decreased explosion power",
     "1.12.2-1.6.1": "looting can now be applied to the jack o'launcher,\nadded JEI support for arrows",
     "1.12.2-1.6.2": "renamed 'exploding jack o'lantern' to 'jack o'launcher ammo',\nfixed enchantment glint on jack o'launcher,\noverhauled textures,\nrecipes with wool now require at least 1 gunpowder,\nfixed tooltips for exploding jack o'lanterns with potion effects,\nfixed a crash in worlds with exploding jack o'launcher entities generated before 1.6.0",
-    "1.12.2-1.6.3": "added proper support for modded arrows,\nfixed launching increasing inaccuracy instead of velocity,\nslightly increased launching effectiveness,\ndecreased inaccuracy"
+    "1.12.2-1.6.3": "added proper support for modded arrows,\nfixed launching increasing inaccuracy instead of velocity,\nslightly increased launching effectiveness,\ndecreased inaccuracy",
+    "1.12.2-1.7.0": "backported new jack o'launcher model,\nbackported new jack o'projectile rendering,\nminor fixes"
   },
   "1.13.2": {
     "1.13.2-0.1.0": "ported to 1.13.2",
@@ -21,8 +22,8 @@
     "1.13.2-1.0.0": "Added jei support,\nfixed recipe output for jack o'launcher ammo,\njack o'launcher ammo now displays its texture/modelf,\nfixed jack o'projectile spawning too high,\nslightly reduced jack o'projectile bounding box size"
   },
   "promos": {
-    "1.12.2-latest": "1.12.2-1.6.2",
-    "1.12.2-recommended": "1.12.2-1.6.2",
+    "1.12.2-latest": "1.12.2-1.7.0",
+    "1.12.2-recommended": "1.12.2-1.7.0",
     "1.13.2-latest": "1.13.2-1.0.0",
     "1.13.2-recommended": "1.13.2-1.0.0"
   }
