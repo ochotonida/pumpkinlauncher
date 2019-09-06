@@ -4,18 +4,21 @@ import jackolauncher.enchantment.EnchantmentBlastShield;
 import jackolauncher.enchantment.EnchantmentLaunching;
 import jackolauncher.enchantment.EnchantmentReloading;
 import jackolauncher.enchantment.EnchantmentUnwasting;
-import jackolauncher.entity.EntityJackOProjectile;
+import jackolauncher.entity.JackOProjectileEntity;
+import jackolauncher.entity.JackOProjectileRenderer;
 import jackolauncher.item.BehaviorDispenseJackOAmmo;
 import jackolauncher.item.ItemJackOAmmo;
 import jackolauncher.item.ItemJackOLauncher;
-import jackolauncher.item.RecipeJackOAmmo;
-import net.minecraft.block.BlockDispenser;
+import net.minecraft.block.DispenserBlock;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.item.crafting.RecipeSerializers;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -31,9 +34,19 @@ public class JackOLauncher {
     public static final Item JACK_O_LAUNCHER = new ItemJackOLauncher();
     public static final Item JACK_O_AMMO = new ItemJackOAmmo();
 
-    public static final EntityType<EntityJackOProjectile> JACK_O_PROJECTILE_ENTITY_TYPE = EntityType.register(MODID + ":jack_o_projectile", EntityType.Builder.create(EntityJackOProjectile.class, EntityJackOProjectile::new).tracker(128, 1, true));
+    public static final EntityType<JackOProjectileEntity> JACK_O_PROJECTILE_ENTITY_TYPE = createEntity();
 
-    public static final RecipeSerializers.SimpleSerializer<RecipeJackOAmmo> CRAFTING_SPECIAL_JACK_O_AMMO = RecipeSerializers.register(new RecipeSerializers.SimpleSerializer<>("jack_o_launcher:crafting_special_jack_o_ammo", RecipeJackOAmmo::new));
+    private static EntityType<JackOProjectileEntity> createEntity() {
+        EntityType.Builder<JackOProjectileEntity> builder = EntityType.Builder.create(JackOProjectileEntity::new, EntityClassification.MISC);
+        builder.size(0.8F, 0.8F);
+        builder.setTrackingRange(128);
+        builder.setCustomClientFactory((spawnEntity, world) -> new JackOProjectileEntity(world));
+        EntityType<JackOProjectileEntity> entityType = builder.build(MODID + "jack_o_projectile");
+        entityType.setRegistryName(new ResourceLocation(MODID, "jack_o_projectile"));
+        return entityType;
+    }
+
+    //public static final RecipeSerializers.SimpleSerializer<RecipeJackOAmmo> CRAFTING_SPECIAL_JACK_O_AMMO = RecipeSerializers.register(new RecipeSerializers.SimpleSerializer<>("jack_o_launcher:crafting_special_jack_o_ammo", RecipeJackOAmmo::new));
 
     public static final Enchantment UNWASTING = new EnchantmentUnwasting();
     public static final Enchantment RELOADING = new EnchantmentReloading();
@@ -41,8 +54,13 @@ public class JackOLauncher {
     public static final Enchantment LAUNCHING = new EnchantmentLaunching();
 
     @SubscribeEvent
-    public static void setup(FMLCommonSetupEvent event) {
-        BlockDispenser.registerDispenseBehavior(JackOLauncher.JACK_O_AMMO, new BehaviorDispenseJackOAmmo());
+    public static void commonSetup(FMLCommonSetupEvent event) {
+        DispenserBlock.registerDispenseBehavior(JackOLauncher.JACK_O_AMMO, new BehaviorDispenseJackOAmmo());
+    }
+
+    @SubscribeEvent
+    public static void registerEntity(RegistryEvent.Register<EntityType<?>> event) {
+        event.getRegistry().register(JACK_O_PROJECTILE_ENTITY_TYPE);
     }
 
     @SubscribeEvent
@@ -53,5 +71,10 @@ public class JackOLauncher {
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
         event.getRegistry().registerAll(UNWASTING, RELOADING, BLAST_SHIELD, LAUNCHING);
+    }
+
+    @SubscribeEvent
+    public static void registerEntityRenderer(ModelRegistryEvent event) {
+        RenderingRegistry.registerEntityRenderingHandler(JackOProjectileEntity.class, JackOProjectileRenderer::new);
     }
 }

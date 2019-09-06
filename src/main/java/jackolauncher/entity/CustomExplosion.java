@@ -3,26 +3,30 @@ package jackolauncher.entity;
 import com.google.common.collect.Sets;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.enchantment.EnchantmentProtection;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.ProtectionEnchantment;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Particles;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.network.play.server.SPacketExplosion;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SExplosionPacket;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameters;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -42,12 +46,12 @@ public class CustomExplosion extends Explosion {
     protected final double y;
     protected final double z;
     protected final Entity exploder;
-    protected final EntityLivingBase shootingEntity;
+    protected final LivingEntity shootingEntity;
     protected final float explosionPower;
     protected final int extraDamage;
 
-    public CustomExplosion(World world, Entity explodingEntity, @Nullable EntityLivingBase shootingEntity, double x, double y, double z, float explosionPower, int extraDamage, boolean shouldCauseFire, boolean shouldDamageTerrain, boolean shouldDamageShooter) {
-        super(world, explodingEntity, x, y, z, explosionPower, shouldCauseFire, shouldDamageTerrain);
+    public CustomExplosion(World world, Entity explodingEntity, @Nullable LivingEntity shootingEntity, double x, double y, double z, float explosionPower, int extraDamage, boolean shouldCauseFire, boolean shouldDamageTerrain, boolean shouldDamageShooter) {
+        super(world, explodingEntity, x, y, z, explosionPower, shouldCauseFire, shouldDamageTerrain ? Mode.BREAK : Mode.NONE);
         this.random = new Random();
         this.world = world;
         this.exploder = explodingEntity;
@@ -66,15 +70,15 @@ public class CustomExplosion extends Explosion {
         if (!net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, this)) {
             doExplosionA();
 
-            if (world instanceof WorldServer) {
+            if (world instanceof ServerWorld) {
                 doExplosionB(false);
                 if (!shouldDamageTerrain) {
                     clearAffectedBlockPositions();
                 }
 
-                for (EntityPlayer entityplayer : world.playerEntities) {
+                for (PlayerEntity entityplayer : world.getPlayers()) {
                     if (entityplayer.getDistanceSq(x, y, z) < 4096) {
-                        ((EntityPlayerMP) entityplayer).connection.sendPacket(new SPacketExplosion(x, y, z, explosionPower, getAffectedBlockPositions(), getPlayerKnockbackMap().get(entityplayer)));
+                        ((ServerPlayerEntity) entityplayer).connection.sendPacket(new SExplosionPacket(x, y, z, explosionPower, getAffectedBlockPositions(), getPlayerKnockbackMap().get(entityplayer)));
                     }
                 }
             } else {
@@ -120,7 +124,7 @@ public class CustomExplosion extends Explosion {
 
         while (remainingExplosionPower > 0) {
             BlockPos pos = new BlockPos(posX, posY, posZ);
-            IBlockState blockState = world.getBlockState(pos);
+            BlockState blockState = world.getBlockState(pos);
             IFluidState fluidState = world.getFluidState(pos);
 
             if (!blockState.isAir(world, pos) || !fluidState.isEmpty()) {
@@ -154,7 +158,7 @@ public class CustomExplosion extends Explosion {
 
         for (Entity entity : affectedEntities) {
             if (!entity.isImmuneToExplosions()) {
-                double relativeDistance = entity.getDistance(x, y, z) / explosionPower;
+                double relativeDistance = entity.getDistanceSq(x, y, z) / explosionPower;
 
                 if (relativeDistance <= 1) {
                     double distanceX = entity.posX - x;
@@ -166,7 +170,7 @@ public class CustomExplosion extends Explosion {
                         distanceX = distanceX / distance;
                         distanceY = distanceY / distance;
                         distanceZ = distanceZ / distance;
-                        double blockDensity = world.getBlockDensity(vec3d, entity.getBoundingBox());
+                        double blockDensity = func_222259_a(vec3d, entity);
                         double damageMultiplier = (1 - relativeDistance) * blockDensity;
                         damageMultiplier = damageMultiplier * damageMultiplier + damageMultiplier;
                         if (entity == shootingEntity && !shouldDamageShooter) {
@@ -175,16 +179,14 @@ public class CustomExplosion extends Explosion {
                         entity.attackEntityFrom(DamageSource.causeExplosionDamage(this), (float) ((int) (damageMultiplier / 2 * 7 * explosionPower + 1)) + extraDamage * 1.25F);
                         double knockbackMultiplier = damageMultiplier;
 
-                        if (entity instanceof EntityLivingBase) {
-                            knockbackMultiplier = EnchantmentProtection.getBlastDamageReduction((EntityLivingBase) entity, damageMultiplier);
+                        if (entity instanceof LivingEntity) {
+                            knockbackMultiplier = ProtectionEnchantment.getBlastDamageReduction((LivingEntity) entity, damageMultiplier);
                         }
 
-                        entity.motionX += distanceX * knockbackMultiplier;
-                        entity.motionY += distanceY * knockbackMultiplier;
-                        entity.motionZ += distanceZ * knockbackMultiplier;
+                        entity.setMotion(entity.getMotion().add(new Vec3d(distanceX, distanceY, distanceZ).scale(knockbackMultiplier)));
 
-                        if (entity instanceof EntityPlayer) {
-                            EntityPlayer entityplayer = (EntityPlayer) entity;
+                        if (entity instanceof PlayerEntity) {
+                            PlayerEntity entityplayer = (PlayerEntity) entity;
 
                             if (!entityplayer.isSpectator() && (!entityplayer.isCreative() || !entityplayer.abilities.isFlying)) {
                                 getPlayerKnockbackMap().put(entityplayer, new Vec3d(distanceX * damageMultiplier, distanceY * damageMultiplier, distanceZ * damageMultiplier));
@@ -204,21 +206,24 @@ public class CustomExplosion extends Explosion {
             spawnParticles();
         }
 
-        if (this.shouldDamageTerrain) {
+        if (shouldDamageTerrain) {
+
             for (BlockPos pos : getAffectedBlockPositions()) {
-                IBlockState blockState = world.getBlockState(pos);
-                Block block = blockState.getBlock();
+                BlockState blockstate = this.world.getBlockState(pos);
 
                 if (spawnParticles) {
                     spawnParticles(pos);
                 }
 
-                if (!blockState.isAir(world, pos)) {
-                    if (block.canDropFromExplosion(this)) {
-                        blockState.dropBlockAsItemWithChance(world, pos, 1 / explosionPower, 0);
+                if (!blockstate.isAir(this.world, pos)) {
+                    if (this.world instanceof ServerWorld && blockstate.canDropFromExplosion(this.world, pos, this)) {
+                        TileEntity tileentity = blockstate.hasTileEntity() ? this.world.getTileEntity(pos) : null;
+                        LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).withRandom(this.world.rand).withParameter(LootParameters.POSITION, pos).withParameter(LootParameters.TOOL, ItemStack.EMPTY).withNullableParameter(LootParameters.BLOCK_ENTITY, tileentity);
+
+                        Block.spawnDrops(blockstate, builder);
                     }
 
-                    blockState.onBlockExploded(world, pos, this);
+                    blockstate.onBlockExploded(this.world, pos, this);
                 }
             }
         }
@@ -248,21 +253,21 @@ public class CustomExplosion extends Explosion {
         xSpeed = xSpeed * speedMultiplier;
         ySpeed = ySpeed * speedMultiplier;
         zSpeed = zSpeed * speedMultiplier;
-        world.spawnParticle(Particles.POOF, (xCoord + x) / 2, (yCoord + y) / 2, (zCoord + z) / 2, xSpeed, ySpeed, zSpeed);
-        world.spawnParticle(Particles.SMOKE, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
+        world.addParticle(ParticleTypes.POOF, (xCoord + x) / 2, (yCoord + y) / 2, (zCoord + z) / 2, xSpeed, ySpeed, zSpeed);
+        world.addParticle(ParticleTypes.SMOKE, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
     }
 
     protected void spawnParticles() {
         if (explosionPower >= 2 && shouldDamageTerrain) {
-            world.spawnParticle(Particles.EXPLOSION_EMITTER, x, y, z, 1, 0, 0);
+            world.addParticle(ParticleTypes.EXPLOSION_EMITTER, x, y, z, 1, 0, 0);
         } else {
-            world.spawnParticle(Particles.EXPLOSION, x, y, z, 1, 0, 0);
+            world.addParticle(ParticleTypes.EXPLOSION, x, y, z, 1, 0, 0);
         }
     }
 
     @Override
     @Nullable
-    public EntityLivingBase getExplosivePlacedBy() {
+    public LivingEntity getExplosivePlacedBy() {
         return shootingEntity != null ? shootingEntity : super.getExplosivePlacedBy();
     }
 }

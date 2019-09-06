@@ -1,5 +1,6 @@
 package jackolauncher.compat;
 
+/*
 import jackolauncher.JackOLauncher;
 import jackolauncher.item.RecipeJackOAmmo;
 import mezz.jei.api.IModPlugin;
@@ -7,8 +8,8 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.MethodsReturnNonnullByDefault;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
@@ -45,3 +46,4 @@ public class JEIPlugin implements IModPlugin {
         registration.addRecipes(recipes, VanillaRecipeCategoryUid.CRAFTING);
     }
 }
+*/

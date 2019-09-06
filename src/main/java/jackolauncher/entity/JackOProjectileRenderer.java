@@ -1,11 +1,11 @@
 package jackolauncher.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -13,16 +13,16 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderJackOProjectile extends Render<EntityJackOProjectile> {
+public class JackOProjectileRenderer extends EntityRenderer<JackOProjectileEntity> {
 
-    public RenderJackOProjectile(RenderManager rendermanager) {
-        super(rendermanager);
+    public JackOProjectileRenderer(EntityRendererManager rendererManager) {
+        super(rendererManager);
         shadowSize = 0.5F;
     }
 
     @Override
     @ParametersAreNonnullByDefault
-    public void doRender(EntityJackOProjectile entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void doRender(JackOProjectileEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
         GlStateManager.pushMatrix();
 
         GlStateManager.translatef((float) x, (float) y + 0.5F, (float) z);
@@ -31,7 +31,7 @@ public class RenderJackOProjectile extends Render<EntityJackOProjectile> {
         GlStateManager.rotatef(rotation, 0, 1, 0);
         GlStateManager.translatef(-0.5F, -0.5F, +0.5F);
 
-        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         blockrendererdispatcher.getBlockModelRenderer().renderModelBrightness(blockrendererdispatcher.getModelForState(entity.getBlockState()), entity.getBlockState(), 1, false);
 
@@ -41,7 +41,7 @@ public class RenderJackOProjectile extends Render<EntityJackOProjectile> {
 
     @Override
     @ParametersAreNonnullByDefault
-    protected ResourceLocation getEntityTexture(EntityJackOProjectile entity) {
-        return TextureMap.LOCATION_BLOCKS_TEXTURE;
+    protected ResourceLocation getEntityTexture(JackOProjectileEntity entity) {
+        return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
     }
 }

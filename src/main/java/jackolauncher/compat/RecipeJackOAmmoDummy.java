@@ -1,9 +1,10 @@
 package jackolauncher.compat;
-
+/*
 import jackolauncher.JackOLauncher;
 import jackolauncher.item.RecipeJackOAmmo;
-import mezz.jei.api.MethodsReturnNonnullByDefault;
-import net.minecraft.init.Blocks;
+// import mezz.jei.api.MethodsReturnNonnullByDefault;
+import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.block.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -72,3 +73,4 @@ public class RecipeJackOAmmoDummy implements IRecipe {
         return ingredients;
     }
 }
+*/

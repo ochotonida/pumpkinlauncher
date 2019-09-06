@@ -4,18 +4,17 @@ import com.google.common.collect.Lists;
 import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.init.Items;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.potion.PotionUtil;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.EffectUtils;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -34,93 +33,93 @@ public class ItemJackOAmmo extends Item {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, worldIn, tooltip, flag);
-        NBTTagCompound ammoNBT = stack.getOrCreateChildTag("AmmoNBT");
+        CompoundNBT ammoNBT = stack.getOrCreateChildTag("AmmoNBT");
 
-        if (ammoNBT.hasKey("BlockState")) {
+        if (ammoNBT.contains("BlockState")) {
             tooltip.add(NBTUtil.readBlockState(ammoNBT.getCompound("BlockState")).getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GRAY));
         }
         if (!ammoNBT.getCompound("ArrowsNBT").isEmpty()) {
             ItemStack ArrowItemStack = ItemStack.read(ammoNBT.getCompound("ArrowsNBT"));
             if (ArrowItemStack.getCount() > 0) {
-                tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.arrows").appendText(" " + ArrowItemStack.getCount()).applyTextStyle(TextFormatting.GRAY));
+                tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.arrows").appendText(" " + ArrowItemStack.getCount()).applyTextStyle(TextFormatting.GRAY));
 
-                if (ArrowItemStack.getItem() instanceof ItemTippedArrow) {
-                    List<PotionEffect> potionEffects = PotionUtils.getEffectsFromStack(ArrowItemStack);
-                    if (potionEffects.isEmpty()) {
-                        tooltip.add(new TextComponentString("  ").appendSibling(new TextComponentTranslation("effect.none")).applyTextStyle(TextFormatting.GRAY));
+                if (ArrowItemStack.getItem() instanceof TippedArrowItem) {
+                    List<EffectInstance> effects = PotionUtils.getEffectsFromStack(ArrowItemStack);
+                    if (effects.isEmpty()) {
+                        tooltip.add(new StringTextComponent("  ").appendSibling(new TranslationTextComponent("effect.none")).applyTextStyle(TextFormatting.GRAY));
                     } else {
-                        for (PotionEffect potionEffect : potionEffects) {
-                            ITextComponent potionEffectTextComponent = new TextComponentTranslation(potionEffect.getEffectName());
+                        for (EffectInstance effect : effects) {
+                            ITextComponent potionEffectTextComponent = new TranslationTextComponent(effect.getEffectName());
 
-                            if (potionEffect.getAmplifier() > 0) {
-                                potionEffectTextComponent.appendText(" ").appendSibling(new TextComponentTranslation("potion.potency." + potionEffect.getAmplifier()));
+                            if (effect.getAmplifier() > 0) {
+                                potionEffectTextComponent.appendText(" ").appendSibling(new TranslationTextComponent("potion.potency." + effect.getAmplifier()));
                             }
 
-                            if (potionEffect.getDuration() > 20) {
-                                potionEffectTextComponent.appendText(" (" + PotionUtil.getPotionDurationString(potionEffect, 0.125F) + ")");
+                            if (effect.getDuration() > 20) {
+                                potionEffectTextComponent.appendText(" (" + EffectUtils.getPotionDurationString(effect, 0.125F) + ")");
                             }
 
-                            if (potionEffect.getPotion().isBadEffect()) {
-                                tooltip.add(new TextComponentString("  ").appendSibling(potionEffectTextComponent).applyTextStyle(TextFormatting.RED));
+                            if (effect.getPotion().isBeneficial()) {
+                                tooltip.add(new StringTextComponent("  ").appendSibling(potionEffectTextComponent).applyTextStyle(TextFormatting.BLUE));
                             } else {
-                                tooltip.add(new TextComponentString("  ").appendSibling(potionEffectTextComponent).applyTextStyle(TextFormatting.BLUE));
+                                tooltip.add(new StringTextComponent("  ").appendSibling(potionEffectTextComponent).applyTextStyle(TextFormatting.RED));
                             }
                         }
                     }
-                } else if (ArrowItemStack.getItem() instanceof ItemSpectralArrow) {
-                    tooltip.add(new TextComponentString("  ").appendSibling(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.spectral")).applyTextStyle(TextFormatting.AQUA));
+                } else if (ArrowItemStack.getItem() instanceof SpectralArrowItem) {
+                    tooltip.add(new StringTextComponent("  ").appendSibling(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.spectral")).applyTextStyle(TextFormatting.AQUA));
                 } else if (ArrowItemStack.getItem() != Items.ARROW) {
-                    tooltip.add(new TextComponentString("  ").appendSibling(ArrowItemStack.getTextComponent()).applyTextStyle(TextFormatting.DARK_GREEN));
+                    tooltip.add(new StringTextComponent("  ").appendSibling(ArrowItemStack.getTextComponent()).applyTextStyle(TextFormatting.DARK_GREEN));
                 }
             }
         }
         if (ammoNBT.getByte("ExplosionPower") > 0) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.explosion_power").appendText(" " + ammoNBT.getByte("ExplosionPower")).applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.explosion_power").appendText(" " + ammoNBT.getByte("ExplosionPower")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getByte("BouncesAmount") > 0) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.bounce").appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bounce").appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getByte("ExtraDamage") > 0) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.extra_damage").appendText(" " + ammoNBT.getByte("ExtraDamage")).applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.extra_damage").appendText(" " + ammoNBT.getByte("ExtraDamage")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getBoolean("IsFlaming")) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.flaming").applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.flaming").applyTextStyle(TextFormatting.GRAY));
         }
-        if (ammoNBT.hasKey("CanDestroyBlocks") && !ammoNBT.getBoolean("CanDestroyBlocks")) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks").applyTextStyle(TextFormatting.GRAY));
+        if (ammoNBT.contains("CanDestroyBlocks") && !ammoNBT.getBoolean("CanDestroyBlocks")) {
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks").applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getBoolean("HasBoneMeal")) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.bone_meal").applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bone_meal").applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getBoolean("IsEnderPearl")) {
-            tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.ender_pearl").applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.ender_pearl").applyTextStyle(TextFormatting.GRAY));
         }
-        if (ammoNBT.hasKey("FireworksNBT")) {
-            NBTTagCompound fireworksNBT = (NBTTagCompound) ammoNBT.getTag("FireworksNBT");
-            if (fireworksNBT.hasKey("Flight")) {
-                tooltip.add(new TextComponentTranslation("item.minecraft.firework_rocket.flight").appendText(" " + fireworksNBT.getByte("Flight")).applyTextStyle(TextFormatting.GRAY));
+        if (ammoNBT.contains("FireworksNBT")) {
+            CompoundNBT fireworksNBT = ammoNBT.getCompound("FireworksNBT");
+            if (fireworksNBT.contains("Flight")) {
+                tooltip.add(new TranslationTextComponent("item.minecraft.firework_rocket.flight").appendText(" " + fireworksNBT.getByte("Flight")).applyTextStyle(TextFormatting.GRAY));
             }
 
-            NBTTagList fireworkExplosionsNBTList = fireworksNBT.getList("Explosions", 10);
+            ListNBT fireworkExplosionsNBTList = fireworksNBT.getList("Explosions", 10);
             if (!fireworkExplosionsNBTList.isEmpty()) {
                 for (int i = 0; i < fireworkExplosionsNBTList.size(); ++i) {
-                    NBTTagCompound fireworkExplosionNBT = fireworkExplosionsNBTList.getCompound(i);
+                    CompoundNBT fireworkExplosionNBT = fireworkExplosionsNBTList.getCompound(i);
                     List<ITextComponent> fireworkExplosionTextComponents = Lists.newArrayList();
-                    ItemFireworkStar.func_195967_a(fireworkExplosionNBT, fireworkExplosionTextComponents);
+                    FireworkStarItem.func_195967_a(fireworkExplosionNBT, fireworkExplosionTextComponents);
 
                     if (!fireworkExplosionTextComponents.isEmpty()) {
                         for (int j = 1; j < fireworkExplosionTextComponents.size(); ++j) {
-                            fireworkExplosionTextComponents.set(j, new TextComponentString("  ").appendSibling(fireworkExplosionTextComponents.get(j)));
+                            fireworkExplosionTextComponents.set(j, new StringTextComponent("  ").appendSibling(fireworkExplosionTextComponents.get(j)));
                         }
                         tooltip.addAll(fireworkExplosionTextComponents);
                     }
                 }
             }
         }
-        if (ammoNBT.hasKey("PotionNBT")) {
+        if (ammoNBT.contains("PotionNBT")) {
             ItemStack potionStack = ItemStack.read(ammoNBT.getCompound("PotionNBT"));
             if (potionStack.getItem() == Items.LINGERING_POTION) {
-                tooltip.add(new TextComponentTranslation("item.jack_o_launcher.jack_o_ammo.lingering").applyTextStyle(TextFormatting.DARK_PURPLE));
+                tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.lingering").applyTextStyle(TextFormatting.DARK_PURPLE));
             }
             PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
         }

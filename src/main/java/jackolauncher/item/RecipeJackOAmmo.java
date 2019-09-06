@@ -1,30 +1,13 @@
 package jackolauncher.item;
 
-import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemArrow;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeHidden;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeJackOAmmo extends IRecipeHidden {
-
+public class RecipeJackOAmmo {// extends IRecipeHidden {
+    /*
     public static final Ingredient INGREDIENT_WOOL = Ingredient.fromTag(ItemTags.WOOL);
     public static final Ingredient INGREDIENT_GUNPOWDER = Ingredient.fromItems(Items.GUNPOWDER);
     public static final Ingredient INGREDIENT_SLIME_BALL = Ingredient.fromItems(Items.SLIME_BALL);
@@ -41,8 +24,8 @@ public class RecipeJackOAmmo extends IRecipeHidden {
 
     public static ItemStack getCraftingResult(ItemStack... inputs) {
         ItemStack resultStack = new ItemStack(JackOLauncher.JACK_O_AMMO, 3);
-        NBTTagCompound ammoNBT = resultStack.getOrCreateChildTag("AmmoNBT");
-        ammoNBT.setBoolean("CanDestroyBlock", true);
+        CompoundNBT ammoNBT = resultStack.getOrCreateChildTag("AmmoNBT");
+        ammoNBT.putBoolean("CanDestroyBlock", true);
 
         int gunpowderAmount = 0;
         int slimeBallAmount = 0;
@@ -53,15 +36,15 @@ public class RecipeJackOAmmo extends IRecipeHidden {
         for (ItemStack inputStack : inputs) {
             if (!inputStack.isEmpty()) {
                 if (INGREDIENT_PUMPKIN.test(inputStack)) {
-                    ammoNBT.setTag("BlockState", NBTUtil.writeBlockState(Block.getBlockFromItem(inputStack.getItem()).getDefaultState()));
+                    ammoNBT.put("BlockState", NBTUtil.writeBlockState(Block.getBlockFromItem(inputStack.getItem()).getDefaultState()));
                 } else if (INGREDIENT_BONE_BLOCK.test(inputStack)) {
-                    ammoNBT.setBoolean("HasBoneMeal", true);
+                    ammoNBT.putBoolean("HasBoneMeal", true);
                 } else if (INGREDIENT_ENDER_PEARL.test(inputStack)) {
-                    ammoNBT.setBoolean("IsEnderPearl", true);
+                    ammoNBT.putBoolean("IsEnderPearl", true);
                 } else if (INGREDIENT_FIRE_CHARGE.test(inputStack)) {
-                    ammoNBT.setBoolean("IsFlaming", true);
+                    ammoNBT.putBoolean("IsFlaming", true);
                 } else if (ItemTags.WOOL.contains(inputStack.getItem())) {
-                    ammoNBT.setBoolean("CanDestroyBlocks", false);
+                    ammoNBT.putBoolean("CanDestroyBlocks", false);
                 } else if (INGREDIENT_GUNPOWDER.test(inputStack)) {
                     ++gunpowderAmount;
                 } else if (INGREDIENT_SLIME_BALL.test(inputStack)) {
@@ -69,17 +52,17 @@ public class RecipeJackOAmmo extends IRecipeHidden {
                 } else if (Tags.Items.NUGGETS_IRON.contains(inputStack.getItem())) {
                     ++ironNuggetAmount;
                 } else if (INGREDIENT_POTION.test(inputStack)) {
-                    ammoNBT.setTag("PotionNBT", inputStack.write(new NBTTagCompound()));
+                    ammoNBT.put("PotionNBT", inputStack.write(new CompoundNBT()));
                 } else if (INGREDIENT_FIREWORK_ROCKET.test(inputStack)) {
                     if (!inputStack.hasTag()) {
-                        NBTTagCompound fireworksNBT = new NBTTagCompound();
-                        fireworksNBT.setByte("Flight", (byte) 2);
-                        ammoNBT.setTag("FireworksNBT", fireworksNBT);
+                        CompoundNBT fireworksNBT = new CompoundNBT();
+                        fireworksNBT.putByte("Flight", (byte) 2);
+                        ammoNBT.put("FireworksNBT", fireworksNBT);
                     } else {
                         // noinspection ConstantConditions
-                        ammoNBT.setTag("FireworksNBT", inputStack.getChildTag("Fireworks"));
+                        ammoNBT.put("FireworksNBT", inputStack.getChildTag("Fireworks"));
                     }
-                } else if (inputStack.getItem() instanceof ItemArrow) {
+                } else if (inputStack.getItem() instanceof ArrowItem) {
                     if (arrowsStack.isEmpty()) {
                         arrowsStack = inputStack.copy();
                         arrowsStack.setCount(1);
@@ -90,17 +73,17 @@ public class RecipeJackOAmmo extends IRecipeHidden {
             }
         }
 
-        ammoNBT.setTag("ArrowsNBT", arrowsStack.write(new NBTTagCompound()));
-        ammoNBT.setByte("ExplosionPower", (byte) gunpowderAmount);
-        ammoNBT.setByte("BouncesAmount", (byte) slimeBallAmount);
-        ammoNBT.setByte("ExtraDamage", (byte) ironNuggetAmount);
+        ammoNBT.put("ArrowsNBT", arrowsStack.write(new CompoundNBT()));
+        ammoNBT.putByte("ExplosionPower", (byte) gunpowderAmount);
+        ammoNBT.putByte("BouncesAmount", (byte) slimeBallAmount);
+        ammoNBT.putByte("ExtraDamage", (byte) ironNuggetAmount);
         return resultStack;
     }
 
     @Override
     @SuppressWarnings("ConstantConditions")
     public boolean matches(IInventory inventory, World world) {
-        if (!(inventory instanceof InventoryCrafting)) {
+        if (!(inventory instanceof CraftingInventory)) {
             return false;
         }
 
@@ -164,7 +147,7 @@ public class RecipeJackOAmmo extends IRecipeHidden {
                 if (++ironNuggetAmount > 4) {
                     return false;
                 }
-            } else if (stackInSlot.getItem() instanceof ItemArrow) {
+            } else if (stackInSlot.getItem() instanceof ArrowItem) {
                 if (arrowsStack.isEmpty() || arrowsStack.getCount() >= 16) {
                     arrowsStack = stackInSlot.copy();
                     arrowsStack.setCount(1);
@@ -209,4 +192,5 @@ public class RecipeJackOAmmo extends IRecipeHidden {
     public IRecipeSerializer<?> getSerializer() {
         return JackOLauncher.CRAFTING_SPECIAL_JACK_O_AMMO;
     }
+    */
 }

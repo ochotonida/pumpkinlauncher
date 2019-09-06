@@ -10,14 +10,14 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.13.2-1.0.0'
+version = '1.14.4-1.0.0'
 group = 'jack_o_launcher'
 archivesBaseName = 'Jack-O\'-Launcher'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20180921-1.13'
+    mappings channel: 'snapshot', version: '20190903-1.14.3'
 
     runs {
         client = {
@@ -40,14 +40,14 @@ minecraft {
 }
 
 repositories {
-    maven {
-        url = "http://dvs1.progwml6.com/files/maven/"
-    }
+    //maven {
+    //    url = "http://dvs1.progwml6.com/files/maven/"
+    //}
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.110'
-    deobf "mezz.jei:jei-1.13.2:5.0.0.20"
+    minecraft 'net.minecraftforge:forge:1.14.4-28.0.83'
+    //deobf "mezz.jei:jei-1.13.2:5.0.0.20"
 }
 
 jar {
@@ -55,7 +55,7 @@ jar {
         attributes(["Specification-Title": "Jack-O\'-Launcher",
                     "Specification-Vendor": "ochotonida",
                     "Specification-Version": "${version}",
-                    "Implementation-Title": project.name,
+                    "Implementation-Title": "Jack-O\'-Launcher",
                     "Implementation-Version": "${version}",
                     "Implementation-Vendor" :"ochotonida",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
