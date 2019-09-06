@@ -8,12 +8,15 @@ import jackolauncher.entity.JackOProjectileEntity;
 import jackolauncher.entity.JackOProjectileRenderer;
 import jackolauncher.item.JackOAmmoDispenseBehavior;
 import jackolauncher.item.JackOAmmoItem;
+import jackolauncher.item.JackOAmmoRecipe;
 import jackolauncher.item.JackOLauncherItem;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -36,6 +39,8 @@ public class JackOLauncher {
 
     public static final EntityType<JackOProjectileEntity> JACK_O_PROJECTILE_ENTITY_TYPE = createEntity();
 
+    public static final SpecialRecipeSerializer<JackOAmmoRecipe> JACK_O_AMMO_RECIPE_SERIALIZER = new SpecialRecipeSerializer<>(JackOAmmoRecipe::new);
+
     private static EntityType<JackOProjectileEntity> createEntity() {
         EntityType.Builder<JackOProjectileEntity> builder = EntityType.Builder.create(JackOProjectileEntity::new, EntityClassification.MISC);
         builder.size(0.8F, 0.8F);
@@ -45,8 +50,6 @@ public class JackOLauncher {
         entityType.setRegistryName(new ResourceLocation(MODID, "jack_o_projectile"));
         return entityType;
     }
-
-    //public static final RecipeSerializers.SimpleSerializer<RecipeJackOAmmo> CRAFTING_SPECIAL_JACK_O_AMMO = RecipeSerializers.register(new RecipeSerializers.SimpleSerializer<>("jack_o_launcher:crafting_special_jack_o_ammo", RecipeJackOAmmo::new));
 
     public static final Enchantment UNWASTING = new UnwastingEnchantment();
     public static final Enchantment RELOADING = new ReloadingEnchantment();
@@ -71,6 +74,12 @@ public class JackOLauncher {
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
         event.getRegistry().registerAll(UNWASTING, RELOADING, BLAST_SHIELD, LAUNCHING);
+    }
+
+    @SubscribeEvent
+    public static void registerRecipeSerializer(RegistryEvent.Register<IRecipeSerializer<?>> event) {
+        JACK_O_AMMO_RECIPE_SERIALIZER.setRegistryName("jack_o_launcher:crafting_special_jack_o_ammo");
+        event.getRegistry().register(JACK_O_AMMO_RECIPE_SERIALIZER);
     }
 
     @SubscribeEvent

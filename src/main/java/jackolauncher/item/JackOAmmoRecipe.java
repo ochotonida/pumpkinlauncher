@@ -1,13 +1,29 @@
 package jackolauncher.item;
 
+import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.item.ArrowItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeJackOAmmo {// extends IRecipeHidden {
-    /*
+public class JackOAmmoRecipe extends SpecialRecipe {
+
     public static final Ingredient INGREDIENT_WOOL = Ingredient.fromTag(ItemTags.WOOL);
     public static final Ingredient INGREDIENT_GUNPOWDER = Ingredient.fromItems(Items.GUNPOWDER);
     public static final Ingredient INGREDIENT_SLIME_BALL = Ingredient.fromItems(Items.SLIME_BALL);
@@ -18,7 +34,7 @@ public class RecipeJackOAmmo {// extends IRecipeHidden {
     public static final Ingredient INGREDIENT_POTION = Ingredient.fromItems(Items.SPLASH_POTION, Items.LINGERING_POTION);
     public static final Ingredient INGREDIENT_PUMPKIN = Ingredient.fromItems(Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.JACK_O_LANTERN, Blocks.MELON);
 
-    public RecipeJackOAmmo(ResourceLocation resourceLocation) {
+    public JackOAmmoRecipe(ResourceLocation resourceLocation) {
         super(resourceLocation);
     }
 
@@ -82,7 +98,7 @@ public class RecipeJackOAmmo {// extends IRecipeHidden {
 
     @Override
     @SuppressWarnings("ConstantConditions")
-    public boolean matches(IInventory inventory, World world) {
+    public boolean matches(CraftingInventory inventory, World world) {
         if (!(inventory instanceof CraftingInventory)) {
             return false;
         }
@@ -170,7 +186,7 @@ public class RecipeJackOAmmo {// extends IRecipeHidden {
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inventory) {
+    public ItemStack getCraftingResult(CraftingInventory inventory) {
         ItemStack[] inputs = new ItemStack[inventory.getSizeInventory()];
         for (int slotId = 0; slotId < inventory.getSizeInventory(); ++slotId) {
             inputs[slotId] = inventory.getStackInSlot(slotId);
@@ -190,7 +206,6 @@ public class RecipeJackOAmmo {// extends IRecipeHidden {
 
     @Override
     public IRecipeSerializer<?> getSerializer() {
-        return JackOLauncher.CRAFTING_SPECIAL_JACK_O_AMMO;
+        return JackOLauncher.JACK_O_AMMO_RECIPE_SERIALIZER;
     }
-    */
 }

@@ -590,7 +590,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                     }
                 }
                 if (!dataManager.get(FIREWORKS_NBT).isEmpty()) {
-                    world.addParticle(ParticleTypes.FIREWORK, posX, posY - 0.3, posZ, rand.nextGaussian() * 0.05, -getMotion().getY() * 0.5, rand.nextGaussian() * 0.05);
+                    world.addParticle(ParticleTypes.FIREWORK, posX, posY, posZ, rand.nextGaussian() * 0.05, -getMotion().getY() * 0.5, rand.nextGaussian() * 0.05);
                 }
                 if (dataManager.get(HAS_BONE_MEAL) && ticksExisted % 3 == 0) {
                     spawnParticle(ParticleTypes.HAPPY_VILLAGER, 0.1, 0, 0.02);
