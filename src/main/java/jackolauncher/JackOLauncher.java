@@ -1,14 +1,14 @@
 package jackolauncher;
 
-import jackolauncher.enchantment.EnchantmentBlastShield;
-import jackolauncher.enchantment.EnchantmentLaunching;
-import jackolauncher.enchantment.EnchantmentReloading;
-import jackolauncher.enchantment.EnchantmentUnwasting;
+import jackolauncher.enchantment.BlastShieldEnchantment;
+import jackolauncher.enchantment.LaunchingEnchantment;
+import jackolauncher.enchantment.ReloadingEnchantment;
+import jackolauncher.enchantment.UnwastingEnchantment;
 import jackolauncher.entity.JackOProjectileEntity;
 import jackolauncher.entity.JackOProjectileRenderer;
-import jackolauncher.item.BehaviorDispenseJackOAmmo;
-import jackolauncher.item.ItemJackOAmmo;
-import jackolauncher.item.ItemJackOLauncher;
+import jackolauncher.item.JackOAmmoDispenseBehavior;
+import jackolauncher.item.JackOAmmoItem;
+import jackolauncher.item.JackOLauncherItem;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityClassification;
@@ -31,8 +31,8 @@ public class JackOLauncher {
 
     public static final String MODID = "jack_o_launcher";
 
-    public static final Item JACK_O_LAUNCHER = new ItemJackOLauncher();
-    public static final Item JACK_O_AMMO = new ItemJackOAmmo();
+    public static final Item JACK_O_LAUNCHER = new JackOLauncherItem();
+    public static final Item JACK_O_AMMO = new JackOAmmoItem();
 
     public static final EntityType<JackOProjectileEntity> JACK_O_PROJECTILE_ENTITY_TYPE = createEntity();
 
@@ -48,14 +48,14 @@ public class JackOLauncher {
 
     //public static final RecipeSerializers.SimpleSerializer<RecipeJackOAmmo> CRAFTING_SPECIAL_JACK_O_AMMO = RecipeSerializers.register(new RecipeSerializers.SimpleSerializer<>("jack_o_launcher:crafting_special_jack_o_ammo", RecipeJackOAmmo::new));
 
-    public static final Enchantment UNWASTING = new EnchantmentUnwasting();
-    public static final Enchantment RELOADING = new EnchantmentReloading();
-    public static final Enchantment BLAST_SHIELD = new EnchantmentBlastShield();
-    public static final Enchantment LAUNCHING = new EnchantmentLaunching();
+    public static final Enchantment UNWASTING = new UnwastingEnchantment();
+    public static final Enchantment RELOADING = new ReloadingEnchantment();
+    public static final Enchantment BLAST_SHIELD = new BlastShieldEnchantment();
+    public static final Enchantment LAUNCHING = new LaunchingEnchantment();
 
     @SubscribeEvent
     public static void commonSetup(FMLCommonSetupEvent event) {
-        DispenserBlock.registerDispenseBehavior(JackOLauncher.JACK_O_AMMO, new BehaviorDispenseJackOAmmo());
+        DispenserBlock.registerDispenseBehavior(JackOLauncher.JACK_O_AMMO, new JackOAmmoDispenseBehavior());
     }
 
     @SubscribeEvent

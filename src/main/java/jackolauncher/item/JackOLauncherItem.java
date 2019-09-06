@@ -19,11 +19,11 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemJackOLauncher extends Item {
+public class JackOLauncherItem extends Item {
 
     public static final List<Enchantment> VALID_ENCHANTMENTS = Arrays.asList(Enchantments.MENDING, Enchantments.UNBREAKING, Enchantments.LOOTING, JackOLauncher.UNWASTING, JackOLauncher.BLAST_SHIELD, JackOLauncher.LAUNCHING, JackOLauncher.RELOADING);
 
-    public ItemJackOLauncher() {
+    public JackOLauncherItem() {
         super(new Properties().defaultMaxDamage(95).group(ItemGroup.COMBAT));
         setRegistryName(JackOLauncher.MODID, "jack_o_launcher");
     }

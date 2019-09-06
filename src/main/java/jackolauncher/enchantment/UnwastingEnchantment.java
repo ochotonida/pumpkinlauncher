@@ -1,8 +1,8 @@
 package jackolauncher.enchantment;
 
-public class EnchantmentUnwasting extends ModEnchantment {
+public class UnwastingEnchantment extends ModEnchantment {
 
-    public EnchantmentUnwasting() {
+    public UnwastingEnchantment() {
         super(Rarity.UNCOMMON, "unwasting", 3);
     }
 

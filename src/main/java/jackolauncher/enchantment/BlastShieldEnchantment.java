@@ -1,8 +1,8 @@
 package jackolauncher.enchantment;
 
-public class EnchantmentBlastShield extends ModEnchantment {
+public class BlastShieldEnchantment extends ModEnchantment {
 
-    public EnchantmentBlastShield() {
+    public BlastShieldEnchantment() {
         super(Rarity.UNCOMMON, "blast_shield", 1);
     }
 

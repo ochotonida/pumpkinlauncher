@@ -1,7 +1,7 @@
 package jackolauncher.enchantment;
 
 import jackolauncher.JackOLauncher;
-import jackolauncher.item.ItemJackOLauncher;
+import jackolauncher.item.JackOLauncherItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -22,12 +22,12 @@ public class ModEnchantment extends Enchantment {
 
     @Override
     public boolean canApply(ItemStack stack) {
-        return stack.getItem() instanceof ItemJackOLauncher && super.canApply(stack);
+        return stack.getItem() instanceof JackOLauncherItem && super.canApply(stack);
     }
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
-        return stack.getItem() instanceof ItemJackOLauncher && super.canApplyAtEnchantingTable(stack);
+        return stack.getItem() instanceof JackOLauncherItem && super.canApplyAtEnchantingTable(stack);
     }
 
     @Override

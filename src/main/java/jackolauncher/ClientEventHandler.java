@@ -1,6 +1,6 @@
 package jackolauncher;
 
-import jackolauncher.item.ItemJackOLauncher;
+import jackolauncher.item.JackOLauncherItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.util.HandSide;
@@ -15,8 +15,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public static void setJackOLauncherArmPose(RenderLivingEvent.Pre event) {
-        boolean isHoldingOffHand = event.getEntity().getHeldItemOffhand().getItem() instanceof ItemJackOLauncher;
-        boolean isHoldingMainHand = event.getEntity().getHeldItemMainhand().getItem() instanceof ItemJackOLauncher;
+        boolean isHoldingOffHand = event.getEntity().getHeldItemOffhand().getItem() instanceof JackOLauncherItem;
+        boolean isHoldingMainHand = event.getEntity().getHeldItemMainhand().getItem() instanceof JackOLauncherItem;
         if ((isHoldingMainHand && Minecraft.getInstance().gameSettings.mainHand == HandSide.RIGHT) || (isHoldingOffHand && Minecraft.getInstance().gameSettings.mainHand == HandSide.LEFT)) {
             ((BipedModel) event.getRenderer().getEntityModel()).rightArmPose = BipedModel.ArmPose.CROSSBOW_HOLD;
         } else if ((isHoldingMainHand && Minecraft.getInstance().gameSettings.mainHand == HandSide.LEFT) || (isHoldingOffHand && Minecraft.getInstance().gameSettings.mainHand == HandSide.RIGHT)) {

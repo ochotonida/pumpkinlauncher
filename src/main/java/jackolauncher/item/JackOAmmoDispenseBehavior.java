@@ -12,7 +12,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BehaviorDispenseJackOAmmo extends ProjectileDispenseBehavior {
+public class JackOAmmoDispenseBehavior extends ProjectileDispenseBehavior {
 
     @Override
     protected IProjectile getProjectileEntity(World world, IPosition position, ItemStack stack) {

@@ -23,9 +23,9 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemJackOAmmo extends Item {
+public class JackOAmmoItem extends Item {
 
-    public ItemJackOAmmo() {
+    public JackOAmmoItem() {
         super(new Properties().group(ItemGroup.COMBAT));
         setRegistryName(JackOLauncher.MODID, "jack_o_ammo");
     }
