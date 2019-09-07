@@ -36,6 +36,7 @@ public class JackOAmmoDispenseBehavior extends ProjectileDispenseBehavior {
         return new JackOProjectileEntity(world, position.getX(), position.getY(), position.getZ(), stack.getOrCreateChildTag("AmmoNBT"));
     }
 
+    @Override
     protected float getProjectileVelocity() {
         return 1.3F;
     }
