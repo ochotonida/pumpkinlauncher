@@ -77,7 +77,7 @@ public class JackOAmmoItem extends Item {
             tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.explosion_power").appendText(" " + ammoNBT.getByte("ExplosionPower")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getByte("BouncesAmount") > 0) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bounce").appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bounce"));//.appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getByte("ExtraDamage") > 0) {
             tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.extra_damage").appendText(" " + ammoNBT.getByte("ExtraDamage")).applyTextStyle(TextFormatting.GRAY));

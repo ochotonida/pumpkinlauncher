@@ -176,7 +176,9 @@ public class JackOAmmoRecipe extends SpecialRecipe {
                     arrowsStack.grow(1);
                 }
             } else if (INGREDIENT_SLIME_BALL.test(stackInSlot)) {
-                ++slimeBallAmount;
+                if (++slimeBallAmount > 1) {
+                    return false;
+                }
             } else if (!stackInSlot.isEmpty()) {
                 return false;
             }
