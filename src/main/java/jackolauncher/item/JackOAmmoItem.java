@@ -70,27 +70,15 @@ public class JackOAmmoItem extends Item {
                 }
             }
         }
-        if (ammoNBT.getByte("ExplosionPower") > 0) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.explosion_power").appendText(" " + ammoNBT.getByte("ExplosionPower")).applyTextStyle(TextFormatting.GRAY));
-        }
-        if (ammoNBT.getByte("BouncesAmount") > 0) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bounce").applyTextStyle(TextFormatting.GRAY));//.appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
-        }
-        if (ammoNBT.getByte("ExtraDamage") > 0) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.extra_damage").appendText(" " + ammoNBT.getByte("ExtraDamage")).applyTextStyle(TextFormatting.GRAY));
-        }
-        if (ammoNBT.getBoolean("IsFlaming")) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.flaming").applyTextStyle(TextFormatting.GRAY));
-        }
-        if (ammoNBT.contains("CanDestroyBlocks") && !ammoNBT.getBoolean("CanDestroyBlocks")) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks").applyTextStyle(TextFormatting.GRAY));
-        }
-        if (ammoNBT.getBoolean("HasBoneMeal")) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bone_meal").applyTextStyle(TextFormatting.GRAY));
-        }
-        if (ammoNBT.getBoolean("IsEnderPearl")) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.ender_pearl").applyTextStyle(TextFormatting.GRAY));
-        }
+
+        addTranslationTextComponent(tooltip, ammoNBT.getByte("ExplosionPower") > 0, "explosion_power", " " + ammoNBT.getByte("ExplosionPower"));
+        addTranslationTextComponent(tooltip, ammoNBT.getByte("BouncesAmount") > 0, "bounce");
+        addTranslationTextComponent(tooltip, ammoNBT.getByte("ExtraDamage") > 0, "extra_damage", " " + ammoNBT.getByte("ExtraDamage"));
+        addTranslationTextComponent(tooltip, ammoNBT.getBoolean("IsFlaming"), "flaming");
+        addTranslationTextComponent(tooltip, ammoNBT.contains("CanDestroyBlocks") && !ammoNBT.getBoolean("CanDestroyBlocks"), "cannot_destroy_blocks");
+        addTranslationTextComponent(tooltip, ammoNBT.getBoolean("HasBoneMeal"), "bone_meal");
+        addTranslationTextComponent(tooltip, ammoNBT.getBoolean("IsEnderPearl"), "ender_pearl");
+
         if (ammoNBT.contains("FireworksNBT")) {
             CompoundNBT fireworksNBT = ammoNBT.getCompound("FireworksNBT");
             if (fireworksNBT.contains("Flight")) {
@@ -120,5 +108,21 @@ public class JackOAmmoItem extends Item {
             }
             PotionUtils.addPotionTooltip(potionStack, tooltip, potionStack.getItem() == Items.LINGERING_POTION ? 0.25F : 1);
         }
+    }
+
+    private void addTranslationTextComponent(List<ITextComponent> tooltip, boolean condition, String translationKey) {
+        addTranslationTextComponent(tooltip, condition, translationKey, null);
+    }
+
+    private void addTranslationTextComponent(List<ITextComponent> tooltip, boolean condition, String translationKey, @Nullable String suffix) {
+        if (!condition) {
+            return;
+        }
+        TextComponent result = new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo." + translationKey);
+        if (suffix != null) {
+            result.appendText(suffix);
+        }
+        result.applyTextStyle(TextFormatting.GRAY);
+        tooltip.add(result);
     }
 }
