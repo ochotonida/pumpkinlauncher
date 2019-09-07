@@ -22,7 +22,8 @@
     "1.13.2-1.0.0": "Added jei support,\nfixed recipe output for jack o'launcher ammo,\njack o'launcher ammo now displays its texture/modelf,\nfixed jack o'projectile spawning too high,\nslightly reduced jack o'projectile bounding box size"
   },
   "1.14.4": {
-    "1.14.4-0.1.0": "ported to 1.14.4,\noverhauled jack o'ammo texture"
+    "1.14.4-0.1.0": "ported to 1.14.4,\noverhauled jack o'ammo texture",
+    "1.14.4-1.0.0": "reduced maximum amount of bounces to 1 due to inconsistent bounce behaviour,\nlaunching enchantment now also increases accuracy"
   },
   "promos": {
     "1.12.2-latest": "1.12.2-1.7.0",
