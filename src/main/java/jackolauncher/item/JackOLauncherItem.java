@@ -53,11 +53,18 @@ public class JackOLauncherItem extends Item {
 
         if (!stack.isEmpty()) {
             if (!world.isRemote) {
-                player.getCooldownTracker().setCooldown(this, 40 - 6 * EnchantmentHelper.getEnchantmentLevel(JackOLauncher.RELOADING, player.getHeldItem(hand)));
-                JackOProjectileEntity projectile = new JackOProjectileEntity(world, player, stack.getOrCreateChildTag("AmmoNBT"), EnchantmentHelper.getEnchantmentLevel(JackOLauncher.BLAST_SHIELD, player.getHeldItem(hand)) > 0);
-                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.13F * EnchantmentHelper.getEnchantmentLevel(JackOLauncher.LAUNCHING, player.getHeldItem(hand)), 3F);
+                int reloadingLevel = EnchantmentHelper.getEnchantmentLevel(JackOLauncher.RELOADING, player.getHeldItem(hand));
+                int blastShieldLevel = EnchantmentHelper.getEnchantmentLevel(JackOLauncher.BLAST_SHIELD, player.getHeldItem(hand));
+                int launchingLevel = EnchantmentHelper.getEnchantmentLevel(JackOLauncher.LAUNCHING, player.getHeldItem(hand));
+                int unwastingLevel = EnchantmentHelper.getEnchantmentLevel(JackOLauncher.UNWASTING, player.getHeldItem(hand));
+
+                player.getCooldownTracker().setCooldown(this, 40 - 6 * reloadingLevel);
+
+                JackOProjectileEntity projectile = new JackOProjectileEntity(world, player, stack.getOrCreateChildTag("AmmoNBT"), blastShieldLevel > 0);
+                projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.13F * launchingLevel, 3 - 2.5F * launchingLevel / JackOLauncher.LAUNCHING.getMaxLevel());
                 world.addEntity(projectile);
-                if (!player.abilities.isCreativeMode && random.nextInt(1 + EnchantmentHelper.getEnchantmentLevel(JackOLauncher.UNWASTING, player.getHeldItem(hand))) == 0) {
+
+                if (!player.abilities.isCreativeMode && random.nextInt(unwastingLevel + 1) == 0) {
                     stack.shrink(1);
                 }
             }

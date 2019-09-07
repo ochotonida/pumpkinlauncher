@@ -18,7 +18,7 @@
   "enchantment.jack_o_launcher.unwasting.desc": "Decreases the chance of Jack o'Launcher Ammo being consumed.",
   "enchantment.jack_o_launcher.reloading.desc": "Decreases the cooldown time of the Jack o'Launcher.",
   "enchantment.jack_o_launcher.blast_shield.desc": "Massively decreases explosion damage done to the shooter from Jack o'Projectiles.",
-  "enchantment.jack_o_launcher.launching.desc": "Increases the speed of projectiles fired by the Jack o'Launcher.",
+  "enchantment.jack_o_launcher.launching.desc": "Increases the speed and accuracy of projectiles fired by the Jack o'Launcher.",
   "entity.jack_o_launcher.jack_o_projectile.name": "Jack o'Projectile",
   "death.attack.jack_o_launcher.jack_o_projectile_impact": "%s was killed by a flying Jack o'Lantern",
   "death.attack.jack_o_launcher.jack_o_projectile_impact.player": "%1$s was killed by %2$s's flying Jack o'Lantern"
