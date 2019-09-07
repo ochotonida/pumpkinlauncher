@@ -11,10 +11,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectUtils;
 import net.minecraft.potion.PotionUtils;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -77,7 +74,7 @@ public class JackOAmmoItem extends Item {
             tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.explosion_power").appendText(" " + ammoNBT.getByte("ExplosionPower")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getByte("BouncesAmount") > 0) {
-            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bounce"));//.appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
+            tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.bounce").applyTextStyle(TextFormatting.GRAY));//.appendText(" " + ammoNBT.getByte("BouncesAmount")).applyTextStyle(TextFormatting.GRAY));
         }
         if (ammoNBT.getByte("ExtraDamage") > 0) {
             tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.extra_damage").appendText(" " + ammoNBT.getByte("ExtraDamage")).applyTextStyle(TextFormatting.GRAY));
