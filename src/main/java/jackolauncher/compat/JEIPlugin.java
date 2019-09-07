@@ -1,8 +1,8 @@
 package jackolauncher.compat;
 
-/*
+
 import jackolauncher.JackOLauncher;
-import jackolauncher.item.RecipeJackOAmmo;
+import jackolauncher.item.JackOAmmoRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.MethodsReturnNonnullByDefault;
@@ -32,18 +32,18 @@ public class JEIPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         Set<IRecipe> recipes = new HashSet<>();
-        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(RecipeJackOAmmo.INGREDIENT_GUNPOWDER), Items.GUNPOWDER));
-        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(RecipeJackOAmmo.INGREDIENT_FIRE_CHARGE), Items.FIRE_CHARGE));
-        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(RecipeJackOAmmo.INGREDIENT_SLIME_BALL), Items.SLIME_BALL));
+        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(JackOAmmoRecipe.INGREDIENT_GUNPOWDER), Items.GUNPOWDER));
+        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(JackOAmmoRecipe.INGREDIENT_FIRE_CHARGE), Items.FIRE_CHARGE));
+        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(JackOAmmoRecipe.INGREDIENT_SLIME_BALL), Items.SLIME_BALL));
         recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(Ingredient.fromItems(Items.IRON_NUGGET)), Items.IRON_NUGGET));
-        recipes.add(new RecipeJackOAmmoDummy(Arrays.asList(RecipeJackOAmmo.INGREDIENT_GUNPOWDER, RecipeJackOAmmo.INGREDIENT_WOOL), Items.GUNPOWDER, Blocks.WHITE_WOOL.asItem()));
-        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(RecipeJackOAmmo.INGREDIENT_BONE_BLOCK), Blocks.BONE_BLOCK.asItem()));
-        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(RecipeJackOAmmo.INGREDIENT_ENDER_PEARL), Items.ENDER_PEARL));
-        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(RecipeJackOAmmo.INGREDIENT_FIREWORK_ROCKET), Items.FIREWORK_ROCKET));
+        recipes.add(new RecipeJackOAmmoDummy(Arrays.asList(JackOAmmoRecipe.INGREDIENT_GUNPOWDER, JackOAmmoRecipe.INGREDIENT_WOOL), Items.GUNPOWDER, Blocks.WHITE_WOOL.asItem()));
+        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(JackOAmmoRecipe.INGREDIENT_BONE_BLOCK), Blocks.BONE_BLOCK.asItem()));
+        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(JackOAmmoRecipe.INGREDIENT_ENDER_PEARL), Items.ENDER_PEARL));
+        recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(JackOAmmoRecipe.INGREDIENT_FIREWORK_ROCKET), Items.FIREWORK_ROCKET));
         recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(Ingredient.fromItems(Items.SPLASH_POTION)), Items.SPLASH_POTION));
         recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(Ingredient.fromItems(Items.LINGERING_POTION)), Items.LINGERING_POTION));
         recipes.add(new RecipeJackOAmmoDummy(Collections.singletonList(Ingredient.fromItems(Items.ARROW, Items.SPECTRAL_ARROW, Items.TIPPED_ARROW)), Items.ARROW));
         registration.addRecipes(recipes, VanillaRecipeCategoryUid.CRAFTING);
     }
 }
-*/
+

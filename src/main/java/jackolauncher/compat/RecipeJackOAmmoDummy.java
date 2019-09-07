@@ -1,16 +1,14 @@
 package jackolauncher.compat;
-/*
+
 import jackolauncher.JackOLauncher;
-import jackolauncher.item.RecipeJackOAmmo;
+import jackolauncher.item.JackOAmmoRecipe;
 // import mezz.jei.api.MethodsReturnNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Blocks;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.*;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -22,28 +20,29 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RecipeJackOAmmoDummy implements IRecipe {
+public class RecipeJackOAmmoDummy extends SpecialRecipe {
 
     private static final Ingredient INGREDIENT_PUMPKIN = Ingredient.fromItems(Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.JACK_O_LANTERN);
     private final NonNullList<Ingredient> ingredients;
     private final ItemStack output;
 
-    protected RecipeJackOAmmoDummy(List<Ingredient> ingredients, Item... ingredientsForOutput) {
+    RecipeJackOAmmoDummy(List<Ingredient> ingredients, Item... ingredientsForOutput) {
+        super(new ResourceLocation(""));
         this.ingredients = NonNullList.create();
         this.ingredients.addAll(ingredients);
         this.ingredients.add(0, INGREDIENT_PUMPKIN);
         ArrayList<Item> ingredientsForOutputList = new ArrayList<>(Arrays.asList(ingredientsForOutput));
         ingredientsForOutputList.add(Blocks.PUMPKIN.asItem());
-        this.output = RecipeJackOAmmo.getCraftingResult(ingredientsForOutputList.stream().map(ItemStack::new).toArray(ItemStack[]::new));
+        this.output = JackOAmmoRecipe.getCraftingResult(ingredientsForOutputList.stream().map(ItemStack::new).toArray(ItemStack[]::new));
     }
 
     @Override
-    public boolean matches(IInventory inv, World worldIn) {
+    public boolean matches(CraftingInventory inv, World worldIn) {
         return true;
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv) {
+    public ItemStack getCraftingResult(CraftingInventory inv) {
         return output;
     }
 
@@ -69,8 +68,12 @@ public class RecipeJackOAmmoDummy implements IRecipe {
     }
 
     @Override
+    public IRecipeType<?> getType() {
+        return IRecipeType.CRAFTING;
+    }
+
+    @Override
     public NonNullList<Ingredient> getIngredients() {
         return ingredients;
     }
 }
-*/
