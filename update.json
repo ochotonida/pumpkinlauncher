@@ -21,6 +21,9 @@
     "1.13.2-0.1.3": "added a bunch of translations,\nadded impact death messages,\nadded jack o'projectile variants,\nadded a particle texture,\nfixed jack o'projectiles not dealing impact damage on players,\nfixed update.json,\nvarious other tweaks and fixes",
     "1.13.2-1.0.0": "Added jei support,\nfixed recipe output for jack o'launcher ammo,\njack o'launcher ammo now displays its texture/modelf,\nfixed jack o'projectile spawning too high,\nslightly reduced jack o'projectile bounding box size"
   },
+  "1.14.4": {
+    "1.14.4-0.1.0": "ported to 1.14.4,\noverhauled jack o'ammo texture"
+  },
   "promos": {
     "1.12.2-latest": "1.12.2-1.7.0",
     "1.12.2-recommended": "1.12.2-1.7.0",

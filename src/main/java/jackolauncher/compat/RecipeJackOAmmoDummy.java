@@ -2,7 +2,6 @@ package jackolauncher.compat;
 
 import jackolauncher.JackOLauncher;
 import jackolauncher.item.JackOAmmoRecipe;
-// import mezz.jei.api.MethodsReturnNonnullByDefault;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Blocks;
 import net.minecraft.inventory.CraftingInventory;
