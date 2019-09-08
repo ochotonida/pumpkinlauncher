@@ -33,8 +33,8 @@ public class JackOAmmoRecipe extends SpecialRecipe {
     public static final Ingredient INGREDIENT_GUNPOWDER = Ingredient.fromTag(Tags.Items.GUNPOWDER);
     public static final Ingredient INGREDIENT_ENDER_PEARLS = Ingredient.fromTag(Tags.Items.ENDER_PEARLS);
     public static final Ingredient INGREDIENT_SLIMEBALLS = Ingredient.fromTag(Tags.Items.SLIMEBALLS);
-    // public static final Ingredient INGREDIENT_NUGGETS_GOLD = Ingredient.fromTag(Tags.Items.NUGGETS_GOLD);
-    // public static final Ingredient INGREDIENT_FEATHERS = Ingredient.fromTag(Tags.Items.FEATHERS);
+    public static final Ingredient INGREDIENT_NUGGETS_GOLD = Ingredient.fromTag(Tags.Items.NUGGETS_GOLD);
+    public static final Ingredient INGREDIENT_FEATHERS = Ingredient.fromTag(Tags.Items.FEATHERS);
 
     public static final Ingredient INGREDIENT_BONE_BLOCK = Ingredient.fromItems(Blocks.BONE_BLOCK);
     public static final Ingredient INGREDIENT_FIRE_CHARGE = Ingredient.fromItems(Items.FIRE_CHARGE);
@@ -51,40 +51,48 @@ public class JackOAmmoRecipe extends SpecialRecipe {
         CompoundNBT ammoNBT = resultStack.getOrCreateChildTag("AmmoNBT");
         ammoNBT.putBoolean("CanDestroyBlock", true);
 
-        int gunpowderAmount = 0;
-        int slimeBallAmount = 0;
-        int ironNuggetAmount = 0;
+        ItemStack result = new ItemStack(JackOLauncher.JACK_O_AMMO, 3);
+        CompoundNBT resultCompoundNBT = result.getOrCreateChildTag("AmmoNBT");
+        resultCompoundNBT.putBoolean("CanDestroyBlock", true);
+
+        int explosionPower = 0;
+        int bounceAmount = 0;
+        int extraDamage = 0;
+        int fortuneLevel = 0;
 
         ItemStack arrowsStack = ItemStack.EMPTY;
 
         for (ItemStack inputStack : inputs) {
             if (!inputStack.isEmpty()) {
                 if (Block.getBlockFromItem(inputStack.getItem()) instanceof StemGrownBlock || Block.getBlockFromItem(inputStack.getItem()) instanceof CarvedPumpkinBlock) {
-                    ammoNBT.put("BlockState", NBTUtil.writeBlockState(Block.getBlockFromItem(inputStack.getItem()).getDefaultState()));
+                    resultCompoundNBT.put("BlockState", NBTUtil.writeBlockState(Block.getBlockFromItem(inputStack.getItem()).getDefaultState()));
                 } else if (INGREDIENT_BONE_BLOCK.test(inputStack)) {
-                    ammoNBT.putBoolean("HasBoneMeal", true);
+                    resultCompoundNBT.putBoolean("HasBoneMeal", true);
                 } else if (INGREDIENT_ENDER_PEARLS.test(inputStack)) {
-                    ammoNBT.putBoolean("IsEnderPearl", true);
+                    resultCompoundNBT.putBoolean("IsEnderPearl", true);
                 } else if (INGREDIENT_FIRE_CHARGE.test(inputStack)) {
-                    ammoNBT.putBoolean("IsFlaming", true);
-                } else if (ItemTags.WOOL.contains(inputStack.getItem())) {
-                    ammoNBT.putBoolean("CanDestroyBlocks", false);
+                    resultCompoundNBT.putBoolean("IsFlaming", true);
+                } else if (INGREDIENT_WOOL.test(inputStack)) {
+                    resultCompoundNBT.putBoolean("CanDestroyBlocks", false);
+                } else if (INGREDIENT_FEATHERS.test(inputStack)) {
+                    resultCompoundNBT.putBoolean("HasSilkTouch", true);
                 } else if (INGREDIENT_GUNPOWDER.test(inputStack)) {
-                    ++gunpowderAmount;
+                    ++explosionPower;
                 } else if (INGREDIENT_SLIMEBALLS.test(inputStack)) {
-                    ++slimeBallAmount;
+                    ++bounceAmount;
                 } else if (INGREDIENT_NUGGETS_IRON.test(inputStack)) {
-                    ++ironNuggetAmount;
+                    ++extraDamage;
+                } else if (INGREDIENT_NUGGETS_GOLD.test(inputStack)) {
+                    ++fortuneLevel;
                 } else if (INGREDIENT_POTION.test(inputStack)) {
-                    ammoNBT.put("PotionNBT", inputStack.write(new CompoundNBT()));
+                    resultCompoundNBT.put("PotionNBT", inputStack.write(new CompoundNBT()));
                 } else if (INGREDIENT_FIREWORK_ROCKET.test(inputStack)) {
                     if (!inputStack.hasTag()) {
                         CompoundNBT fireworksNBT = new CompoundNBT();
                         fireworksNBT.putByte("Flight", (byte) 2);
-                        ammoNBT.put("FireworksNBT", fireworksNBT);
+                        resultCompoundNBT.put("FireworksNBT", fireworksNBT);
                     } else {
-                        // noinspection ConstantConditions
-                        ammoNBT.put("FireworksNBT", inputStack.getChildTag("Fireworks"));
+                        resultCompoundNBT.put("FireworksNBT", inputStack.getChildTag("Fireworks"));
                     }
                 } else if (inputStack.getItem() instanceof ArrowItem) {
                     if (arrowsStack.isEmpty()) {
@@ -97,11 +105,13 @@ public class JackOAmmoRecipe extends SpecialRecipe {
             }
         }
 
-        ammoNBT.put("ArrowsNBT", arrowsStack.write(new CompoundNBT()));
-        ammoNBT.putByte("ExplosionPower", (byte) gunpowderAmount);
-        ammoNBT.putByte("BouncesAmount", (byte) slimeBallAmount);
-        ammoNBT.putByte("ExtraDamage", (byte) ironNuggetAmount);
-        return resultStack;
+        resultCompoundNBT.put("ArrowsNBT", arrowsStack.write(new CompoundNBT()));
+        resultCompoundNBT.putByte("ExplosionPower", (byte) explosionPower);
+        resultCompoundNBT.putByte("BouncesAmount", (byte) bounceAmount);
+        resultCompoundNBT.putByte("ExtraDamage", (byte) extraDamage);
+        resultCompoundNBT.putByte("FortuneLevel", (byte) fortuneLevel);
+
+        return result;
     }
 
     @Override
@@ -111,17 +121,19 @@ public class JackOAmmoRecipe extends SpecialRecipe {
             return false;
         }
 
-        boolean woolFlag = false;
-        boolean potionFlag = false;
-        boolean pumpkinFlag = false;
         boolean boneBlockFlag = false;
         boolean enderPearlFlag = false;
         boolean fireChargeFlag = false;
         boolean fireworkRocketFlag = false;
+        boolean potionFlag = false;
+        boolean pumpkinFlag = false;
+        boolean featherFlag = false;
+        boolean woolFlag = false;
 
         int gunpowderAmount = 0;
         int slimeBallAmount = 0;
         int ironNuggetAmount = 0;
+        int goldNuggetAmount = 0;
 
         ItemStack arrowsStack = ItemStack.EMPTY;
 
@@ -163,12 +175,21 @@ public class JackOAmmoRecipe extends SpecialRecipe {
                     return false;
                 }
                 woolFlag = true;
+            } else if (INGREDIENT_FEATHERS.test(stackInSlot)) {
+                if (featherFlag) {
+                    return false;
+                }
+                featherFlag = true;
             } else if (INGREDIENT_GUNPOWDER.test(stackInSlot)) {
                 if (++gunpowderAmount > 16) {
                     return false;
                 }
             } else if (INGREDIENT_NUGGETS_IRON.test(stackInSlot)) {
                 if (++ironNuggetAmount > 4) {
+                    return false;
+                }
+            } else if (INGREDIENT_NUGGETS_GOLD.test(stackInSlot)) {
+                if (++goldNuggetAmount > 3) {
                     return false;
                 }
             } else if (stackInSlot.getItem() instanceof ArrowItem) {
@@ -192,7 +213,17 @@ public class JackOAmmoRecipe extends SpecialRecipe {
             }
         }
 
-        return pumpkinFlag && (potionFlag || boneBlockFlag || enderPearlFlag || fireChargeFlag || fireworkRocketFlag || gunpowderAmount > 0 || ironNuggetAmount > 0 || slimeBallAmount > 0 || !arrowsStack.isEmpty()) && (!woolFlag || gunpowderAmount >= 1 && woolFlag);
+        if (!(potionFlag || boneBlockFlag || enderPearlFlag || fireChargeFlag || fireworkRocketFlag || gunpowderAmount > 0 || ironNuggetAmount > 0 || slimeBallAmount > 0 || !arrowsStack.isEmpty())) {
+            return false;
+        }
+        if ((featherFlag || goldNuggetAmount > 0 || woolFlag) && gunpowderAmount == 0) {
+            return false;
+        }
+        if ((woolFlag && featherFlag) || (woolFlag && goldNuggetAmount > 0) || (featherFlag && goldNuggetAmount > 0)) {
+            return false;
+        }
+
+        return pumpkinFlag;
     }
 
     @Override
@@ -211,7 +242,7 @@ public class JackOAmmoRecipe extends SpecialRecipe {
 
     @Override
     public ItemStack getRecipeOutput() {
-        return new ItemStack(JackOLauncher.JACK_O_AMMO);
+        return ItemStack.EMPTY;
     }
 
     @Override

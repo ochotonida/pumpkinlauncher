@@ -9,14 +9,13 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.block.Blocks;
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.crafting.*;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.common.Tags;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -48,12 +47,14 @@ public class JEIPlugin implements IModPlugin {
         recipes.add(new DummyRecipe(JackOAmmoRecipe.INGREDIENT_FIREWORK_ROCKET, Items.FIREWORK_ROCKET));
         recipes.add(new DummyRecipe(JackOAmmoRecipe.INGREDIENT_POTION, Items.SPLASH_POTION));
         recipes.add(new DummyRecipe(Ingredient.fromTag(Tags.Items.ARROWS), Items.ARROW));
+        recipes.add(new DummyRecipe(JackOAmmoRecipe.INGREDIENT_NUGGETS_GOLD, Items.GOLD_NUGGET));
+        recipes.add(new DummyRecipe(JackOAmmoRecipe.INGREDIENT_FEATHERS, Items.FEATHER));
         registration.addRecipes(recipes, VanillaRecipeCategoryUid.CRAFTING);
     }
 
     @ParametersAreNonnullByDefault
     @MethodsReturnNonnullByDefault
-    private static class DummyRecipe extends SpecialRecipe {
+    private static class DummyRecipe extends JackOAmmoRecipe {
 
         private static final Ingredient INGREDIENT_PUMPKIN = Ingredient.fromItems(Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.JACK_O_LANTERN);
         private final NonNullList<Ingredient> ingredients;
@@ -63,50 +64,19 @@ public class JEIPlugin implements IModPlugin {
             this(Collections.singletonList(ingredient), ingredientsForOutput);
         }
 
-        private DummyRecipe(List<Ingredient> ingredients, Item... ingredientsForOutput) {
-            super(new ResourceLocation(""));
-            this.ingredients = NonNullList.create();
-            this.ingredients.addAll(ingredients);
-            this.ingredients.add(0, INGREDIENT_PUMPKIN);
+        private DummyRecipe(List<Ingredient> ingredientsForDisplay, Item... ingredientsForOutput) {
+            super(new ResourceLocation(JackOLauncher.MODID, "crafting_special_jack_o_ammo"));
+            ingredients = NonNullList.create();
+            ingredients.addAll(ingredientsForDisplay);
+            ingredients.add(0, INGREDIENT_PUMPKIN);
             ArrayList<Item> ingredientsForOutputList = new ArrayList<>(Arrays.asList(ingredientsForOutput));
             ingredientsForOutputList.add(Blocks.PUMPKIN.asItem());
-            this.output = JackOAmmoRecipe.getCraftingResult(ingredientsForOutputList.stream().map(ItemStack::new).toArray(ItemStack[]::new));
-        }
-
-        @Override
-        public boolean matches(CraftingInventory inv, World worldIn) {
-            return true;
-        }
-
-        @Override
-        public ItemStack getCraftingResult(CraftingInventory inv) {
-            return output;
-        }
-
-        @Override
-        public boolean canFit(int width, int height) {
-            return true;
+            output = getCraftingResult(ingredientsForOutputList.stream().map(ItemStack::new).toArray(ItemStack[]::new));
         }
 
         @Override
         public ItemStack getRecipeOutput() {
             return output;
-        }
-
-        @Override
-        public ResourceLocation getId() {
-            return new ResourceLocation(JackOLauncher.MODID, "");
-        }
-
-        @Override
-        public IRecipeSerializer<?> getSerializer() {
-            // noinspection ConstantConditions
-            return null;
-        }
-
-        @Override
-        public IRecipeType<?> getType() {
-            return IRecipeType.CRAFTING;
         }
 
         @Override

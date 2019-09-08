@@ -1,10 +1,12 @@
 package jackolauncher.entity;
 
 import com.google.common.collect.Sets;
+import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.enchantment.ProtectionEnchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -49,8 +51,9 @@ public class CustomExplosion extends Explosion {
     protected final LivingEntity shootingEntity;
     protected final float explosionPower;
     protected final int extraDamage;
+    protected final ItemStack tool = new ItemStack(JackOLauncher.JACK_O_LAUNCHER);
 
-    public CustomExplosion(World world, Entity explodingEntity, @Nullable LivingEntity shootingEntity, double x, double y, double z, float explosionPower, int extraDamage, boolean shouldCauseFire, boolean shouldDamageTerrain, boolean shouldDamageShooter) {
+    public CustomExplosion(World world, Entity explodingEntity, @Nullable LivingEntity shootingEntity, double x, double y, double z, float explosionPower, int extraDamage, boolean shouldCauseFire, boolean shouldDamageTerrain, boolean shouldDamageShooter, boolean silkTouch, int fortuneLevel) {
         super(world, explodingEntity, x, y, z, explosionPower, shouldCauseFire, shouldDamageTerrain ? Mode.BREAK : Mode.NONE);
         this.random = new Random();
         this.world = world;
@@ -64,6 +67,11 @@ public class CustomExplosion extends Explosion {
         this.shouldCauseFire = shouldCauseFire;
         this.shouldDamageTerrain = shouldDamageTerrain;
         this.shouldDamageShooter = shouldDamageShooter;
+        if (silkTouch) {
+            tool.addEnchantment(Enchantments.SILK_TOUCH, 1);
+        } else if (fortuneLevel > 0) {
+            tool.addEnchantment(Enchantments.FORTUNE, fortuneLevel);
+        }
     }
 
     public void detonate() {
@@ -209,21 +217,21 @@ public class CustomExplosion extends Explosion {
         if (shouldDamageTerrain) {
 
             for (BlockPos pos : getAffectedBlockPositions()) {
-                BlockState blockstate = this.world.getBlockState(pos);
+                BlockState blockstate = world.getBlockState(pos);
 
                 if (spawnParticles) {
                     spawnParticles(pos);
                 }
 
                 if (!blockstate.isAir(this.world, pos)) {
-                    if (this.world instanceof ServerWorld && blockstate.canDropFromExplosion(this.world, pos, this)) {
-                        TileEntity tileentity = blockstate.hasTileEntity() ? this.world.getTileEntity(pos) : null;
-                        LootContext.Builder builder = (new LootContext.Builder((ServerWorld) this.world)).withRandom(this.world.rand).withParameter(LootParameters.POSITION, pos).withParameter(LootParameters.TOOL, ItemStack.EMPTY).withNullableParameter(LootParameters.BLOCK_ENTITY, tileentity);
+                    if (this.world instanceof ServerWorld && blockstate.canDropFromExplosion(world, pos, this)) {
+                        TileEntity tileentity = blockstate.hasTileEntity() ? world.getTileEntity(pos) : null;
+                        LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).withRandom(world.rand).withParameter(LootParameters.POSITION, pos).withParameter(LootParameters.TOOL, tool).withNullableParameter(LootParameters.BLOCK_ENTITY, tileentity);
 
                         Block.spawnDrops(blockstate, builder);
                     }
 
-                    blockstate.onBlockExploded(this.world, pos, this);
+                    blockstate.onBlockExploded(world, pos, this);
                 }
             }
         }

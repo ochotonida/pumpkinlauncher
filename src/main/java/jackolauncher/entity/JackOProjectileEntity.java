@@ -66,6 +66,8 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     private int fireworkLifetime;
     private boolean canDestroyBlocks = true;
     private ItemStack arrowStack = ItemStack.EMPTY;
+    private boolean hasSilkTouch = false;
+    private int fortuneLevel = 0;
 
     public JackOProjectileEntity(EntityType<?> entityType, World world) {
         super(entityType, world);
@@ -118,6 +120,8 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         extraDamage = compound.getByte("ExtraDamage");
         shootingEntity = compound.getUniqueId("ShootingEntityUUID");
         reduceDamageToShooter = compound.getBoolean("ReduceDamageToShooter");
+        hasSilkTouch = compound.getBoolean("HasSilkTouch");
+        fortuneLevel = compound.getByte("FortuneLevel");
 
         dataManager.set(IS_FLAMING, compound.getBoolean("IsFlaming"));
         dataManager.set(HAS_BONE_MEAL, compound.getBoolean("HasBoneMeal"));
@@ -313,7 +317,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (explosionPower > 0) {
-                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && canDestroyBlocks, !reduceDamageToShooter).detonate();
+                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && canDestroyBlocks, !reduceDamageToShooter, hasSilkTouch, fortuneLevel).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
                 world.playSound(null, posX, posY, posZ, getBlockState().getSoundType(world, new BlockPos(posX, posY, posZ), null).getBreakSound(), SoundCategory.NEUTRAL, 1, 1);

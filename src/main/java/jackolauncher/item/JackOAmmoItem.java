@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import jackolauncher.JackOLauncher;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -35,6 +36,14 @@ public class JackOAmmoItem extends Item {
         if (ammoNBT.contains("BlockState")) {
             tooltip.add(NBTUtil.readBlockState(ammoNBT.getCompound("BlockState")).getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GRAY));
         }
+
+        if (ammoNBT.getBoolean("HasSilkTouch")) {
+            tooltip.add(Enchantments.SILK_TOUCH.getDisplayName(1).applyTextStyle(TextFormatting.GRAY));
+        }
+        if (ammoNBT.getByte("FortuneLevel") > 0) {
+            tooltip.add(Enchantments.FORTUNE.getDisplayName(ammoNBT.getByte("FortuneLevel")).applyTextStyle(TextFormatting.GRAY));
+        }
+
         if (!ammoNBT.getCompound("ArrowsNBT").isEmpty()) {
             ItemStack ArrowItemStack = ItemStack.read(ammoNBT.getCompound("ArrowsNBT"));
             if (ArrowItemStack.getCount() > 0) {
