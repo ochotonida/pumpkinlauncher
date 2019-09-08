@@ -10,7 +10,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.14.4-1.0.0'
+version = '1.14.4-1.1.0'
 group = 'jack_o_launcher'
 archivesBaseName = 'Jack-O\'-Launcher'
 
