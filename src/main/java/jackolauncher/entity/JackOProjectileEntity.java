@@ -90,7 +90,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     }
 
     public BlockState getBlockState() {
-        return dataManager.get(BLOCKSTATE).orElse(Blocks.PUMPKIN.getDefaultState());
+        return dataManager.get(BLOCKSTATE).orElse(Blocks.JACK_O_LANTERN.getDefaultState());
     }
 
     @Override
