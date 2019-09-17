@@ -10,6 +10,7 @@ import jackolauncher.item.JackOAmmoDispenseBehavior;
 import jackolauncher.item.JackOAmmoItem;
 import jackolauncher.item.JackOAmmoRecipe;
 import jackolauncher.item.JackOLauncherItem;
+import jackolauncher.item.loot.SetRandomJackOAmmoNBT;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityClassification;
@@ -18,6 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -59,6 +61,7 @@ public class JackOLauncher {
     @SubscribeEvent
     public static void commonSetup(FMLCommonSetupEvent event) {
         DispenserBlock.registerDispenseBehavior(JackOLauncher.JACK_O_AMMO, new JackOAmmoDispenseBehavior());
+        LootFunctionManager.registerFunction(new SetRandomJackOAmmoNBT.Serializer());
     }
 
     @SubscribeEvent
