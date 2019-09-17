@@ -60,7 +60,7 @@ public class JackOLauncherItem extends Item {
 
                 player.getCooldownTracker().setCooldown(this, 40 - 6 * reloadingLevel);
 
-                JackOProjectileEntity projectile = new JackOProjectileEntity(world, player, stack.getOrCreateChildTag("AmmoNBT"), blastShieldLevel > 0);
+                JackOProjectileEntity projectile = new JackOProjectileEntity(world, player, JackOAmmoHelper.getAmmoProperties(stack).copy(), blastShieldLevel > 0);
                 projectile.shoot(player, player.rotationPitch, player.rotationYaw, 1.3F + 0.13F * launchingLevel, 3 - 2.5F * launchingLevel / JackOLauncher.LAUNCHING.getMaxLevel());
                 world.addEntity(projectile);
 

@@ -8,7 +8,6 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.EffectUtils;
 import net.minecraft.potion.PotionUtils;
@@ -31,26 +30,25 @@ public class JackOAmmoItem extends Item {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, worldIn, tooltip, flag);
-        CompoundNBT ammoNBT = stack.getOrCreateChildTag("AmmoNBT");
 
-        if (ammoNBT.contains("BlockState")) {
-            tooltip.add(NBTUtil.readBlockState(ammoNBT.getCompound("BlockState")).getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GRAY));
-        }
+        tooltip.add(JackOAmmoHelper.getBlockState(stack).getBlock().getNameTextComponent().applyTextStyle(TextFormatting.GRAY));
 
-        if (ammoNBT.getBoolean("HasSilkTouch")) {
+        if (JackOAmmoHelper.hasSilkTouch(stack)) {
             tooltip.add(Enchantments.SILK_TOUCH.getDisplayName(1).applyTextStyle(TextFormatting.GRAY));
         }
-        if (ammoNBT.getByte("FortuneLevel") > 0) {
-            tooltip.add(Enchantments.FORTUNE.getDisplayName(ammoNBT.getByte("FortuneLevel")).applyTextStyle(TextFormatting.GRAY));
+
+        int fortuneLevel = JackOAmmoHelper.getFortuneLevel(stack);
+        if (fortuneLevel > 0) {
+            tooltip.add(Enchantments.FORTUNE.getDisplayName(fortuneLevel).applyTextStyle(TextFormatting.GRAY));
         }
 
-        if (!ammoNBT.getCompound("ArrowsNBT").isEmpty()) {
-            ItemStack ArrowItemStack = ItemStack.read(ammoNBT.getCompound("ArrowsNBT"));
-            if (ArrowItemStack.getCount() > 0) {
-                tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.arrows").appendText(" " + ArrowItemStack.getCount()).applyTextStyle(TextFormatting.GRAY));
+        ItemStack arrowStack = JackOAmmoHelper.getArrows(stack);
+        if (!arrowStack.isEmpty()) {
+            if (arrowStack.getCount() > 0) {
+                tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.arrows").appendText(" " + arrowStack.getCount()).applyTextStyle(TextFormatting.GRAY));
 
-                if (ArrowItemStack.getItem() instanceof TippedArrowItem) {
-                    List<EffectInstance> effects = PotionUtils.getEffectsFromStack(ArrowItemStack);
+                if (arrowStack.getItem() instanceof TippedArrowItem) {
+                    List<EffectInstance> effects = PotionUtils.getEffectsFromStack(arrowStack);
                     if (effects.isEmpty()) {
                         tooltip.add(new StringTextComponent("  ").appendSibling(new TranslationTextComponent("effect.none")).applyTextStyle(TextFormatting.GRAY));
                     } else {
@@ -72,46 +70,48 @@ public class JackOAmmoItem extends Item {
                             }
                         }
                     }
-                } else if (ArrowItemStack.getItem() instanceof SpectralArrowItem) {
+                } else if (arrowStack.getItem() instanceof SpectralArrowItem) {
                     tooltip.add(new StringTextComponent("  ").appendSibling(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.spectral")).applyTextStyle(TextFormatting.AQUA));
-                } else if (ArrowItemStack.getItem() != Items.ARROW) {
-                    tooltip.add(new StringTextComponent("  ").appendSibling(ArrowItemStack.getTextComponent()).applyTextStyle(TextFormatting.DARK_GREEN));
+                } else if (arrowStack.getItem() != Items.ARROW) {
+                    tooltip.add(new StringTextComponent("  ").appendSibling(arrowStack.getTextComponent()).applyTextStyle(TextFormatting.DARK_GREEN));
                 }
             }
         }
 
-        addTranslationTextComponent(tooltip, ammoNBT.getByte("ExplosionPower") > 0, "explosion_power", " " + ammoNBT.getByte("ExplosionPower"));
-        addTranslationTextComponent(tooltip, ammoNBT.getByte("BouncesAmount") > 0, "bounce");
-        addTranslationTextComponent(tooltip, ammoNBT.getByte("ExtraDamage") > 0, "extra_damage", " " + ammoNBT.getByte("ExtraDamage"));
-        addTranslationTextComponent(tooltip, ammoNBT.getBoolean("IsFlaming"), "flaming");
-        addTranslationTextComponent(tooltip, ammoNBT.contains("CanDestroyBlocks") && !ammoNBT.getBoolean("CanDestroyBlocks"), "cannot_destroy_blocks");
-        addTranslationTextComponent(tooltip, ammoNBT.getBoolean("HasBoneMeal"), "bone_meal");
-        addTranslationTextComponent(tooltip, ammoNBT.getBoolean("IsEnderPearl"), "ender_pearl");
+        int explosionPower = JackOAmmoHelper.getExplosionPower(stack);
+        addTranslationTextComponent(tooltip, explosionPower > 0, "explosion_power", " " + explosionPower);
+        int bouncesAmount = JackOAmmoHelper.getBouncesAmount(stack);
+        addTranslationTextComponent(tooltip, bouncesAmount > 0, "bounce");
+        int extraDamage = JackOAmmoHelper.getExtraDamage(stack);
+        addTranslationTextComponent(tooltip, extraDamage > 0, "extra_damage", " " + extraDamage);
 
-        if (ammoNBT.contains("FireworksNBT")) {
-            CompoundNBT fireworksNBT = ammoNBT.getCompound("FireworksNBT");
-            if (fireworksNBT.contains("Flight")) {
-                tooltip.add(new TranslationTextComponent("item.minecraft.firework_rocket.flight").appendText(" " + fireworksNBT.getByte("Flight")).applyTextStyle(TextFormatting.GRAY));
-            }
+        addTranslationTextComponent(tooltip, JackOAmmoHelper.isFlaming(stack), "flaming");
+        addTranslationTextComponent(tooltip, !JackOAmmoHelper.getShouldDamageTerrain(stack), "cannot_destroy_blocks");
+        addTranslationTextComponent(tooltip, JackOAmmoHelper.isBoneMeal(stack), "bone_meal");
+        addTranslationTextComponent(tooltip, JackOAmmoHelper.isEnderPearl(stack), "ender_pearl");
 
-            ListNBT fireworkExplosionsNBTList = fireworksNBT.getList("Explosions", 10);
-            if (!fireworkExplosionsNBTList.isEmpty()) {
-                for (int i = 0; i < fireworkExplosionsNBTList.size(); ++i) {
-                    CompoundNBT fireworkExplosionNBT = fireworkExplosionsNBTList.getCompound(i);
-                    List<ITextComponent> fireworkExplosionTextComponents = Lists.newArrayList();
-                    FireworkStarItem.func_195967_a(fireworkExplosionNBT, fireworkExplosionTextComponents);
+        int flight = JackOAmmoHelper.getFlight(stack);
+        if (flight > 0) {
+            tooltip.add(new TranslationTextComponent("item.minecraft.firework_rocket.flight").appendText(" " + flight).applyTextStyle(TextFormatting.GRAY));
+        }
 
-                    if (!fireworkExplosionTextComponents.isEmpty()) {
-                        for (int j = 1; j < fireworkExplosionTextComponents.size(); ++j) {
-                            fireworkExplosionTextComponents.set(j, new StringTextComponent("  ").appendSibling(fireworkExplosionTextComponents.get(j)));
-                        }
-                        tooltip.addAll(fireworkExplosionTextComponents);
-                    }
+
+        ListNBT fireworkExplosionsNBTList = JackOAmmoHelper.getFireworkExplosions(stack);
+        for (int i = 0; i < fireworkExplosionsNBTList.size(); ++i) {
+            CompoundNBT fireworkExplosionNBT = fireworkExplosionsNBTList.getCompound(i);
+            List<ITextComponent> fireworkExplosionTextComponents = Lists.newArrayList();
+            FireworkStarItem.func_195967_a(fireworkExplosionNBT, fireworkExplosionTextComponents);
+
+            if (!fireworkExplosionTextComponents.isEmpty()) {
+                for (int j = 1; j < fireworkExplosionTextComponents.size(); ++j) {
+                    fireworkExplosionTextComponents.set(j, new StringTextComponent("  ").appendSibling(fireworkExplosionTextComponents.get(j)));
                 }
+                tooltip.addAll(fireworkExplosionTextComponents);
             }
         }
-        if (ammoNBT.contains("PotionNBT")) {
-            ItemStack potionStack = ItemStack.read(ammoNBT.getCompound("PotionNBT"));
+
+        ItemStack potionStack = JackOAmmoHelper.getPotion(stack);
+        if (!potionStack.isEmpty()) {
             if (potionStack.getItem() == Items.LINGERING_POTION) {
                 tooltip.add(new TranslationTextComponent("item.jack_o_launcher.jack_o_ammo.lingering").applyTextStyle(TextFormatting.DARK_PURPLE));
             }

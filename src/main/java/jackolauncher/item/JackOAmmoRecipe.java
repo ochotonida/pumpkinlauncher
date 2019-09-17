@@ -13,8 +13,6 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -47,13 +45,7 @@ public class JackOAmmoRecipe extends SpecialRecipe {
     }
 
     public static ItemStack getCraftingResult(ItemStack... inputs) {
-        ItemStack resultStack = new ItemStack(JackOLauncher.JACK_O_AMMO, 3);
-        CompoundNBT ammoNBT = resultStack.getOrCreateChildTag("AmmoNBT");
-        ammoNBT.putBoolean("CanDestroyBlock", true);
-
         ItemStack result = new ItemStack(JackOLauncher.JACK_O_AMMO, 3);
-        CompoundNBT resultCompoundNBT = result.getOrCreateChildTag("AmmoNBT");
-        resultCompoundNBT.putBoolean("CanDestroyBlock", true);
 
         int explosionPower = 0;
         int bounceAmount = 0;
@@ -65,17 +57,17 @@ public class JackOAmmoRecipe extends SpecialRecipe {
         for (ItemStack inputStack : inputs) {
             if (!inputStack.isEmpty()) {
                 if (Block.getBlockFromItem(inputStack.getItem()) instanceof StemGrownBlock || Block.getBlockFromItem(inputStack.getItem()) instanceof CarvedPumpkinBlock) {
-                    resultCompoundNBT.put("BlockState", NBTUtil.writeBlockState(Block.getBlockFromItem(inputStack.getItem()).getDefaultState()));
+                    JackOAmmoHelper.setBlockState(result, Block.getBlockFromItem(inputStack.getItem()).getDefaultState());
                 } else if (INGREDIENT_BONE_BLOCK.test(inputStack)) {
-                    resultCompoundNBT.putBoolean("HasBoneMeal", true);
+                    JackOAmmoHelper.setBoneMeal(result);
                 } else if (INGREDIENT_ENDER_PEARLS.test(inputStack)) {
-                    resultCompoundNBT.putBoolean("IsEnderPearl", true);
+                    JackOAmmoHelper.setEnderPearl(result);
                 } else if (INGREDIENT_FIRE_CHARGE.test(inputStack)) {
-                    resultCompoundNBT.putBoolean("IsFlaming", true);
+                    JackOAmmoHelper.setFlaming(result);
                 } else if (INGREDIENT_WOOL.test(inputStack)) {
-                    resultCompoundNBT.putBoolean("CanDestroyBlocks", false);
+                    JackOAmmoHelper.setShouldDamageTerrain(result, false);
                 } else if (INGREDIENT_FEATHERS.test(inputStack)) {
-                    resultCompoundNBT.putBoolean("HasSilkTouch", true);
+                    JackOAmmoHelper.setSilkTouch(result);
                 } else if (INGREDIENT_GUNPOWDER.test(inputStack)) {
                     ++explosionPower;
                 } else if (INGREDIENT_SLIMEBALLS.test(inputStack)) {
@@ -85,15 +77,9 @@ public class JackOAmmoRecipe extends SpecialRecipe {
                 } else if (INGREDIENT_NUGGETS_GOLD.test(inputStack)) {
                     ++fortuneLevel;
                 } else if (INGREDIENT_POTION.test(inputStack)) {
-                    resultCompoundNBT.put("PotionNBT", inputStack.write(new CompoundNBT()));
+                    JackOAmmoHelper.setPotion(result, inputStack);
                 } else if (INGREDIENT_FIREWORK_ROCKET.test(inputStack)) {
-                    if (!inputStack.hasTag()) {
-                        CompoundNBT fireworksNBT = new CompoundNBT();
-                        fireworksNBT.putByte("Flight", (byte) 2);
-                        resultCompoundNBT.put("FireworksNBT", fireworksNBT);
-                    } else {
-                        resultCompoundNBT.put("FireworksNBT", inputStack.getChildTag("Fireworks"));
-                    }
+                    JackOAmmoHelper.setFireworks(result, inputStack);
                 } else if (inputStack.getItem() instanceof ArrowItem) {
                     if (arrowsStack.isEmpty()) {
                         arrowsStack = inputStack.copy();
@@ -105,11 +91,11 @@ public class JackOAmmoRecipe extends SpecialRecipe {
             }
         }
 
-        resultCompoundNBT.put("ArrowsNBT", arrowsStack.write(new CompoundNBT()));
-        resultCompoundNBT.putByte("ExplosionPower", (byte) explosionPower);
-        resultCompoundNBT.putByte("BouncesAmount", (byte) bounceAmount);
-        resultCompoundNBT.putByte("ExtraDamage", (byte) extraDamage);
-        resultCompoundNBT.putByte("FortuneLevel", (byte) fortuneLevel);
+        JackOAmmoHelper.setArrows(result, arrowsStack);
+        JackOAmmoHelper.setExplosionPower(result, explosionPower);
+        JackOAmmoHelper.setBouncesAmount(result, bounceAmount);
+        JackOAmmoHelper.setExtraDamage(result, extraDamage);
+        JackOAmmoHelper.setFortuneLevel(result, fortuneLevel);
 
         return result;
     }

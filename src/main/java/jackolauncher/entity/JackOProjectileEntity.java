@@ -30,7 +30,6 @@ import net.minecraft.potion.*;
 import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -51,20 +50,20 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     private static final DataParameter<Boolean> IS_FLAMING = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_SMOKING = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_ENDER_PEARL = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Boolean> HAS_BONE_MEAL = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<CompoundNBT> FIREWORKS_NBT = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.COMPOUND_NBT);
+    private static final DataParameter<Boolean> IS_BONE_MEAL = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<CompoundNBT> FIREWORKS = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.COMPOUND_NBT);
     private static final DataParameter<ItemStack> POTION_STACK = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.ITEMSTACK);
     private static final DataParameter<Optional<BlockState>> BLOCKSTATE = EntityDataManager.createKey(JackOProjectileEntity.class, DataSerializers.OPTIONAL_BLOCK_STATE);
 
     protected int ticksInAir;
-    protected boolean reduceDamageToShooter;
+    protected boolean shouldDamageShooter;
+    private int ticksInAirMax;
     protected int randomRotationOffset;
     @Nullable
     private UUID shootingEntity;
     private int explosionPower = 2;
     private int extraDamage;
-    private int fireworkLifetime;
-    private boolean canDestroyBlocks = true;
+    private boolean shouldDamageTerrain = true;
     private ItemStack arrowStack = ItemStack.EMPTY;
     private boolean hasSilkTouch = false;
     private int fortuneLevel = 0;
@@ -78,16 +77,16 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         this(JackOLauncher.JACK_O_PROJECTILE_ENTITY_TYPE, world);
     }
 
-    public JackOProjectileEntity(World world, double x, double y, double z, CompoundNBT ammoNBT) {
+    public JackOProjectileEntity(World world, double x, double y, double z, CompoundNBT ammoProperties) {
         this(world);
         setPosition(x, y, z);
-        readAdditional(ammoNBT);
+        readAdditional(ammoProperties);
     }
 
-    public JackOProjectileEntity(World world, LivingEntity shootingEntity, CompoundNBT ammoNBT, boolean reduceDamageToShooter) {
-        this(world, shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight() - 0.8 / 2, shootingEntity.posZ, ammoNBT);
+    public JackOProjectileEntity(World world, LivingEntity shootingEntity, CompoundNBT ammoProperties, boolean shouldDamageShooter) {
+        this(world, shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight() - 0.8 / 2, shootingEntity.posZ, ammoProperties);
         this.shootingEntity = shootingEntity.getUniqueID();
-        this.reduceDamageToShooter = reduceDamageToShooter;
+        this.shouldDamageShooter = shouldDamageShooter;
     }
 
     public BlockState getBlockState() {
@@ -99,16 +98,13 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         dataManager.register(BOUNCES_LEFT, 0);
         dataManager.register(IS_FLAMING, false);
         dataManager.register(IS_SMOKING, false);
-        dataManager.register(HAS_BONE_MEAL, false);
-        dataManager.register(FIREWORKS_NBT, new CompoundNBT());
+        dataManager.register(IS_BONE_MEAL, false);
+        dataManager.register(FIREWORKS, new CompoundNBT());
         dataManager.register(POTION_STACK, ItemStack.EMPTY);
         dataManager.register(IS_ENDER_PEARL, false);
         dataManager.register(BLOCKSTATE, Optional.empty());
     }
 
-    /*
-     * https://www.minecraftforge.net/forum/topic/72657-solved-1143-entity-renderer-not-rendering/
-     */
     @Override
     public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
@@ -118,29 +114,31 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     protected void readAdditional(CompoundNBT compound) {
         ticksInAir = compound.getInt("TicksInAir");
         extraDamage = compound.getByte("ExtraDamage");
-        shootingEntity = compound.getUniqueId("ShootingEntityUUID");
-        reduceDamageToShooter = compound.getBoolean("ReduceDamageToShooter");
-        hasSilkTouch = compound.getBoolean("HasSilkTouch");
         fortuneLevel = compound.getByte("FortuneLevel");
+        shouldDamageShooter = compound.getBoolean("ShouldDamageShooter");
+        hasSilkTouch = compound.getBoolean("HasSilkTouch");
+        shouldDamageTerrain = !compound.contains("ShouldDamageTerrain") || compound.getBoolean("ShouldDamageTerrain");
+
+
+        if (compound.hasUniqueId("ShootingEntity")) {
+            shootingEntity = compound.getUniqueId("ShootingEntity");
+        }
 
         dataManager.set(IS_FLAMING, compound.getBoolean("IsFlaming"));
-        dataManager.set(HAS_BONE_MEAL, compound.getBoolean("HasBoneMeal"));
+        dataManager.set(IS_BONE_MEAL, compound.getBoolean("IsBoneMeal"));
         dataManager.set(IS_ENDER_PEARL, compound.getBoolean("IsEnderPearl"));
         dataManager.set(BOUNCES_LEFT, (int) compound.getByte("BouncesAmount"));
 
-        if (compound.contains("CanDestroyBlocks")) {
-            canDestroyBlocks = compound.getBoolean("CanDestroyBlocks");
-        }
         if (compound.contains("ExplosionPower")) {
             explosionPower = compound.getByte("ExplosionPower");
         }
         dataManager.set(IS_SMOKING, explosionPower > 0);
 
-        CompoundNBT arrowNBT = compound.getCompound("ArrowsNBT");
+        CompoundNBT arrowNBT = compound.getCompound("Arrows");
         if (!arrowNBT.isEmpty()) {
             arrowStack = ItemStack.read(arrowNBT);
         }
-        CompoundNBT potionNBT = compound.getCompound("PotionNBT");
+        CompoundNBT potionNBT = compound.getCompound("Potion");
         if (!potionNBT.isEmpty()) {
             dataManager.set(POTION_STACK, ItemStack.read(potionNBT));
         }
@@ -148,36 +146,38 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         if (!(blockState == Blocks.AIR.getDefaultState())) {
             dataManager.set(BLOCKSTATE, Optional.of(blockState));
         }
-        CompoundNBT fireworksNBT = compound.getCompound("FireworksNBT");
+        CompoundNBT fireworksNBT = compound.getCompound("Fireworks");
         if (!fireworksNBT.isEmpty()) {
-            fireworkLifetime = 6 * (fireworksNBT.getByte("Flight") + 1) + rand.nextInt(5);
-            dataManager.set(FIREWORKS_NBT, fireworksNBT);
+            ticksInAirMax = 6 * (fireworksNBT.getByte("Flight") + 1) + rand.nextInt(5);
+            dataManager.set(FIREWORKS, fireworksNBT);
         }
     }
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
         compound.putInt("TicksInAir", ticksInAir);
+        compound.putByte("FortuneLevel", (byte) fortuneLevel);
         compound.putByte("ExtraDamage", (byte) extraDamage);
         compound.putByte("ExplosionPower", (byte) explosionPower);
         compound.putByte("BouncesLeft", dataManager.get(BOUNCES_LEFT).byteValue());
-        compound.putBoolean("CanDestroyBlocks", canDestroyBlocks);
+        compound.putBoolean("HasSilkTouch", hasSilkTouch);
+        compound.putBoolean("ShouldDamageTerrain", shouldDamageTerrain);
         compound.putBoolean("IsFiery", dataManager.get(IS_FLAMING));
         compound.putBoolean("IsEnderPearl", dataManager.get(IS_ENDER_PEARL));
-        compound.putBoolean("HasBoneMeal", dataManager.get(HAS_BONE_MEAL));
-        compound.putBoolean("ReduceDamageToShooter", reduceDamageToShooter);
-        compound.put("FireworksNBT", dataManager.get(FIREWORKS_NBT));
-        compound.put("ArrowsNBT", arrowStack.write(new CompoundNBT()));
-        compound.put("PotionNBT", dataManager.get(POTION_STACK).write(new CompoundNBT()));
+        compound.putBoolean("IsBoneMeal", dataManager.get(IS_BONE_MEAL));
+        compound.putBoolean("ShouldDamageShooter", shouldDamageShooter);
+        compound.put("Fireworks", dataManager.get(FIREWORKS));
+        compound.put("Arrows", arrowStack.write(new CompoundNBT()));
+        compound.put("Potion", dataManager.get(POTION_STACK).write(new CompoundNBT()));
         compound.put("BlockState", NBTUtil.writeBlockState(dataManager.get(BLOCKSTATE).orElse(Blocks.AIR.getDefaultState())));
-        if (compound.hasUniqueId("ShootingEntityUUID")) {
-            shootingEntity = compound.getUniqueId("ShootingEntityUUID");
+        if (shootingEntity != null) {
+            compound.putUniqueId("ShootingEntity", shootingEntity);
         }
     }
 
     @Nullable
     public LivingEntity getShootingEntity() {
-        if (this.shootingEntity == null || !(world instanceof ServerWorld)) {
+        if (shootingEntity == null || !(world instanceof ServerWorld)) {
             return null;
         }
         Entity shootingEntity = ((ServerWorld) world).getEntityByUuid(this.shootingEntity);
@@ -206,17 +206,15 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         super.tick();
         LivingEntity shootingEntity = getShootingEntity();
 
-        if (dataManager.get(IS_ENDER_PEARL) && shootingEntity != null) {
-            if (!shootingEntity.isAlive()) {
-                dataManager.set(IS_ENDER_PEARL, false);
-            }
+        if (shootingEntity != null && !shootingEntity.isAlive() && dataManager.get(IS_ENDER_PEARL)) {
+            dataManager.set(IS_ENDER_PEARL, false);
         }
 
-        if (!dataManager.get(FIREWORKS_NBT).isEmpty() && !world.isRemote) {
+        if (!world.isRemote && !dataManager.get(FIREWORKS).isEmpty()) {
             if (ticksInAir == 0) {
                 world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.NEUTRAL, 2, 1);
             }
-            if (ticksInAir > fireworkLifetime) {
+            if (ticksInAir > ticksInAirMax) {
                 detonate(null);
             }
         }
@@ -231,7 +229,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         }
 
         Vec3d motion = getMotion();
-        if (dataManager.get(FIREWORKS_NBT).isEmpty()) {
+        if (dataManager.get(FIREWORKS).isEmpty()) {
             motion = motion.subtract(0, 0.08, 0);
             if (isInWater()) {
                 motion = motion.scale(0.9);
@@ -281,7 +279,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
     private void bounce(RayTraceResult rayTraceResult) {
         dataManager.set(BOUNCES_LEFT, dataManager.get(BOUNCES_LEFT) - 1);
-        world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1.0F, 1.0F);
+        world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1, 1);
         if (rayTraceResult instanceof BlockRayTraceResult) {
             Direction.Axis axis = ((BlockRayTraceResult) rayTraceResult).getFace().getAxis();
             Vec3d motion = getMotion();
@@ -293,7 +291,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                 setMotion(motion.x, motion.y, -motion.z * 0.75);
             }
             world.setEntityState(this, (byte) 100);
-            if (dataManager.get(HAS_BONE_MEAL) && !world.isRemote) {
+            if (!world.isRemote && dataManager.get(IS_BONE_MEAL)) {
                 // noinspection deprecation
                 if (BoneMealItem.applyBonemeal(new ItemStack(Items.BONE_MEAL), world, ((BlockRayTraceResult) rayTraceResult).getPos())) {
                     world.playEvent(2005, ((BlockRayTraceResult) rayTraceResult).getPos(), 0);
@@ -317,20 +315,20 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (explosionPower > 0) {
-                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && canDestroyBlocks, !reduceDamageToShooter, hasSilkTouch, fortuneLevel).detonate();
+                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && shouldDamageTerrain, !shouldDamageShooter, hasSilkTouch, fortuneLevel).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
                 world.playSound(null, posX, posY, posZ, getBlockState().getSoundType(world, new BlockPos(posX, posY, posZ), null).getBreakSound(), SoundCategory.NEUTRAL, 1, 1);
             }
 
-            if (dataManager.get(HAS_BONE_MEAL)) {
+            if (dataManager.get(IS_BONE_MEAL)) {
                 doBoneMealThings();
             }
 
             if (!dataManager.get(POTION_STACK).isEmpty() && (dataManager.get(POTION_STACK).getItem() == Items.SPLASH_POTION || dataManager.get(POTION_STACK).getItem() == Items.LINGERING_POTION)) {
                 doPotionThings(rayTraceResult);
             }
-            if (!dataManager.get(FIREWORKS_NBT).isEmpty()) {
+            if (!dataManager.get(FIREWORKS).isEmpty()) {
                 dealFireworkExplosionDamage();
                 world.setEntityState(this, (byte) 17);
             }
@@ -340,6 +338,9 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
     private void doEnderPearlThings(@Nullable RayTraceResult rayTraceResult) {
         LivingEntity shootingEntity = getShootingEntity();
+        if (shootingEntity == null || !shootingEntity.isAlive() || shootingEntity.dimension != dimension) {
+            return;
+        }
 
         if (rayTraceResult instanceof EntityRayTraceResult) {
             if (((EntityRayTraceResult) rayTraceResult).getEntity() == shootingEntity) {
@@ -352,7 +353,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
             world.addParticle(ParticleTypes.PORTAL, posX, posY + rand.nextDouble() * 2.0D, posZ, rand.nextGaussian(), 0.0D, rand.nextGaussian());
         }
 
-        if (!this.world.isRemote && shootingEntity != null) {
+        if (!world.isRemote) {
             teleportEntity(shootingEntity, posX, posY, posZ);
         }
     }
@@ -534,7 +535,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
     private void dealFireworkExplosionDamage() {
         int damageMultiplier = 0;
-        ListNBT explosions = dataManager.get(FIREWORKS_NBT).getList("Explosions", 10);
+        ListNBT explosions = dataManager.get(FIREWORKS).getList("Explosions", 10);
 
         if (!explosions.isEmpty()) {
             damageMultiplier = 5 + explosions.size() * 2;
@@ -562,19 +563,6 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         }
     }
 
-    @Override
-    @Nullable
-    public Entity changeDimension(DimensionType dimension) {
-        LivingEntity shootingEntity = getShootingEntity();
-
-        if (shootingEntity != null && shootingEntity.dimension != dimension) {
-            // prevent players from moving though dimensions with projectiles
-            dataManager.set(IS_ENDER_PEARL, false);
-        }
-
-        return super.changeDimension(dimension);
-    }
-
     private void spawnParticles() {
         if (world.isRemote) {
             if (isInWater()) {
@@ -593,10 +581,10 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                         spawnParticle(ParticleTypes.LARGE_SMOKE, 0.4, 0.3, 0);
                     }
                 }
-                if (!dataManager.get(FIREWORKS_NBT).isEmpty()) {
+                if (!dataManager.get(FIREWORKS).isEmpty()) {
                     world.addParticle(ParticleTypes.FIREWORK, posX, posY, posZ, rand.nextGaussian() * 0.05, -getMotion().getY() * 0.5, rand.nextGaussian() * 0.05);
                 }
-                if (dataManager.get(HAS_BONE_MEAL) && ticksExisted % 3 == 0) {
+                if (dataManager.get(IS_BONE_MEAL) && ticksExisted % 3 == 0) {
                     spawnParticle(ParticleTypes.HAPPY_VILLAGER, 0.1, 0, 0.02);
                 }
                 if (dataManager.get(IS_ENDER_PEARL)) {
@@ -621,7 +609,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     public void handleStatusUpdate(byte id) {
         switch (id) {
             case (17):
-                world.makeFireworks(posX, posY, posZ, getMotion().getX(), getMotion().getY(), getMotion().getZ(), dataManager.get(FIREWORKS_NBT));
+                world.makeFireworks(posX, posY, posZ, getMotion().getX(), getMotion().getY(), getMotion().getZ(), dataManager.get(FIREWORKS));
                 break;
             case (100):
                 for (int j = 0; j < 16; ++j) {
