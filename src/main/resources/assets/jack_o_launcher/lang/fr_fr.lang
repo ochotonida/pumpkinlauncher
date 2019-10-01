@@ -6,5 +6,20 @@
   "item.jack_o_launcher.jack_o_ammo.cannot_destroy_blocks": "Étouffée",
   "item.jack_o_launcher.jack_o_ammo.bounce": "Rebond",
   "item.jack_o_launcher.jack_o_ammo.lingering": "Persistante",
+  "item.jack_o_launcher.jack_o_ammo.bone_meal": "Fertilisante",
+  "item.jack_o_launcher.jack_o_ammo.ender_pearl": "Infusée d'Ender",
+  "item.jack_o_launcher.jack_o_ammo.extra_damage": "Shrapnel",
+  "item.jack_o_launcher.jack_o_ammo.arrows": "Flèches :",
+  "item.jack_o_launcher.jack_o_ammo.spectral": "Spectrale",
+  "enchantment.jack_o_launcher.unwasting": "Conservation",
+  "enchantment.jack_o_launcher.reloading": "Rechargement",
+  "enchantment.jack_o_launcher.blast_shield": "Écran protecteur",
+  "enchantment.jack_o_launcher.launching": "Projection",
+  "enchantment.jack_o_launcher.unwasting.desc": "Réduit les chances qu'une citrouille explosive soit consommée.",
+  "enchantment.jack_o_launcher.reloading.desc": "Réduit le temps de rechargement du lance-citrouilles.",
+  "enchantment.jack_o_launcher.blast_shield.desc": "Réduit massivement les dégâts d'explosion sur le tireur des citrouilles explosives.",
+  "enchantment.jack_o_launcher.launching.desc": "Augmente la vitesse et la précision des projectiles du lance-citrouilles.",
   "entity.jack_o_launcher.jack_o_projectile.name": "Citrouille explosive"
+  "death.attack.jack_o_launcher.jack_o_projectile_impact": "%s a été tué par une citrouille",
+  "death.attack.jack_o_launcher.jack_o_projectile_impact.player": "%1$s a été tué par la citrouille de %2$s"
 }
