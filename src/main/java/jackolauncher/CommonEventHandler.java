@@ -25,6 +25,5 @@ public class CommonEventHandler {
             LootPool pool = LootPool.builder().addEntry(entry).build();
             event.getTable().addPool(pool);
         }
-        System.out.println(event.getName());
     }
 }
