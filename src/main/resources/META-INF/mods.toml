@@ -9,7 +9,7 @@ authors="ochotonida"
 
 [[mods]]
 modId="jack_o_launcher"
-version="1.14.4-1.2.0"
+version="1.14.4-1.2.1"
 displayName="Jack-O'-Launcher"
 updateJSONURL="https://raw.githubusercontent.com/ochotonida/pumpkinlauncher/1.14/update.json"
 description='''Exploding jack-o'-lanterns and stuff'''
