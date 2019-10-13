@@ -25,7 +25,7 @@
     "1.14.4-0.1.0": "ported to 1.14.4,\noverhauled jack o'ammo texture",
     "1.14.4-1.0.0": "reduced maximum amount of bounces to 1 due to inconsistent bounce behaviour,\nlaunching enchantment now also increases accuracy",
     "1.14.4-1.1.0": "gold nuggets and feathers can now be used to add fortune and silk touch to jack o'ammo,\nrecipes now use the tag system",
-    "1.14.4-1.2.0": "randomly generated jack o'ammo now spawns in dungeons, buried treasure and jungle temples,\njack o'launchers can now spawn in weaponsmith village chests"
+    "1.14.4-1.2.0": "randomly generated jack o'ammo now spawns in dungeons, buried treasure and jungle temples,\njack o'launchers can now spawn in weaponsmith village chests",
     "1.14.4-1.2.1": "updated french translations (thanks lykrast),\nfixed a potential compatibility issue"
   },
   "promos": {
