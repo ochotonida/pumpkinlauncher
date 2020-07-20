@@ -72,7 +72,7 @@ public class SetRandomJackOAmmoNBT extends LootFunction {
         }
         explosionCompound.putIntArray("FadeColors", colors);
 
-        explosionCompound.putByte("Type", (byte) FireworkRocketItem.Shape.values()[random.nextInt(FireworkRocketItem.Shape.values().length)].func_196071_a());
+        explosionCompound.putByte("Type", (byte) FireworkRocketItem.Shape.values()[random.nextInt(FireworkRocketItem.Shape.values().length)].getIndex());
 
         ListNBT explosions = new ListNBT();
         explosions.add(explosionCompound);
@@ -164,5 +164,4 @@ public class SetRandomJackOAmmoNBT extends LootFunction {
             return new SetRandomJackOAmmoNBT(conditions);
         }
     }
-
 }

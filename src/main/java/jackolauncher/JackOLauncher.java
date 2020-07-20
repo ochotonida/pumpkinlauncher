@@ -39,7 +39,7 @@ public class JackOLauncher {
     public static final Item JACK_O_LAUNCHER = new JackOLauncherItem();
     public static final Item JACK_O_AMMO = new JackOAmmoItem();
 
-    public static final EntityType<JackOProjectileEntity> JACK_O_PROJECTILE_ENTITY_TYPE = createEntity();
+    public static final EntityType<JackOProjectileEntity> JACK_O_PROJECTILE = createEntity();
 
     public static final SpecialRecipeSerializer<JackOAmmoRecipe> JACK_O_AMMO_RECIPE_SERIALIZER = new SpecialRecipeSerializer<>(JackOAmmoRecipe::new);
 
@@ -66,7 +66,7 @@ public class JackOLauncher {
 
     @SubscribeEvent
     public static void registerEntity(RegistryEvent.Register<EntityType<?>> event) {
-        event.getRegistry().register(JACK_O_PROJECTILE_ENTITY_TYPE);
+        event.getRegistry().register(JACK_O_PROJECTILE);
     }
 
     @SubscribeEvent
@@ -87,6 +87,6 @@ public class JackOLauncher {
 
     @SubscribeEvent
     public static void registerEntityRenderer(ModelRegistryEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(JackOProjectileEntity.class, JackOProjectileRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(JACK_O_PROJECTILE, JackOProjectileRenderer::new);
     }
 }

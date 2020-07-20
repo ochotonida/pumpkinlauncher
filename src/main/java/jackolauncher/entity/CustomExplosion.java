@@ -84,9 +84,9 @@ public class CustomExplosion extends Explosion {
                     clearAffectedBlockPositions();
                 }
 
-                for (PlayerEntity entityplayer : world.getPlayers()) {
-                    if (entityplayer.getDistanceSq(x, y, z) < 4096) {
-                        ((ServerPlayerEntity) entityplayer).connection.sendPacket(new SExplosionPacket(x, y, z, explosionPower, getAffectedBlockPositions(), getPlayerKnockbackMap().get(entityplayer)));
+                for (PlayerEntity player : world.getPlayers()) {
+                    if (player.getDistanceSq(x, y, z) < 4096) {
+                        ((ServerPlayerEntity) player).connection.sendPacket(new SExplosionPacket(x, y, z, explosionPower, getAffectedBlockPositions(), getPlayerKnockbackMap().get(player)));
                     }
                 }
             } else {
@@ -169,16 +169,16 @@ public class CustomExplosion extends Explosion {
                 double relativeDistance = entity.getDistanceSq(x, y, z) / explosionPower;
 
                 if (relativeDistance <= 1) {
-                    double distanceX = entity.posX - x;
-                    double distanceY = entity.posY + entity.getEyeHeight() - y;
-                    double distanceZ = entity.posZ - z;
+                    double distanceX = entity.getPosX() - x;
+                    double distanceY = entity.getPosY() + entity.getEyeHeight() - y;
+                    double distanceZ = entity.getPosZ() - z;
                     double distance = MathHelper.sqrt(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ);
 
                     if (distance != 0) {
                         distanceX = distanceX / distance;
                         distanceY = distanceY / distance;
                         distanceZ = distanceZ / distance;
-                        double blockDensity = func_222259_a(vec3d, entity);
+                        double blockDensity = getBlockDensity(vec3d, entity);
                         double damageMultiplier = (1 - relativeDistance) * blockDensity;
                         damageMultiplier = damageMultiplier * damageMultiplier + damageMultiplier;
                         if (entity == shootingEntity && !shouldDamageShooter) {
@@ -194,10 +194,10 @@ public class CustomExplosion extends Explosion {
                         entity.setMotion(entity.getMotion().add(new Vec3d(distanceX, distanceY, distanceZ).scale(knockbackMultiplier)));
 
                         if (entity instanceof PlayerEntity) {
-                            PlayerEntity entityplayer = (PlayerEntity) entity;
+                            PlayerEntity player = (PlayerEntity) entity;
 
-                            if (!entityplayer.isSpectator() && (!entityplayer.isCreative() || !entityplayer.abilities.isFlying)) {
-                                getPlayerKnockbackMap().put(entityplayer, new Vec3d(distanceX * damageMultiplier, distanceY * damageMultiplier, distanceZ * damageMultiplier));
+                            if (!player.isSpectator() && (!player.isCreative() || !player.abilities.isFlying)) {
+                                getPlayerKnockbackMap().put(player, new Vec3d(distanceX * damageMultiplier, distanceY * damageMultiplier, distanceZ * damageMultiplier));
                             }
                         }
                     }
@@ -217,21 +217,25 @@ public class CustomExplosion extends Explosion {
         if (shouldDamageTerrain) {
 
             for (BlockPos pos : getAffectedBlockPositions()) {
-                BlockState blockstate = world.getBlockState(pos);
+                BlockState state = world.getBlockState(pos);
 
                 if (spawnParticles) {
                     spawnParticles(pos);
                 }
 
-                if (!blockstate.isAir(this.world, pos)) {
-                    if (this.world instanceof ServerWorld && blockstate.canDropFromExplosion(world, pos, this)) {
-                        TileEntity tileentity = blockstate.hasTileEntity() ? world.getTileEntity(pos) : null;
-                        LootContext.Builder builder = (new LootContext.Builder((ServerWorld) world)).withRandom(world.rand).withParameter(LootParameters.POSITION, pos).withParameter(LootParameters.TOOL, tool).withNullableParameter(LootParameters.BLOCK_ENTITY, tileentity);
+                if (!state.isAir(this.world, pos)) {
+                    if (this.world instanceof ServerWorld && state.canDropFromExplosion(world, pos, this)) {
+                        TileEntity tileentity = state.hasTileEntity() ? world.getTileEntity(pos) : null;
+                        LootContext.Builder builder = new LootContext.Builder((ServerWorld) world)
+                                .withRandom(world.rand)
+                                .withParameter(LootParameters.POSITION, pos)
+                                .withParameter(LootParameters.TOOL, tool)
+                                .withNullableParameter(LootParameters.BLOCK_ENTITY, tileentity);
 
-                        Block.spawnDrops(blockstate, builder);
+                        state.getDrops(builder).forEach((stack) -> Block.spawnAsEntity(world, pos, stack));
                     }
 
-                    blockstate.onBlockExploded(world, pos, this);
+                    state.onBlockExploded(world, pos, this);
                 }
             }
         }
@@ -246,12 +250,12 @@ public class CustomExplosion extends Explosion {
     }
 
     protected void spawnParticles(BlockPos pos) {
-        double xCoord = pos.getX() + world.rand.nextFloat();
-        double yCoord = pos.getY() + world.rand.nextFloat();
-        double zCoord = pos.getZ() + world.rand.nextFloat();
-        double xSpeed = xCoord - x;
-        double ySpeed = yCoord - y;
-        double zSpeed = zCoord - z;
+        double posX = pos.getX() + world.rand.nextFloat();
+        double posY = pos.getY() + world.rand.nextFloat();
+        double posZ = pos.getZ() + world.rand.nextFloat();
+        double xSpeed = posX - x;
+        double ySpeed = posY - y;
+        double zSpeed = posZ - z;
         double speed = MathHelper.sqrt(xSpeed * xSpeed + ySpeed * ySpeed + zSpeed * zSpeed);
         xSpeed = xSpeed / speed;
         ySpeed = ySpeed / speed;
@@ -261,8 +265,8 @@ public class CustomExplosion extends Explosion {
         xSpeed = xSpeed * speedMultiplier;
         ySpeed = ySpeed * speedMultiplier;
         zSpeed = zSpeed * speedMultiplier;
-        world.addParticle(ParticleTypes.POOF, (xCoord + x) / 2, (yCoord + y) / 2, (zCoord + z) / 2, xSpeed, ySpeed, zSpeed);
-        world.addParticle(ParticleTypes.SMOKE, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed);
+        world.addParticle(ParticleTypes.POOF, (posX + x) / 2, (posY + y) / 2, (posZ + z) / 2, xSpeed, ySpeed, zSpeed);
+        world.addParticle(ParticleTypes.SMOKE, posX, posY, posZ, xSpeed, ySpeed, zSpeed);
     }
 
     protected void spawnParticles() {

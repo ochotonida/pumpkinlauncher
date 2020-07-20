@@ -10,28 +10,24 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.14.4-1.2.1'
+version = '1.15.2-1.2.1'
 group = 'jack_o_launcher'
 archivesBaseName = 'Jack-O\'-Launcher'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190903-1.14.3'
+    mappings channel: 'snapshot', version: '20200720-1.15.1'
 
     runs {
         client = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
+            properties 'forge.logging.markers': ''
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
         }
         server = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
+            properties 'forge.logging.markers': ''
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
@@ -46,9 +42,9 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.44'
-    compileOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.11:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.11")
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.31'
+    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.2.12:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.2.12")
 }
 
 jar {

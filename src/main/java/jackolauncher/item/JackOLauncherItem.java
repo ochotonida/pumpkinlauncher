@@ -68,12 +68,12 @@ public class JackOLauncherItem extends Item {
                     stack.shrink(1);
                 }
             }
-            world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
+            world.playSound(player, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.NEUTRAL, 1.0F, 0.6F);
             player.getHeldItem(hand).damageItem(1, player, (entity) -> entity.sendBreakAnimation(hand));
             return new ActionResult<>(ActionResultType.SUCCESS, player.getHeldItem(hand));
         } else {
             if (!world.isRemote) {
-                world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.NEUTRAL, 1.0F, 1.2F);
+                world.playSound(null, player.getPosX(), player.getPosY(), player.getPosZ(), SoundEvents.BLOCK_DISPENSER_FAIL, SoundCategory.NEUTRAL, 1.0F, 1.2F);
             }
             return new ActionResult<>(ActionResultType.FAIL, player.getHeldItem(hand));
         }

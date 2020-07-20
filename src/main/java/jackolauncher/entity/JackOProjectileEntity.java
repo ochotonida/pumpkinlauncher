@@ -74,7 +74,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     }
 
     public JackOProjectileEntity(World world) {
-        this(JackOLauncher.JACK_O_PROJECTILE_ENTITY_TYPE, world);
+        this(JackOLauncher.JACK_O_PROJECTILE, world);
     }
 
     public JackOProjectileEntity(World world, double x, double y, double z, CompoundNBT ammoProperties) {
@@ -84,7 +84,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     }
 
     public JackOProjectileEntity(World world, LivingEntity shootingEntity, CompoundNBT ammoProperties, boolean shouldDamageShooter) {
-        this(world, shootingEntity.posX, shootingEntity.posY + shootingEntity.getEyeHeight() - 0.8 / 2, shootingEntity.posZ, ammoProperties);
+        this(world, shootingEntity.getPosX(), shootingEntity.getPosY() + shootingEntity.getEyeHeight() - 0.8 / 2, shootingEntity.getPosZ(), ammoProperties);
         this.shootingEntity = shootingEntity.getUniqueID();
         this.shouldDamageShooter = shouldDamageShooter;
     }
@@ -212,7 +212,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
         if (!world.isRemote && !dataManager.get(FIREWORKS).isEmpty()) {
             if (ticksInAir == 0) {
-                world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.NEUTRAL, 2, 1);
+                world.playSound(null, getPosX(), getPosY(), getPosZ(), SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.NEUTRAL, 2, 1);
             }
             if (ticksInAir > ticksInAirMax) {
                 detonate(null);
@@ -222,8 +222,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         ++ticksInAir;
         spawnParticles();
 
-        RayTraceResult rayTraceResult = ProjectileHelper.func_221266_a(this, true, ticksInAir >= 5, shootingEntity, RayTraceContext.BlockMode.COLLIDER);
-        //noinspection ConstantConditions
+        RayTraceResult rayTraceResult = ProjectileHelper.rayTrace(this, true, ticksInAir >= 5, shootingEntity, RayTraceContext.BlockMode.COLLIDER);
         if (rayTraceResult.getType() != RayTraceResult.Type.MISS && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, rayTraceResult)) {
             onImpact(rayTraceResult);
         }
@@ -236,12 +235,8 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
             }
         }
         setMotion(motion);
-
-        posX += motion.x;
-        posY += motion.y;
-        posZ += motion.z;
-
-        setPosition(posX, posY, posZ);
+        Vec3d position = getPositionVec().add(motion);
+        setPosition(position.x, position.y, position.z);
 
         doBlockCollisions();
     }
@@ -279,7 +274,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
     private void bounce(RayTraceResult rayTraceResult) {
         dataManager.set(BOUNCES_LEFT, dataManager.get(BOUNCES_LEFT) - 1);
-        world.playSound(null, posX, posY, posZ, SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1, 1);
+        world.playSound(null, getPosX(), getPosY(), getPosZ(), SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.NEUTRAL, 1, 1);
         if (rayTraceResult instanceof BlockRayTraceResult) {
             Direction.Axis axis = ((BlockRayTraceResult) rayTraceResult).getFace().getAxis();
             Vec3d motion = getMotion();
@@ -315,10 +310,10 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
 
             boolean canMobGrief = shootingEntity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, shootingEntity);
             if (explosionPower > 0) {
-                new CustomExplosion(world, this, shootingEntity, posX, posY, posZ, (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && shouldDamageTerrain, !shouldDamageShooter, hasSilkTouch, fortuneLevel).detonate();
+                new CustomExplosion(world, this, shootingEntity, getPosX(), getPosY(), getPosZ(), (explosionPower + 2) / 2.25F, extraDamage, canMobGrief && dataManager.get(IS_FLAMING), canMobGrief && shouldDamageTerrain, !shouldDamageShooter, hasSilkTouch, fortuneLevel).detonate();
             } else {
                 world.setEntityState(this, (byte) 101);
-                world.playSound(null, posX, posY, posZ, getBlockState().getSoundType(world, new BlockPos(posX, posY, posZ), null).getBreakSound(), SoundCategory.NEUTRAL, 1, 1);
+                world.playSound(null, getPosX(), getPosY(), getPosZ(), getBlockState().getSoundType(world, getPosition(), null).getBreakSound(), SoundCategory.NEUTRAL, 1, 1);
             }
 
             if (dataManager.get(IS_BONE_MEAL)) {
@@ -350,19 +345,19 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         }
 
         for (int i = 0; i < 32; ++i) {
-            world.addParticle(ParticleTypes.PORTAL, posX, posY + rand.nextDouble() * 2.0D, posZ, rand.nextGaussian(), 0.0D, rand.nextGaussian());
+            world.addParticle(ParticleTypes.PORTAL, getPosX(), getPosY() + rand.nextDouble() * 2.0D, getPosZ(), rand.nextGaussian(), 0.0D, rand.nextGaussian());
         }
 
         if (!world.isRemote) {
-            teleportEntity(shootingEntity, posX, posY, posZ);
+            teleportEntity(shootingEntity, getPosX(), getPosY(), getPosZ());
         }
     }
 
     private void teleportEntity(LivingEntity entity, double posX, double posY, double posZ) {
         if (entity instanceof ServerPlayerEntity) {
-            ServerPlayerEntity entityplayermp = (ServerPlayerEntity) entity;
+            ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
-            if (entityplayermp.connection.getNetworkManager().isChannelOpen() && entityplayermp.world == world && !entityplayermp.isSleeping()) {
+            if (player.connection.getNetworkManager().isChannelOpen() && player.world == world && !player.isSleeping()) {
                 entity.stopRiding();
                 entity.setPositionAndUpdate(posX, posY, posZ);
                 entity.fallDistance = 0;
@@ -387,9 +382,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                 }
                 arrow = ((ArrowItem) arrowStack.getItem()).createArrow(world, arrowStack, FakePlayerFactory.getMinecraft((ServerWorld) world));
             }
-            arrow.posX = posX;
-            arrow.posY = posY;
-            arrow.posZ = posZ;
+            arrow.setPosition(getPosX(), getPosY(), getPosZ());
             arrow.pickupStatus = ArrowEntity.PickupStatus.CREATIVE_ONLY;
             arrow.setDamage(arrow.getDamage() * 2.5);
             if (shootingEntity != null) {
@@ -419,7 +412,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     }
 
     private void doBoneMealThings() {
-        BlockPos.getAllInBox((int) (posX + 0.5) - 5, (int) (posY + 0.5) - 5, (int) (posZ + 0.5) - 5, (int) (posX + 0.5) + 5, (int) (posY + 0.5) + 5, (int) (posZ + 0.5) + 5).forEach(pos -> {
+        BlockPos.getAllInBox((int) (getPosX() + 0.5) - 5, (int) (getPosY() + 0.5) - 5, (int) (getPosZ() + 0.5) - 5, (int) (getPosX() + 0.5) + 5, (int) (getPosY() + 0.5) + 5, (int) (getPosZ() + 0.5) + 5).forEach(pos -> {
             // noinspection deprecation
             if (rand.nextInt(8) == 0 && BoneMealItem.applyBonemeal(new ItemStack(Items.BONE_MEAL), world, pos)) {
                 world.playEvent(2005, pos, 0);
@@ -473,11 +466,11 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         AxisAlignedBB axisalignedbb = getBoundingBox().grow(5, 3, 5);
         List<LivingEntity> list = world.getEntitiesWithinAABB(LivingEntity.class, axisalignedbb, PotionEntity.WATER_SENSITIVE);
         if (!list.isEmpty()) {
-            for (LivingEntity entitylivingbase : list) {
-                double distance = getDistanceSq(entitylivingbase);
+            for (LivingEntity entity : list) {
+                double distance = getDistanceSq(entity);
 
-                if (distance < 16.0D && (entitylivingbase instanceof EndermanEntity || entitylivingbase instanceof BlazeEntity)) {
-                    entitylivingbase.attackEntityFrom(DamageSource.DROWN, 1);
+                if (distance < 16.0D && (entity instanceof EndermanEntity || entity instanceof BlazeEntity)) {
+                    entity.attackEntityFrom(DamageSource.DROWN, 1);
                 }
             }
         }
@@ -513,7 +506,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     }
 
     private void makeAreaOfEffectCloud(ItemStack stack, Potion potion) {
-        AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(world, posX, posY, posZ);
+        AreaEffectCloudEntity effectCloud = new AreaEffectCloudEntity(world, getPosX(), getPosY(), getPosZ());
         effectCloud.setOwner(getShootingEntity());
         effectCloud.setRadius(3.2F);
         effectCloud.setRadiusOnUse(-0.4F);
@@ -542,13 +535,13 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         }
 
         if (damageMultiplier > 0) {
-            Vec3d posVec = new Vec3d(posX, posY, posZ);
+            Vec3d posVec = new Vec3d(getPosX(), getPosY(), getPosZ());
 
             for (LivingEntity entity : world.getEntitiesWithinAABB(LivingEntity.class, this.getBoundingBox().grow(5))) {
                 if (getDistanceSq(entity) <= 25) {
                     boolean flag = false;
                     for (int i = 0; i < 2; ++i) {
-                        RayTraceResult raytraceresult = world.rayTraceBlocks(new RayTraceContext(posVec, new Vec3d(entity.posX, entity.posY + entity.getHeight() * 0.5 * i, entity.posZ), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
+                        RayTraceResult raytraceresult = world.rayTraceBlocks(new RayTraceContext(posVec, new Vec3d(entity.getPosX(), entity.getPosY() + entity.getHeight() * 0.5 * i, entity.getPosZ()), RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, this));
                         if (raytraceresult.getType() == RayTraceResult.Type.MISS) {
                             flag = true;
                             break;
@@ -567,7 +560,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
         if (world.isRemote) {
             if (isInWater()) {
                 for (int i = 0; i < 4; ++i) {
-                    world.addParticle(ParticleTypes.BUBBLE, posX - getMotion().getX() * 0.25, posY - getMotion().getY() * 0.25, posZ - getMotion().getZ() * 0.25, getMotion().getX(), getMotion().getY(), getMotion().getZ());
+                    world.addParticle(ParticleTypes.BUBBLE, getPosX() - getMotion().getX() * 0.25, getPosY() - getMotion().getY() * 0.25, getPosZ() - getMotion().getZ() * 0.25, getMotion().getX(), getMotion().getY(), getMotion().getZ());
                 }
             } else {
                 if (dataManager.get(IS_FLAMING)) {
@@ -582,7 +575,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                     }
                 }
                 if (!dataManager.get(FIREWORKS).isEmpty()) {
-                    world.addParticle(ParticleTypes.FIREWORK, posX, posY, posZ, rand.nextGaussian() * 0.05, -getMotion().getY() * 0.5, rand.nextGaussian() * 0.05);
+                    world.addParticle(ParticleTypes.FIREWORK, getPosX(), getPosY(), getPosZ(), rand.nextGaussian() * 0.05, -getMotion().getY() * 0.5, rand.nextGaussian() * 0.05);
                 }
                 if (dataManager.get(IS_BONE_MEAL) && ticksExisted % 3 == 0) {
                     spawnParticle(ParticleTypes.HAPPY_VILLAGER, 0.1, 0, 0.02);
@@ -593,7 +586,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                 if (!dataManager.get(POTION_STACK).isEmpty()) {
                     int color = PotionUtils.getColor(dataManager.get(POTION_STACK));
                     if (color > 0) {
-                        world.addOptionalParticle(ParticleTypes.ENTITY_EFFECT, posX + (rand.nextDouble() - 0.5) * getWidth(), posY + rand.nextDouble() * getHeight(), posZ + (rand.nextDouble() - 0.5) * getWidth(), (color >> 16 & 255) / 255D, (color >> 8 & 255) / 255D, (color & 255) / 255D);
+                        world.addOptionalParticle(ParticleTypes.ENTITY_EFFECT, getPosX() + (rand.nextDouble() - 0.5) * getWidth(), getPosY() + rand.nextDouble() * getHeight(), getPosZ() + (rand.nextDouble() - 0.5) * getWidth(), (color >> 16 & 255) / 255D, (color >> 8 & 255) / 255D, (color & 255) / 255D);
                     }
                 }
             }
@@ -601,7 +594,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     }
 
     private void spawnParticle(IParticleData particle, double spreadMultiplier, double motionMultiplier, double motionSpreadMultiplier) {
-        world.addParticle(particle, posX + rand.nextGaussian() * spreadMultiplier, posY + rand.nextGaussian() * spreadMultiplier + 0.5, posZ + rand.nextGaussian() * spreadMultiplier, getMotion().getX() * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier, getMotion().getY() * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier, getMotion().getZ() * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier);
+        world.addParticle(particle, getPosX() + rand.nextGaussian() * spreadMultiplier, getPosY() + rand.nextGaussian() * spreadMultiplier + 0.5, getPosZ() + rand.nextGaussian() * spreadMultiplier, getMotion().getX() * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier, getMotion().getY() * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier, getMotion().getZ() * motionMultiplier + rand.nextGaussian() * motionSpreadMultiplier);
     }
 
     @Override
@@ -609,7 +602,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
     public void handleStatusUpdate(byte id) {
         switch (id) {
             case (17):
-                world.makeFireworks(posX, posY, posZ, getMotion().getX(), getMotion().getY(), getMotion().getZ(), dataManager.get(FIREWORKS));
+                world.makeFireworks(getPosX(), getPosY(), getPosZ(), getMotion().getX(), getMotion().getY(), getMotion().getZ(), dataManager.get(FIREWORKS));
                 break;
             case (100):
                 for (int j = 0; j < 16; ++j) {
@@ -619,7 +612,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                     float x = MathHelper.sin(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float z = MathHelper.cos(rotationY) * distance;
-                    world.addParticle(ParticleTypes.ITEM_SLIME, posX + x, posY + y, posZ + z, 0, 0, 0);
+                    world.addParticle(ParticleTypes.ITEM_SLIME, getPosX() + x, getPosY() + y, getPosZ() + z, 0, 0, 0);
                 }
                 break;
             case (101):
@@ -630,7 +623,7 @@ public class JackOProjectileEntity extends Entity implements IProjectile {
                     float x = MathHelper.sin(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float y = MathHelper.cos(rotationXZ) * MathHelper.sin(rotationY) * distance;
                     float z = MathHelper.cos(rotationY) * distance;
-                    world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, getBlockState()), posX + x, posY + y, posZ + z, 0, 0, 0);
+                    world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, getBlockState()), getPosX() + x, getPosY() + y, getPosZ() + z, 0, 0, 0);
                 }
                 break;
             default:
